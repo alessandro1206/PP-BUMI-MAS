@@ -1,0 +1,214 @@
+"""
+=============================================================================
+PP BUMI MAS ERP - Server OCR Nopol CCTV TP-Link (Local POS API)
+=============================================================================
+Skrip Python ini berfungsi sebagai microservice lokal untuk mengambil foto 1 frame 
+dari stream CCTV RTSP TP-Link di pos timbangan dan membaca Plat Nomor Polisi (Nopol) 
+armada truk menggunakan PaddleOCR.
+
+Persyaratan Library Python:
+  pip install flask flask-cors opencv-python paddlepaddle paddleocr numpy
+
+Cara menjalankan di komputer Pos Timbangan:
+  python server_cctv.py
+
+Endpoint API:
+  GET  http://localhost:5000/scan-nopol
+  POST http://localhost:5000/scan-nopol
+=============================================================================
+"""
+
+import os
+import re
+import sys
+import logging
+import numpy as np
+import cv2
+from flask import Flask, jsonify, request
+from flask_cors import CORS
+
+# Setup logging
+logging.basicConfig(level=logging.INFO, format='[%(asctime)s] %(levelname)s: %(message)s')
+logger = logging.getLogger("CCTV_OCR_Server")
+
+app = Flask(__name__)
+CORS(app)  # Izinkan CORS agar website ERP (Vite / localhost) bisa akses API port 5000
+
+# =============================================================================
+# KONFIGURASI CCTV TP-LINK & PADDLEOCR
+# =============================================================================
+# RTSP URL CCTV TP-Link (Tapo / VIGI)
+# Format RTSP TP-Link Tapo: rtsp://username:password@IP_CCTV:554/stream1
+# Format RTSP TP-Link VIGI: rtsp://username:password@IP_CCTV:554/h264/ch1/main/av_stream
+RTSP_URL = os.getenv("CCTV_RTSP_URL", "rtsp://admin:admin123@192.168.1.60:554/stream1")
+
+# Fallback ke webcam USB jika RTSP gagal / mode testing (0 = default webcam)
+FALLBACK_TO_WEBCAM = os.getenv("FALLBACK_TO_WEBCAM", "true").lower() == "true"
+
+# Inisialisasi PaddleOCR (CPU mode secara bawaan agar kompatibel di semua PC Pos)
+logger.info("Menginisialisasi PaddleOCR Engine...")
+try:
+    from paddleocr import PaddleOCR
+    # lang='en' atau 'id' bagus untuk karakter huruf & angka latin
+    ocr_engine = PaddleOCR(use_angle_cls=True, lang='en', show_log=False, use_gpu=False)
+    logger.info("PaddleOCR Engine berhasil dimuat!")
+except Exception as e:
+    logger.error(f"Gagal memuat PaddleOCR: {e}")
+    ocr_engine = None
+
+
+# =============================================================================
+# HELPER FUNCTIONS
+# =============================================================================
+def clean_nopol_text(text_list):
+    """
+    Ekstrak & format teks plat nomor Indonesia dari hasil deteksi PaddleOCR.
+    Format Plat Nomor: 1-2 Huruf (Kode Wilayah) + 1-4 Angka + 1-3 Huruf (Seri)
+    Contoh: L 9482 UB, B 1234 XYZ, N 888 AB, W 1020 A
+    """
+    nopol_pattern = re.compile(r'\b([A-Z]{1,2})\s*(\d{1,4})\s*([A-Z]{1,3})\b', re.IGNORECASE)
+
+    for item in text_list:
+        raw_str = item.strip().upper()
+        # Bersihkan karakter aneh
+        cleaned = re.sub(r'[^A-Z0-9\s]', '', raw_str)
+        
+        match = nopol_pattern.search(cleaned)
+        if match:
+            kode_wilayah = match.group(1).upper()
+            angka = match.group(2)
+            seri = match.group(3).upper()
+            return f"{kode_wilayah} {angka} {seri}"
+
+    # Jika pola baku tidak ketemu, coba gabungkan teks angka dan huruf terdeteksi
+    combined = " ".join(text_list).upper()
+    match = nopol_pattern.search(combined)
+    if match:
+        return f"{match.group(1)} {match.group(2)} {match.group(3)}"
+
+    return ""
+
+
+def capture_frame_from_cctv():
+    """
+    Membuka stream RTSP CCTV TP-Link dan mengambil 1 frame foto terbaru.
+    """
+    logger.info(f"Membuka RTSP Stream CCTV: {RTSP_URL}")
+    cap = cv2.VideoCapture(RTSP_URL)
+    
+    # Set buffer size terkecil agar tidak terjadi delay/lag snapshot
+    cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
+
+    if not cap.isOpened():
+        logger.warning("Stream RTSP CCTV tidak dapat dibuka!")
+        cap.release()
+        
+        if FALLBACK_TO_WEBCAM:
+            logger.info("Mencoba fallback ke Webcam USB lokal (device 0)...")
+            cap = cv2.VideoCapture(0)
+            if not cap.isOpened():
+                cap.release()
+                return None, "Gagal terhubung ke CCTV RTSP dan Webcam USB"
+
+    # Buang beberapa frame awal buffer untuk dapatkan frame terbaru (fresh photo)
+    for _ in range(3):
+        cap.read()
+
+    ret, frame = cap.read()
+    cap.release()
+
+    if not ret or frame is None:
+        return None, "Gagal mengambil frame foto dari kamera"
+
+    return frame, None
+
+
+# =============================================================================
+# ENDPOINT API
+# =============================================================================
+@app.route("/", methods=["GET"])
+def health_check():
+    return jsonify({
+        "status": "ONLINE",
+        "service": "PP Bumi Mas CCTV OCR Nopol Service",
+        "rtsp_url": RTSP_URL,
+        "ocr_loaded": ocr_engine is not None
+    })
+
+
+@app.route("/scan-nopol", methods=["GET", "POST"])
+def scan_nopol():
+    """
+    Endpoint utama yang dipanggil oleh tombol [ SCAN NOPOL CCTV ] di website ERP.
+    """
+    logger.info("Menerima permintaan scan Nopol CCTV...")
+
+    if ocr_engine is None:
+        return jsonify({
+            "success": False,
+            "nopol": "",
+            "message": "Engine PaddleOCR belum terpasang atau gagal dimuat di server Python."
+        }), 500
+
+    # 1. Ambil 1 frame foto dari CCTV
+    frame, err_msg = capture_frame_from_cctv()
+    if err_msg or frame is None:
+        logger.error(f"Capture error: {err_msg}")
+        return jsonify({
+            "success": False,
+            "nopol": "",
+            "message": f"Gagal membaca CCTV: {err_msg}. Periksa koneksi RTSP IP camera."
+        }), 500
+
+    # 2. Proses foto dengan PaddleOCR
+    try:
+        # PaddleOCR menerima array OpenCV BGR / RGB
+        result = ocr_engine.ocr(frame, cls=True)
+
+        detected_texts = []
+        if result and len(result) > 0 and result[0] is not None:
+            for line in result[0]:
+                text = line[1][0]
+                confidence = line[1][1]
+                logger.info(f"Detected Text: '{text}' (Conf: {confidence:.2f})")
+                detected_texts.append(text)
+
+        # 3. Ekstrak format Plat Nopol dari teks terdeteksi
+        nopol_result = clean_nopol_text(detected_texts)
+
+        if nopol_result:
+            logger.info(f"✅ Nopol Terdeteksi: {nopol_result}")
+            return jsonify({
+                "success": True,
+                "nopol": nopol_result,
+                "raw_texts": detected_texts,
+                "message": "Nopol berhasil dibaca dari CCTV"
+            })
+        else:
+            raw_concat = ", ".join(detected_texts) if detected_texts else "Tidak ada teks terdeteksi"
+            logger.warning(f"❌ Nopol tidak terdeteksi. Teks mentah: {raw_concat}")
+            return jsonify({
+                "success": False,
+                "nopol": "",
+                "raw_texts": detected_texts,
+                "message": f"Plat Nopol tidak terbaca dengan jelas. Teks terdeteksi: '{raw_concat}'"
+            }), 200
+
+    except Exception as e:
+        logger.error(f"Error saat proses OCR: {e}")
+        return jsonify({
+            "success": False,
+            "nopol": "",
+            "message": f"Terjadi kesalahan pada OCR: {str(e)}"
+        }), 500
+
+
+if __name__ == "__main__":
+    print("\n" + "="*70)
+    print(" 🚀 PP BUMI MAS ERP - SERVER CCTV OCR NOPOL")
+    print(" Port: 5000")
+    print(" Endpoint API: http://localhost:5000/scan-nopol")
+    print(" Press Ctrl+C to stop server")
+    print("="*70 + "\n")
+
+    app.run(host="0.0.0.0", port=5000, debug=False)
