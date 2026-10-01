@@ -17,9 +17,16 @@ import {
   Clock, 
   History, 
   X,
-  Check
+  Check,
+  Settings,
+  Terminal,
+  Activity,
+  Radio,
+  Wifi,
+  WifiOff
 } from 'lucide-react';
 import { StapelAllocationItem } from '../types';
+
 
 export const Admin1WeighbridgeScreen: React.FC = () => {
   const { 
@@ -57,7 +64,7 @@ export const Admin1WeighbridgeScreen: React.FC = () => {
   }, []);
 
   // -------------------------------------------------------------
-  // COM Port RS232 & Live Weight State
+  // COM Port RS232, Indicator Protocol & Diagnostics
   // -------------------------------------------------------------
   const [comPortConnected, setComPortConnected] = useState<boolean>(false);
   const [isSimulatedCom, setIsSimulatedCom] = useState<boolean>(false);
@@ -67,91 +74,178 @@ export const Admin1WeighbridgeScreen: React.FC = () => {
   const [isScaleStable, setIsScaleStable] = useState<boolean>(true);
   const [simWeightInput, setSimWeightInput] = useState<string>('15450.0');
 
-  // CCTV OCR Scanner State
-  const [isScanningCctv, setIsScanningCctv] = useState<boolean>(false);
-  const [cctvError, setCctvError] = useState<string | null>(null);
-
-  // -------------------------------------------------------------
-  // Form State (Same as Desktop App)
-  // -------------------------------------------------------------
-  const [nopol, setNopol] = useState<string>('');
-  const [customerName, setCustomerName] = useState<string>('');
-  const [goods, setGoods] = useState<string>('Beras Medium');
-  const [sacks, setSacks] = useState<string>('');
-  const [supplierId, setSupplierId] = useState<string>(suppliers[0]?.id || '');
-  const [selectedTruckForTare, setSelectedTruckForTare] = useState<any | null>(null);
-  
-  // Optional warehouse stapel allocation (for ERP compatibility)
-  const [showStapelAlloc, setShowStapelAlloc] = useState<boolean>(false);
-  const [allocations, setAllocations] = useState<StapelAllocationItem[]>([
-    { stapel_id: stapelPiles[0]?.id, stapel_name: stapelPiles[0]?.name || 'Stapel 1', is_direct_cor: false, allocated_kg: 0 }
+  // Multi-Mode & Advanced Indicator Settings
+  const [connectionMode, setConnectionMode] = useState<'webserial' | 'localbridge' | 'simulated'>('webserial');
+  const [availablePorts, setAvailablePorts] = useState<string[]>(['COM3', 'COM4', 'COM5', 'COM6', 'COM1', 'COM2']);
+  const [selectedPort, setSelectedPort] = useState<string>('COM3');
+  const [indicatorProtocol, setIndicatorProtocol] = useState<'universal' | 'yaohua' | 'toledo' | 'cas' | 'gedge'>('universal');
+  const [showSettingsModal, setShowSettingsModal] = useState<boolean>(false);
+  const [settingsActiveTab, setSettingsActiveTab] = useState<'config' | 'terminal'>('config');
+  const [rawStreamLogs, setRawStreamLogs] = useState<string[]>([
+    `[${new Date().toLocaleTimeString('id-ID')}] Terminal diagnostik siap. Menunggu stream data RS232...`
   ]);
+  const [localBridgeInterval, setLocalBridgeInterval] = useState<any | null>(null);
 
-  // Customer Panel State (Search & Add)
-  const [custFilter, setCustFilter] = useState<string>('');
-  const [newCustInput, setNewCustInput] = useState<string>('');
+  // Auto-scan COM ports from local Python service on mount
+  useEffect(() => {
+    refreshAvailablePorts();
+    return () => {
+      if (localBridgeInterval) clearInterval(localBridgeInterval);
+    };
+  }, []);
 
-  // Queue Panel State (Search)
-  const [plateFilter, setPlateFilter] = useState<string>('');
-
-  // Ticket History Modal & Print Slip State
-  const [showHistoryModal, setShowHistoryModal] = useState<boolean>(false);
-  const [historySearch, setHistorySearch] = useState<string>('');
-  const [printTicket, setPrintTicket] = useState<any | null>(null);
-  const [isReprint, setIsReprint] = useState<boolean>(false);
-
-  // Activity Log Messages
-  const [activityLogs, setActivityLogs] = useState<Array<{ time: string; msg: string; type: 'info' | 'success' | 'warn' }>>([
-    { time: new Date().toLocaleTimeString('id-ID'), msg: 'Sistem Timbangan Digital PT. BUMI MAS siap.', type: 'info' }
-  ]);
-
-  const addLog = (msg: string, type: 'info' | 'success' | 'warn' = 'info') => {
-    const time = new Date().toLocaleTimeString('id-ID');
-    setActivityLogs(prev => [{ time, msg, type }, ...prev.slice(0, 30)]);
-  };
-
-  // -------------------------------------------------------------
-  // Web Serial & COM Communication
-  // -------------------------------------------------------------
-  const handleConnectComPort = async () => {
-    if (comPortConnected) {
-      if (serialPortObj) {
-        try { await serialPortObj.close(); } catch (e) { console.warn(e); }
+  const refreshAvailablePorts = async () => {
+    try {
+      const res = await fetch('http://localhost:5000/ports', { method: 'GET' });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.ports && data.ports.length > 0) {
+          setAvailablePorts(data.ports);
+          if (!data.ports.includes(selectedPort)) {
+            setSelectedPort(data.ports[0]);
+          }
+          addLog(`Port COM terdeteksi dari PC: ${data.ports.join(', ')}`, 'info');
+          return;
+        }
       }
-      setSerialPortObj(null);
-      setComPortConnected(false);
-      setIsSimulatedCom(false);
-      setLiveComWeight(0);
-      addLog('Koneksi port serial terputus.', 'warn');
-      return;
+    } catch (e) {
+      // Local bridge belum aktif, fallback port list
     }
 
     if ('serial' in navigator) {
+      try {
+        const ports = await (navigator as any).serial.getPorts();
+        if (ports && ports.length > 0) {
+          addLog(`Web Serial mendeteksi ${ports.length} port terpasang.`, 'info');
+        }
+      } catch (e) {}
+    }
+  };
+
+  // Parser sesuai merk/protokol indikator
+  const parseWeightLine = (line: string, protocol: string) => {
+    let weight: number | null = null;
+    let stable: boolean = true;
+
+    if (line.includes('ST')) stable = true;
+    else if (line.includes('US')) stable = false;
+
+    if (protocol === 'yaohua') {
+      // Yaohua XK3190 A12 / A9 continuous frame: e.g. =015420 or =+015420
+      const yMatch = line.match(/[=](\+|-)?(\d+)/);
+      if (yMatch) {
+        weight = parseFloat(yMatch[2]);
+      } else {
+        const match = line.match(/[-+]?\s*\d*\.\d+|[-+]?\s*\d+/);
+        if (match) weight = parseFloat(match[0].trim());
+      }
+    } else {
+      // Universal, Toledo 8142, CAS CI-2001, Gedge
+      const match = line.match(/[-+]?\s*\d*\.\d+|[-+]?\s*\d+/);
+      if (match) weight = parseFloat(match[0].trim());
+    }
+
+    return { weight, stable };
+  };
+
+  // Toggle Connection Handler (Mirip Desktop App)
+  const handleToggleConnection = async () => {
+    if (comPortConnected) {
+      handleDisconnect();
+      return;
+    }
+
+    // MODE 1: Web Serial API (Chrome / Edge)
+    if (connectionMode === 'webserial' && 'serial' in navigator) {
       try {
         const port = await (navigator as any).serial.requestPort();
         await port.open({ baudRate });
         setSerialPortObj(port);
         setComPortConnected(true);
         setIsSimulatedCom(false);
-        addLog(`Serial RS232 Terhubung (${baudRate} Bps)`, 'success');
+        addLog(`Web Serial RS232 Terhubung (${baudRate} Bps)`, 'success');
         readSerialDataStream(port);
         return;
-      } catch (err) {
-        console.warn('Serial port connection cancelled or failed:', err);
+      } catch (err: any) {
+        console.warn('Web Serial port connection error:', err);
+        addLog(`Gagal membuka port via browser: ${err.message || err}`, 'warn');
       }
     }
 
-    // Fallback: prompt for trial simulation mode
+    // MODE 2: Local Python Hardware Bridge
+    if (connectionMode === 'localbridge') {
+      try {
+        const res = await fetch('http://localhost:5000/connect-scale', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ port: selectedPort, baudrate: baudRate })
+        });
+        const data = await res.json();
+        if (data.success) {
+          setComPortConnected(true);
+          setIsSimulatedCom(false);
+          addLog(`Scale Bridge Terhubung ke ${selectedPort} (${baudRate} Bps)`, 'success');
+          
+          // Mulai loop polling setiap 100ms
+          const interval = setInterval(async () => {
+            try {
+              const r = await fetch('http://localhost:5000/scale-weight');
+              if (r.ok) {
+                const sData = await r.json();
+                if (sData.connected) {
+                  setLiveComWeight(sData.weight || 0);
+                  setIsScaleStable(sData.stable !== false);
+                  if (sData.raw) {
+                    const nowStr = new Date().toLocaleTimeString('id-ID');
+                    setRawStreamLogs(prev => [`[${nowStr}] Rx: ${sData.raw}`, ...prev.slice(0, 49)]);
+                  }
+                }
+              }
+            } catch (e) {}
+          }, 100);
+          setLocalBridgeInterval(interval);
+          return;
+        } else {
+          alert(`Gagal koneksi ke ${selectedPort}: ${data.message}`);
+          addLog(`Gagal koneksi: ${data.message}`, 'warn');
+        }
+      } catch (err) {
+        alert('Server Python Lokal (server_cctv.py / app.py) belum dijalankan pada port 5000.');
+        addLog('Server Python port 5000 tidak merespons.', 'warn');
+      }
+    }
+
+    // MODE 3: Simulasi Fallback
     const enableSim = window.confirm(
-      'Kabel Hardware RS232 belum terhubung ke komputer ini.\n\nAktifkan [Mode Simulasi] untuk uji coba timbangan digital?'
+      'Kabel fisik RS232 belum terhubung.\n\nAktifkan [Mode Simulasi] untuk pengujian bobot di timbangan?'
     );
     if (enableSim) {
       setComPortConnected(true);
       setIsSimulatedCom(true);
       const simVal = parseFloat(simWeightInput) || 15450.0;
       setLiveComWeight(simVal);
-      addLog(`Mode Simulasi Aktif: ${simVal} KG`, 'info');
+      addLog(`Mode Simulasi Aktif: ${simVal.toLocaleString('id-ID')} KG`, 'info');
     }
+  };
+
+  const handleDisconnect = async () => {
+    if (localBridgeInterval) {
+      clearInterval(localBridgeInterval);
+      setLocalBridgeInterval(null);
+      try {
+        await fetch('http://localhost:5000/disconnect-scale', { method: 'POST' });
+      } catch (e) {}
+    }
+
+    if (serialPortObj) {
+      try { await serialPortObj.close(); } catch (e) { console.warn(e); }
+      setSerialPortObj(null);
+    }
+
+    setComPortConnected(false);
+    setIsSimulatedCom(false);
+    setLiveComWeight(0);
+    addLog('Koneksi port serial timbangan diputuskan.', 'warn');
   };
 
   const readSerialDataStream = async (port: any) => {
@@ -159,6 +253,7 @@ export const Admin1WeighbridgeScreen: React.FC = () => {
       const textDecoder = new TextDecoderStream();
       port.readable.pipeTo(textDecoder.writable);
       const reader = textDecoder.readable.getReader();
+      let lineBuffer = '';
 
       while (true) {
         const { value, done } = await reader.read();
@@ -167,25 +262,32 @@ export const Admin1WeighbridgeScreen: React.FC = () => {
           break;
         }
         if (value) {
-          if (value.includes('ST')) {
-            setIsScaleStable(true);
-          } else if (value.includes('US')) {
-            setIsScaleStable(false);
-          }
+          lineBuffer += value;
+          const lines = lineBuffer.split(/[\r\n]+/);
+          lineBuffer = lines.pop() || '';
 
-          const matches = value.match(/[-+]?\s*\d*\.\d+|[-+]?\s*\d+/g);
-          if (matches && matches.length > 0) {
-            const raw = parseFloat(matches[0].trim());
-            if (!isNaN(raw) && raw >= 0 && raw < 120000) {
-              setLiveComWeight(raw);
+          for (const line of lines) {
+            const trimmed = line.trim();
+            if (!trimmed) continue;
+
+            const nowStr = new Date().toLocaleTimeString('id-ID');
+            setRawStreamLogs(prev => [`[${nowStr}] Rx: ${trimmed}`, ...prev.slice(0, 49)]);
+
+            const { weight, stable } = parseWeightLine(trimmed, indicatorProtocol);
+            if (weight !== null && !isNaN(weight) && weight >= 0 && weight < 150000) {
+              setLiveComWeight(weight);
             }
+            setIsScaleStable(stable);
           }
         }
       }
     } catch (err) {
       console.error('Serial stream reader error:', err);
+      addLog(`Koneksi serial terputus atau error: ${err}`, 'warn');
+      setComPortConnected(false);
     }
   };
+
 
   const handleSetSimWeight = () => {
     const val = parseFloat(simWeightInput);
@@ -489,42 +591,62 @@ export const Admin1WeighbridgeScreen: React.FC = () => {
           </div>
         </div>
 
-        {/* Right Header Controls: Riwayat, Port, Connect, Status */}
+        {/* Right Header Controls: Port, Baud, Connect, Status, Settings, Riwayat */}
         <div className="flex flex-wrap items-center gap-2">
-          <button
-            onClick={() => setShowHistoryModal(true)}
-            className="px-3 py-1.5 bg-[#1e293b] hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold transition flex items-center space-x-1.5 border border-slate-600"
-          >
-            <History className="w-3.5 h-3.5 text-sky-400" />
-            <span>📄 Riwayat Tiket ({completedTickets.length})</span>
-          </button>
+          {/* Port Selector (Same as Desktop App) */}
+          <div className="flex items-center space-x-1.5 bg-[#1e293b] px-2.5 py-1.5 rounded-xl border border-slate-700 text-xs">
+            <span className="text-slate-400 font-bold">Port:</span>
+            <select
+              value={selectedPort}
+              onChange={(e) => setSelectedPort(e.target.value)}
+              disabled={comPortConnected}
+              className="bg-[#0f172a] text-slate-200 font-bold px-2 py-0.5 rounded outline-none border border-slate-600 cursor-pointer disabled:opacity-60"
+            >
+              {availablePorts.map((p) => (
+                <option key={p} value={p}>{p}</option>
+              ))}
+            </select>
+            <button
+              type="button"
+              onClick={refreshAvailablePorts}
+              disabled={comPortConnected}
+              className="p-1 hover:bg-slate-700 text-sky-400 rounded transition disabled:opacity-40"
+              title="Scan Ulang Port COM Hardware"
+            >
+              <RefreshCw className="w-3.5 h-3.5" />
+            </button>
+          </div>
 
-          <div className="flex items-center space-x-2 bg-[#1e293b] px-3 py-1.5 rounded-xl border border-slate-700 text-xs">
-            <span className="text-slate-400">Baud:</span>
+          {/* Baud Rate Selector */}
+          <div className="flex items-center space-x-1.5 bg-[#1e293b] px-2.5 py-1.5 rounded-xl border border-slate-700 text-xs">
+            <span className="text-slate-400 font-bold">Baud:</span>
             <select
               value={baudRate}
               onChange={(e) => setBaudRate(parseInt(e.target.value, 10))}
               disabled={comPortConnected}
-              className="bg-[#0f172a] text-slate-200 font-bold px-2 py-0.5 rounded outline-none border border-slate-600"
+              className="bg-[#0f172a] text-slate-200 font-bold px-2 py-0.5 rounded outline-none border border-slate-600 cursor-pointer disabled:opacity-60"
             >
               <option value={9600}>9600</option>
               <option value={4800}>4800</option>
               <option value={2400}>2400</option>
+              <option value={1200}>1200</option>
               <option value={19200}>19200</option>
+              <option value={38400}>38400</option>
               <option value={115200}>115200</option>
             </select>
           </div>
 
+          {/* Connect / Disconnect Toggle Button */}
           <button
-            onClick={handleConnectComPort}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center space-x-1.5 ${
+            onClick={handleToggleConnection}
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-extrabold transition flex items-center space-x-1.5 shadow ${
               comPortConnected
                 ? 'bg-rose-600 hover:bg-rose-700 text-white'
                 : 'bg-sky-600 hover:bg-sky-700 text-white'
             }`}
           >
             <Cpu className="w-3.5 h-3.5" />
-            <span>{comPortConnected ? 'Putuskan RS232' : 'Hubungkan RS232'}</span>
+            <span>{comPortConnected ? 'Putuskan' : 'Hubungkan'}</span>
           </button>
 
           {/* Status Badge */}
@@ -534,8 +656,30 @@ export const Admin1WeighbridgeScreen: React.FC = () => {
               : 'bg-slate-800 text-slate-400 border border-slate-700'
           }`}>
             <span className={`w-2 h-2 rounded-full ${comPortConnected ? 'bg-emerald-400 animate-pulse' : 'bg-rose-500'}`} />
-            <span>{comPortConnected ? (isSimulatedCom ? '● COM SIMULASI' : '● RS232 CONNECTED') : '● TERPUTUS'}</span>
+            <span>
+              {comPortConnected 
+                ? (isSimulatedCom ? '● COM SIMULASI' : `● ${selectedPort} @ ${baudRate}`) 
+                : '● TERPUTUS'}
+            </span>
           </span>
+
+          {/* Settings & Diagnostic Terminal Button */}
+          <button
+            onClick={() => setShowSettingsModal(true)}
+            className="p-1.5 bg-[#1e293b] hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl border border-slate-700 transition"
+            title="Pengaturan Indikator & Terminal Diagnostik"
+          >
+            <Settings className="w-4 h-4 text-slate-300" />
+          </button>
+
+          {/* Riwayat Tiket Button */}
+          <button
+            onClick={() => setShowHistoryModal(true)}
+            className="px-3 py-1.5 bg-[#1e293b] hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold transition flex items-center space-x-1.5 border border-slate-600"
+          >
+            <History className="w-3.5 h-3.5 text-sky-400" />
+            <span>📄 Riwayat ({completedTickets.length})</span>
+          </button>
         </div>
       </div>
 
@@ -1151,6 +1295,247 @@ export const Admin1WeighbridgeScreen: React.FC = () => {
                 className="px-4 py-2 bg-slate-200 text-slate-700 rounded-xl font-bold text-xs"
               >
                 Tutup
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* =========================================================
+          MODAL PENGATURAN INDIKATOR & TERMINAL DIAGNOSTIK RS232
+      ========================================================= */}
+      {showSettingsModal && (
+        <div className="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-2xl w-full p-6 space-y-4 shadow-2xl border-4 border-[#0f172a]">
+            {/* Header */}
+            <div className="flex justify-between items-center border-b pb-3">
+              <div className="flex items-center space-x-2">
+                <Settings className="w-5 h-5 text-sky-600" />
+                <h3 className="text-base font-extrabold text-slate-900">
+                  ⚙️ Pengaturan Koneksi Indikator Timbangan (RS232 / COM)
+                </h3>
+              </div>
+              <button 
+                onClick={() => setShowSettingsModal(false)}
+                className="p-1 text-slate-400 hover:text-slate-600 rounded-lg"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Tab Switcher */}
+            <div className="flex border-b border-slate-200">
+              <button
+                type="button"
+                onClick={() => setSettingsActiveTab('config')}
+                className={`py-2 px-4 text-xs font-bold border-b-2 flex items-center space-x-2 ${
+                  settingsActiveTab === 'config'
+                    ? 'border-sky-600 text-sky-600'
+                    : 'border-transparent text-slate-400 hover:text-slate-600'
+                }`}
+              >
+                <Cpu className="w-4 h-4" />
+                <span>🔌 Konfigurasi Port & Protokol</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setSettingsActiveTab('terminal')}
+                className={`py-2 px-4 text-xs font-bold border-b-2 flex items-center space-x-2 ${
+                  settingsActiveTab === 'terminal'
+                    ? 'border-emerald-600 text-emerald-600'
+                    : 'border-transparent text-slate-400 hover:text-slate-600'
+                }`}
+              >
+                <Terminal className="w-4 h-4" />
+                <span>💻 Terminal Diagnostik Stream ({rawStreamLogs.length})</span>
+              </button>
+            </div>
+
+            {/* Tab 1: Konfigurasi Port & Protokol */}
+            {settingsActiveTab === 'config' && (
+              <div className="space-y-4 text-xs">
+                {/* Mode Koneksi */}
+                <div>
+                  <label className="block text-slate-700 font-bold mb-1.5">Metode Koneksi:</label>
+                  <div className="grid grid-cols-3 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setConnectionMode('webserial')}
+                      className={`p-3 rounded-xl border text-left font-bold transition ${
+                        connectionMode === 'webserial'
+                          ? 'border-sky-600 bg-sky-50 text-sky-900 shadow-sm'
+                          : 'border-slate-200 hover:border-slate-300 text-slate-600'
+                      }`}
+                    >
+                      <div className="flex items-center space-x-1.5 mb-1">
+                        <Radio className="w-4 h-4 text-sky-600" />
+                        <span>Web Serial API</span>
+                      </div>
+                      <p className="text-[10px] text-slate-500 font-normal">Browser Chrome/Edge langsung ke USB-to-RS232</p>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setConnectionMode('localbridge')}
+                      className={`p-3 rounded-xl border text-left font-bold transition ${
+                        connectionMode === 'localbridge'
+                          ? 'border-emerald-600 bg-emerald-50 text-emerald-900 shadow-sm'
+                          : 'border-slate-200 hover:border-slate-300 text-slate-600'
+                      }`}
+                    >
+                      <div className="flex items-center space-x-1.5 mb-1">
+                        <Wifi className="w-4 h-4 text-emerald-600" />
+                        <span>Local Scale Bridge</span>
+                      </div>
+                      <p className="text-[10px] text-slate-500 font-normal">Background Python port 5000 (Semua Browser)</p>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setConnectionMode('simulated')}
+                      className={`p-3 rounded-xl border text-left font-bold transition ${
+                        connectionMode === 'simulated'
+                          ? 'border-amber-600 bg-amber-50 text-amber-900 shadow-sm'
+                          : 'border-slate-200 hover:border-slate-300 text-slate-600'
+                      }`}
+                    >
+                      <div className="flex items-center space-x-1.5 mb-1">
+                        <Activity className="w-4 h-4 text-amber-600" />
+                        <span>Mode Simulasi</span>
+                      </div>
+                      <p className="text-[10px] text-slate-500 font-normal">Input bobot manual untuk pengetesan sistem</p>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Port & Baud */}
+                <div className="grid grid-cols-2 gap-3 bg-slate-50 p-3.5 rounded-2xl border border-slate-200">
+                  <div>
+                    <div className="flex justify-between items-center mb-1">
+                      <label className="text-slate-700 font-bold">Port COM Windows:</label>
+                      <button
+                        type="button"
+                        onClick={refreshAvailablePorts}
+                        className="text-sky-600 hover:text-sky-700 flex items-center space-x-1 font-bold text-[11px]"
+                      >
+                        <RefreshCw className="w-3 h-3" />
+                        <span>Scan Ulang</span>
+                      </button>
+                    </div>
+                    <select
+                      value={selectedPort}
+                      onChange={(e) => setSelectedPort(e.target.value)}
+                      disabled={comPortConnected}
+                      className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 font-mono font-bold text-slate-800 outline-none"
+                    >
+                      {availablePorts.map((p) => (
+                        <option key={p} value={p}>{p}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-700 font-bold mb-1">Baud Rate:</label>
+                    <select
+                      value={baudRate}
+                      onChange={(e) => setBaudRate(parseInt(e.target.value, 10))}
+                      disabled={comPortConnected}
+                      className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 font-mono font-bold text-slate-800 outline-none"
+                    >
+                      <option value={9600}>9600 (Umum/Default)</option>
+                      <option value={4800}>4800 (Yaohua / Toledo)</option>
+                      <option value={2400}>2400 (CAS / Mk-Cells)</option>
+                      <option value={1200}>1200</option>
+                      <option value={19200}>19200</option>
+                      <option value={38400}>38400</option>
+                      <option value={115200}>115200</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Protokol Indikator */}
+                <div>
+                  <label className="block text-slate-700 font-bold mb-1">Merk / Protokol Indikator Timbangan:</label>
+                  <select
+                    value={indicatorProtocol}
+                    onChange={(e) => setIndicatorProtocol(e.target.value as any)}
+                    className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 font-bold text-slate-800 outline-none"
+                  >
+                    <option value="universal">Universal / Auto Regex (Toledo, Yaohua, CAS, dll)</option>
+                    <option value="yaohua">Yaohua XK3190 Series (A12, A12E, A9, DS3)</option>
+                    <option value="toledo">Mettler Toledo 8142 / MT Continuous Output</option>
+                    <option value="cas">CAS CI-2001A / CI-5010A / CI-1500A</option>
+                    <option value="gedge">Gedge Systems / Cardinal Scale Output</option>
+                  </select>
+                </div>
+
+                {/* Status Bar inside config */}
+                <div className="flex items-center justify-between p-3 rounded-xl bg-slate-100 border border-slate-200">
+                  <div className="flex items-center space-x-2">
+                    <span className={`w-2.5 h-2.5 rounded-full ${comPortConnected ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'}`} />
+                    <span className="font-bold text-slate-700">
+                      Status: {comPortConnected ? `Terhubung ke ${selectedPort} (${baudRate} Bps)` : 'Terputus'}
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleToggleConnection}
+                    className={`px-4 py-1.5 rounded-xl font-bold transition shadow ${
+                      comPortConnected 
+                        ? 'bg-rose-600 hover:bg-rose-700 text-white' 
+                        : 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                    }`}
+                  >
+                    {comPortConnected ? 'Putuskan Koneksi' : 'Hubungkan Sekarang'}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Tab 2: Terminal Diagnostik Live Stream */}
+            {settingsActiveTab === 'terminal' && (
+              <div className="space-y-3">
+                <div className="flex justify-between items-center text-xs">
+                  <span className="text-slate-500">
+                    Aliran paket data mentah (Raw ASCII) dari kabel RS232:
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setRawStreamLogs([])}
+                    className="px-2.5 py-1 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg font-bold transition"
+                  >
+                    Bersihkan Terminal
+                  </button>
+                </div>
+
+                {/* Console Log Window */}
+                <div className="bg-[#090d16] border-2 border-slate-800 rounded-2xl p-3.5 h-64 overflow-y-auto font-mono text-[11px] text-emerald-400 space-y-1 shadow-inner">
+                  {rawStreamLogs.length === 0 ? (
+                    <div className="text-slate-600 italic">Belum ada paket data masuk dari port serial.</div>
+                  ) : (
+                    rawStreamLogs.map((log, idx) => (
+                      <div key={idx} className="leading-tight font-medium hover:bg-slate-900 px-1 rounded">
+                        {log}
+                      </div>
+                    ))
+                  )}
+                </div>
+
+                <div className="flex items-center justify-between text-[11px] text-slate-500">
+                  <span>💡 Tips: Jika angka timbangan tidak muncul, periksa Baud Rate dan kabel USB-to-RS232.</span>
+                  <span className="font-mono text-emerald-700 font-bold">Live: {liveComWeight.toLocaleString('id-ID')} KG</span>
+                </div>
+              </div>
+            )}
+
+            {/* Footer */}
+            <div className="flex justify-end pt-2 border-t">
+              <button
+                type="button"
+                onClick={() => setShowSettingsModal(false)}
+                className="px-5 py-2 bg-[#0f172a] hover:bg-slate-800 text-white font-bold rounded-xl text-xs transition"
+              >
+                Selesai / Tutup
               </button>
             </div>
           </div>

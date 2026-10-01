@@ -24,15 +24,103 @@ import sys
 import logging
 import numpy as np
 import cv2
+import threading
+import time
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 
+try:
+    import serial
+    import serial.tools.list_ports
+except ImportError:
+    serial = None
+
 # Setup logging
 logging.basicConfig(level=logging.INFO, format='[%(asctime)s] %(levelname)s: %(message)s')
-logger = logging.getLogger("CCTV_OCR_Server")
+logger = logging.getLogger("CCTV_Scale_Server")
 
 app = Flask(__name__)
 CORS(app)  # Izinkan CORS agar website ERP (Vite / localhost) bisa akses API port 5000
+
+# =============================================================================
+# HARDWARE SCALE SERIAL MANAGER (RS232 / COM Port)
+# =============================================================================
+class ScaleManager:
+    def __init__(self):
+        self.conn = None
+        self.port = "COM3"
+        self.baudrate = 9600
+        self.is_connected = False
+        self.is_reading = False
+        self.current_weight = 0.0
+        self.is_stable = True
+        self.last_raw = ""
+        self.lock = threading.Lock()
+
+    def get_ports(self):
+        if not serial:
+            return []
+        try:
+            return [p.device for p in serial.tools.list_ports.comports()]
+        except Exception:
+            return []
+
+    def connect(self, port, baudrate=9600):
+        if not serial:
+            return False, "Modul pyserial belum terpasang."
+        self.disconnect()
+        try:
+            self.conn = serial.Serial(port, baudrate=int(baudrate), timeout=1)
+            self.port = port
+            self.baudrate = int(baudrate)
+            self.is_connected = True
+            self.is_reading = True
+            threading.Thread(target=self._read_loop, daemon=True).start()
+            logger.info(f"Scale serial terhubung ke {port} @ {baudrate}")
+            return True, f"Terhubung ke {port} @ {baudrate} bps"
+        except Exception as e:
+            self.is_connected = False
+            logger.error(f"Gagal koneksi scale serial {port}: {e}")
+            return False, str(e)
+
+    def disconnect(self):
+        self.is_reading = False
+        if self.conn and self.conn.is_open:
+            try:
+                self.conn.close()
+            except Exception:
+                pass
+        self.conn = None
+        self.is_connected = False
+        logger.info("Scale serial terputus.")
+
+    def _read_loop(self):
+        while self.is_reading and self.conn and self.conn.is_open:
+            try:
+                if self.conn.in_waiting:
+                    line = self.conn.readline().decode('ascii', errors='ignore').strip()
+                    if line:
+                        with self.lock:
+                            self.last_raw = line
+                            if 'ST' in line:
+                                self.is_stable = True
+                            elif 'US' in line:
+                                self.is_stable = False
+                            
+                            m = re.search(r'[-+]?\s*\d*\.\d+|[-+]?\s*\d+', line)
+                            if m:
+                                try:
+                                    val = float(m.group().replace(' ', ''))
+                                    if 0 <= val < 150000:
+                                        self.current_weight = val
+                                except ValueError:
+                                    pass
+                time.sleep(0.04)
+            except Exception:
+                time.sleep(0.1)
+
+scale_manager = ScaleManager()
+
 
 # =============================================================================
 # KONFIGURASI CCTV TP-LINK & PADDLEOCR
@@ -203,12 +291,67 @@ def scan_nopol():
         }), 500
 
 
+# =============================================================================
+# ENDPOINT TIMBANGAN SERIAL RS232 / HARDWARE SCALE BRIDGE
+# =============================================================================
+@app.route('/ports', methods=['GET'])
+def get_serial_ports():
+    """Daftar Port COM yang tersedia di Windows."""
+    ports = scale_manager.get_ports()
+    return jsonify({
+        "success": True,
+        "ports": ports,
+        "connected_port": scale_manager.port if scale_manager.is_connected else None
+    })
+
+@app.route('/connect-scale', methods=['POST'])
+def connect_scale():
+    """Hubungkan hardware timbangan ke port COM tertentu."""
+    data = request.json or {}
+    port = data.get('port', 'COM3')
+    baudrate = data.get('baudrate', 9600)
+    success, msg = scale_manager.connect(port, baudrate)
+    return jsonify({
+        "success": success,
+        "message": msg,
+        "connected": scale_manager.is_connected,
+        "port": scale_manager.port,
+        "baudrate": scale_manager.baudrate
+    })
+
+@app.route('/disconnect-scale', methods=['POST'])
+def disconnect_scale():
+    """Putuskan koneksi hardware timbangan."""
+    scale_manager.disconnect()
+    return jsonify({
+        "success": True,
+        "connected": False,
+        "message": "Koneksi timbangan serial diputuskan."
+    })
+
+@app.route('/scale-weight', methods=['GET'])
+def get_scale_weight():
+    """Ambil data pembacaan berat realtime dari timbangan."""
+    with scale_manager.lock:
+        return jsonify({
+            "connected": scale_manager.is_connected,
+            "port": scale_manager.port,
+            "baudrate": scale_manager.baudrate,
+            "weight": scale_manager.current_weight,
+            "stable": scale_manager.is_stable,
+            "raw": scale_manager.last_raw
+        })
+
+
 if __name__ == "__main__":
     print("\n" + "="*70)
-    print(" 🚀 PP BUMI MAS ERP - SERVER CCTV OCR NOPOL")
+    print(" 🚀 PP BUMI MAS ERP - SERVER POS: CCTV OCR & SCALE HARDWARE")
     print(" Port: 5000")
-    print(" Endpoint API: http://localhost:5000/scan-nopol")
+    print(" Endpoint CCTV OCR : http://localhost:5000/scan-nopol")
+    print(" Endpoint Scale COM: http://localhost:5000/scale-weight")
+    print(" Daftar Port COM   : http://localhost:5000/ports")
     print(" Press Ctrl+C to stop server")
     print("="*70 + "\n")
 
     app.run(host="0.0.0.0", port=5000, debug=False)
+
