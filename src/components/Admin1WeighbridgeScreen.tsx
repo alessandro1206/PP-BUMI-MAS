@@ -1,6 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
-import { Scale, Printer, Plus, RefreshCw, CheckCircle2, Truck, ArrowLeft, Cpu, FileText, Layers, Trash2, ArrowRight, Camera } from 'lucide-react';
+import { 
+  Scale, 
+  Printer, 
+  Plus, 
+  RefreshCw, 
+  Truck, 
+  ArrowLeft, 
+  Cpu, 
+  FileText, 
+  Layers, 
+  Trash2, 
+  Camera, 
+  Search, 
+  RotateCcw, 
+  Clock, 
+  History, 
+  X,
+  Check
+} from 'lucide-react';
 import { StapelAllocationItem } from '../types';
 
 export const Admin1WeighbridgeScreen: React.FC = () => {
@@ -8,98 +26,93 @@ export const Admin1WeighbridgeScreen: React.FC = () => {
     weighbridgeInList, 
     addWeighbridgeIn, 
     updateTareAndFinishWeighbridge, 
+    deleteWeighbridgeIn,
     suppliers, 
-    addSupplier, 
+    customers,
+    addCustomer,
+    deleteCustomer,
     stapelPiles, 
     addStapelPile, 
     setRole, 
-    setActiveScreen,
-    loadSampleMasterData
+    setActiveScreen
   } = useApp();
 
-  // COM Port RS232 State (Default DISCONNECTED)
+  // -------------------------------------------------------------
+  // Live Clock State
+  // -------------------------------------------------------------
+  const [currentClock, setCurrentClock] = useState<string>('');
+  useEffect(() => {
+    const updateTime = () => {
+      const now = new Date();
+      setCurrentClock(now.toLocaleDateString('id-ID', { 
+        weekday: 'long', 
+        day: '2-digit', 
+        month: 'short', 
+        year: 'numeric' 
+      }) + ' • ' + now.toLocaleTimeString('id-ID') + ' WIB');
+    };
+    updateTime();
+    const timer = setInterval(updateTime, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // -------------------------------------------------------------
+  // COM Port RS232 & Live Weight State
+  // -------------------------------------------------------------
   const [comPortConnected, setComPortConnected] = useState<boolean>(false);
   const [isSimulatedCom, setIsSimulatedCom] = useState<boolean>(false);
   const [liveComWeight, setLiveComWeight] = useState<number>(0);
   const [serialPortObj, setSerialPortObj] = useState<any | null>(null);
+  const [baudRate, setBaudRate] = useState<number>(9600);
+  const [isScaleStable, setIsScaleStable] = useState<boolean>(true);
+  const [simWeightInput, setSimWeightInput] = useState<string>('15450.0');
 
   // CCTV OCR Scanner State
   const [isScanningCctv, setIsScanningCctv] = useState<boolean>(false);
   const [cctvError, setCctvError] = useState<string | null>(null);
 
-  const handleScanNopolCctv = async () => {
-    setIsScanningCctv(true);
-    setCctvError(null);
-    try {
-      const response = await fetch('http://localhost:5000/scan-nopol', {
-        method: 'GET',
-        headers: { 'Accept': 'application/json' }
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP Error Status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      if (data.success && data.nopol) {
-        setNopol(data.nopol.toUpperCase());
-        setCctvError(null);
-      } else if (data.nopol) {
-        setNopol(data.nopol.toUpperCase());
-        setCctvError(null);
-      } else {
-        const errorText = data.message || 'Teks Nopol tidak terdeteksi dari stream foto CCTV.';
-        setCctvError(errorText);
-        alert(`Gagal Scan CCTV: ${errorText}`);
-      }
-    } catch (err: any) {
-      console.error('CCTV Scan Error:', err);
-      const msg = 'Gagal terhubung ke CCTV server lokal di http://localhost:5000/scan-nopol. Pastikan skrip server_cctv.py sudah dijalankan.';
-      setCctvError(msg);
-      alert(msg);
-    } finally {
-      setIsScanningCctv(false);
-    }
-  };
-
-  // Weighing Mode: 'MASUK' (Bruto) or 'KELUAR' (Tara)
-  const [weighMode, setWeighMode] = useState<'MASUK' | 'KELUAR'>('MASUK');
-  const [selectedTruckForTare, setSelectedTruckForTare] = useState<any | null>(null);
-
-  // Form State - Truk Masuk (Bruto)
+  // -------------------------------------------------------------
+  // Form State (Same as Desktop App)
+  // -------------------------------------------------------------
   const [nopol, setNopol] = useState<string>('');
+  const [customerName, setCustomerName] = useState<string>('');
+  const [goods, setGoods] = useState<string>('Beras Medium');
+  const [sacks, setSacks] = useState<string>('');
   const [supplierId, setSupplierId] = useState<string>(suppliers[0]?.id || '');
-  const [grossWeight, setGrossWeight] = useState<number>(0);
-
-  // Form State - Truk Keluar (Tara)
-  const [tareWeightInput, setTareWeightInput] = useState<number>(0);
-
-  // Auto select first supplier if suppliers loaded dynamically
-  React.useEffect(() => {
-    if (!supplierId && suppliers.length > 0) {
-      setSupplierId(suppliers[0].id);
-    }
-  }, [suppliers, supplierId]);
-
-  // Unloading Allocation State (Multi-Stapel / Direct Cor)
+  const [selectedTruckForTare, setSelectedTruckForTare] = useState<any | null>(null);
+  
+  // Optional warehouse stapel allocation (for ERP compatibility)
+  const [showStapelAlloc, setShowStapelAlloc] = useState<boolean>(false);
   const [allocations, setAllocations] = useState<StapelAllocationItem[]>([
     { stapel_id: stapelPiles[0]?.id, stapel_name: stapelPiles[0]?.name || 'Stapel 1', is_direct_cor: false, allocated_kg: 0 }
   ]);
 
-  // Modal State: Tambah Supplier Baru & Tambah Stapel Baru
-  const [showAddSupplier, setShowAddSupplier] = useState<boolean>(false);
-  const [newSupName, setNewSupName] = useState<string>('');
-  const [newSupBank, setNewSupBank] = useState<string>('BCA');
-  const [newSupAcc, setNewSupAcc] = useState<string>('');
-  const [newSupPhone, setNewSupPhone] = useState<string>('');
+  // Customer Panel State (Search & Add)
+  const [custFilter, setCustFilter] = useState<string>('');
+  const [newCustInput, setNewCustInput] = useState<string>('');
 
-  const [showAddStapel, setShowAddStapel] = useState<boolean>(false);
-  const [newStapelName, setNewStapelName] = useState<string>('');
-  const [newStapelGrade, setNewStapelGrade] = useState<string>('Standar Pabrik');
+  // Queue Panel State (Search)
+  const [plateFilter, setPlateFilter] = useState<string>('');
 
-  // STT Print Preview Modal
+  // Ticket History Modal & Print Slip State
+  const [showHistoryModal, setShowHistoryModal] = useState<boolean>(false);
+  const [historySearch, setHistorySearch] = useState<string>('');
   const [printTicket, setPrintTicket] = useState<any | null>(null);
+  const [isReprint, setIsReprint] = useState<boolean>(false);
 
+  // Activity Log Messages
+  const [activityLogs, setActivityLogs] = useState<Array<{ time: string; msg: string; type: 'info' | 'success' | 'warn' }>>([
+    { time: new Date().toLocaleTimeString('id-ID'), msg: 'Sistem Timbangan Digital PT. BUMI MAS siap.', type: 'info' }
+  ]);
+
+  const addLog = (msg: string, type: 'info' | 'success' | 'warn' = 'info') => {
+    const time = new Date().toLocaleTimeString('id-ID');
+    setActivityLogs(prev => [{ time, msg, type }, ...prev.slice(0, 30)]);
+  };
+
+  // -------------------------------------------------------------
+  // Web Serial & COM Communication
+  // -------------------------------------------------------------
   const handleConnectComPort = async () => {
     if (comPortConnected) {
       if (serialPortObj) {
@@ -109,20 +122,18 @@ export const Admin1WeighbridgeScreen: React.FC = () => {
       setComPortConnected(false);
       setIsSimulatedCom(false);
       setLiveComWeight(0);
+      addLog('Koneksi port serial terputus.', 'warn');
       return;
     }
 
-    // Try Web Serial API if supported by browser
     if ('serial' in navigator) {
       try {
         const port = await (navigator as any).serial.requestPort();
-        await port.open({ baudRate: 9600 });
+        await port.open({ baudRate });
         setSerialPortObj(port);
         setComPortConnected(true);
         setIsSimulatedCom(false);
-        alert('✅ Port Serial RS232 Timbangan Berhasil Terhubung! (BaudRate: 9600 Bps)');
-        
-        // Read serial data stream in background
+        addLog(`Serial RS232 Terhubung (${baudRate} Bps)`, 'success');
         readSerialDataStream(port);
         return;
       } catch (err) {
@@ -130,15 +141,16 @@ export const Admin1WeighbridgeScreen: React.FC = () => {
       }
     }
 
-    // Fallback prompt for trial simulation mode
+    // Fallback: prompt for trial simulation mode
     const enableSim = window.confirm(
-      'Kabel Hardware Timbangan RS232 belum terhubung ke komputer/browser ini.\n\nApakah Anda ingin mengaktifkan [Mode Simulasi Uji Coba]?'
+      'Kabel Hardware RS232 belum terhubung ke komputer ini.\n\nAktifkan [Mode Simulasi] untuk uji coba timbangan digital?'
     );
     if (enableSim) {
       setComPortConnected(true);
       setIsSimulatedCom(true);
-      if (grossWeight === 0) setGrossWeight(24500);
-      if (tareWeightInput === 0) setTareWeightInput(8200);
+      const simVal = parseFloat(simWeightInput) || 15450.0;
+      setLiveComWeight(simVal);
+      addLog(`Mode Simulasi Aktif: ${simVal} KG`, 'info');
     }
   };
 
@@ -155,11 +167,16 @@ export const Admin1WeighbridgeScreen: React.FC = () => {
           break;
         }
         if (value) {
-          // Extract continuous weight digits (e.g. ST,GS,+024500kg -> 24500)
-          const matches = value.match(/\d+/g);
+          if (value.includes('ST')) {
+            setIsScaleStable(true);
+          } else if (value.includes('US')) {
+            setIsScaleStable(false);
+          }
+
+          const matches = value.match(/[-+]?\s*\d*\.\d+|[-+]?\s*\d+/g);
           if (matches && matches.length > 0) {
-            const raw = parseInt(matches.join(''), 10);
-            if (!isNaN(raw) && raw > 0 && raw < 100000) {
+            const raw = parseFloat(matches[0].trim());
+            if (!isNaN(raw) && raw >= 0 && raw < 120000) {
               setLiveComWeight(raw);
             }
           }
@@ -170,52 +187,249 @@ export const Admin1WeighbridgeScreen: React.FC = () => {
     }
   };
 
-  const simulateComRead = (isGross: boolean) => {
-    if (!comPortConnected) {
-      const opt = window.confirm(
-        '⚠️ Kabel Timbangan RS232 Belum Terhubung!\n\n' +
-        '• Jika ada kabel hardware timbangan: Klik tombol [Connect RS232] di kanan atas.\n' +
-        '• Tanpa hardware: Anda bisa mengetik berat BRUTO/TARA langsung di kotak angka secara manual.\n\n' +
-        'Apakah Anda ingin mengaktifkan Mode Simulasi Uji Coba sekarang?'
-      );
-      if (opt) {
-        setComPortConnected(true);
-        setIsSimulatedCom(true);
-        if (isGross) {
-          const val = grossWeight > 0 ? grossWeight : 24500;
-          setGrossWeight(val);
-          setLiveComWeight(val);
-        } else {
-          const val = tareWeightInput > 0 ? tareWeightInput : 8200;
-          setTareWeightInput(val);
-          setLiveComWeight(val);
-        }
-      }
-      return;
-    }
-
-    if (!isSimulatedCom && liveComWeight > 0) {
-      // Hardware Serial Mode: pull current live scale weight
-      if (isGross) {
-        setGrossWeight(liveComWeight);
-      } else {
-        setTareWeightInput(liveComWeight);
-      }
-    } else if (isSimulatedCom) {
-      // Simulation Mode: set clean standard weight if empty, avoid randomizing on every click
-      if (isGross) {
-        const val = grossWeight > 0 ? grossWeight : 24500;
-        setGrossWeight(val);
-        setLiveComWeight(val);
-      } else {
-        const val = tareWeightInput > 0 ? tareWeightInput : 8200;
-        setTareWeightInput(val);
-        setLiveComWeight(val);
-      }
+  const handleSetSimWeight = () => {
+    const val = parseFloat(simWeightInput);
+    if (!isNaN(val)) {
+      setLiveComWeight(val);
+      setIsScaleStable(true);
+      addLog(`Berat simulasi diset: ${val.toLocaleString('id-ID')} KG`, 'info');
     }
   };
 
-  // Add allocation row (Multi-stapel / Direct Cor)
+  // CCTV OCR Scanner
+  const handleScanNopolCctv = async () => {
+    setIsScanningCctv(true);
+    setCctvError(null);
+    try {
+      const response = await fetch('http://localhost:5000/scan-nopol', {
+        method: 'GET',
+        headers: { 'Accept': 'application/json' }
+      });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const data = await response.json();
+      if (data.nopol) {
+        const detected = data.nopol.toUpperCase().trim();
+        setNopol(detected);
+        handleLookupPlate(detected);
+        addLog(`CCTV OCR Berhasil Mendeteksi Plat: ${detected}`, 'success');
+      } else {
+        const err = data.message || 'Teks plat tidak terdeteksi dari CCTV.';
+        setCctvError(err);
+        addLog(`Gagal Scan CCTV: ${err}`, 'warn');
+      }
+    } catch (err: any) {
+      const msg = 'CCTV Server offline (localhost:5000). Jalankan jalankan_server_cctv.bat.';
+      setCctvError(msg);
+      addLog(msg, 'warn');
+    } finally {
+      setIsScanningCctv(false);
+    }
+  };
+
+  // -------------------------------------------------------------
+  // Data Filtering (Queue & Customers)
+  // -------------------------------------------------------------
+  // Trucks currently inside waiting for 2nd weigh-out
+  const inboundTrucks = weighbridgeInList.filter(w => !w.status || w.status === 'MASUK');
+  
+  const filteredInboundTrucks = inboundTrucks.filter(t => {
+    if (!plateFilter.trim()) return true;
+    const q = plateFilter.toLowerCase();
+    return t.nopol.toLowerCase().includes(q) || 
+           (t.customer_name || '').toLowerCase().includes(q) ||
+           (t.supplier_name || '').toLowerCase().includes(q);
+  });
+
+  const filteredCustomers = customers.filter(c => {
+    if (!custFilter.trim()) return true;
+    return c.name.toLowerCase().includes(custFilter.toLowerCase());
+  });
+
+  // Completed tickets for history
+  const completedTickets = weighbridgeInList.filter(w => w.status === 'SELESAI');
+  const filteredHistory = completedTickets.filter(t => {
+    if (!historySearch.trim()) return true;
+    const q = historySearch.toLowerCase();
+    return t.nopol.toLowerCase().includes(q) || 
+           t.ticket_number.toLowerCase().includes(q) ||
+           (t.customer_name || '').toLowerCase().includes(q);
+  });
+
+  // -------------------------------------------------------------
+  // Plate Selection & 1-Click Operations (Same as Desktop App)
+  // -------------------------------------------------------------
+  const handleSelectTruckForTare = (truck: any) => {
+    setSelectedTruckForTare(truck);
+    setNopol(truck.nopol);
+    setCustomerName(truck.customer_name || truck.supplier_name || '');
+    setGoods(truck.goods || 'Beras Medium');
+    setSacks(truck.sacks ? String(truck.sacks) : '');
+    addLog(`PILIH TRUK: ${truck.nopol} (${truck.customer_name || truck.supplier_name}) | Berat 1: ${truck.gross_weight.toLocaleString('id-ID')} KG`, 'success');
+  };
+
+  const handleLookupPlate = (plateInput: string) => {
+    const cleanPlate = plateInput.toUpperCase().trim();
+    if (!cleanPlate) return;
+
+    // Check if truck is already inside
+    const inside = inboundTrucks.find(t => t.nopol.toUpperCase() === cleanPlate);
+    if (inside) {
+      handleSelectTruckForTare(inside);
+      return;
+    }
+
+    // Otherwise check history to suggest customer & goods
+    const prev = completedTickets.find(t => t.nopol.toUpperCase() === cleanPlate);
+    if (prev) {
+      if (!customerName) setCustomerName(prev.customer_name || prev.supplier_name || '');
+      if (prev.goods) setGoods(prev.goods);
+      addLog(`Plat ${cleanPlate} pernah masuk sebelumnya (${prev.customer_name || prev.supplier_name}).`, 'info');
+    } else {
+      addLog(`Plat Baru: ${cleanPlate}`, 'info');
+    }
+    setSelectedTruckForTare(null);
+  };
+
+  const handleCustomerClick = (name: string, focusNext = false) => {
+    setCustomerName(name);
+    addLog(`Customer dipilih: ${name}`, 'info');
+    if (focusNext) {
+      const goodsInput = document.getElementById('weigh-goods-input');
+      if (goodsInput) goodsInput.focus();
+    }
+  };
+
+  const handleAddNewCustomer = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    const name = newCustInput.trim();
+    if (!name) return;
+    
+    // Check if exists
+    if (customers.some(c => c.name.toLowerCase() === name.toLowerCase())) {
+      alert(`Customer '${name}' sudah ada di database.`);
+      return;
+    }
+
+    addCustomer({
+      name,
+      credit_limit: 100000000,
+      payment_terms_days: 14,
+      phone: ''
+    });
+    setNewCustInput('');
+    setCustomerName(name);
+    addLog(`Customer baru didaftarkan: ${name}`, 'success');
+  };
+
+  const handleDeleteCustomer = (id: string, name: string) => {
+    if (window.confirm(`Yakin ingin menghapus customer '${name}' dari database?`)) {
+      deleteCustomer(id);
+      if (customerName === name) setCustomerName('');
+      addLog(`Customer '${name}' dihapus dari database.`, 'warn');
+    }
+  };
+
+  const handleCancelInboundTruck = (id: string, plate: string) => {
+    if (window.confirm(`Yakin ingin membatalkan antrean truk '${plate}'?`)) {
+      deleteWeighbridgeIn(id);
+      if (selectedTruckForTare?.id === id) {
+        handleResetForm();
+      }
+      addLog(`Truk ${plate} dikeluarkan dari antrean.`, 'warn');
+    }
+  };
+
+  // -------------------------------------------------------------
+  // Weighing Submissions
+  // -------------------------------------------------------------
+  // 1st Weigh (MASUK - Bruto)
+  const handleSaveFirstWeight = (e: React.FormEvent) => {
+    e.preventDefault();
+    const cleanPlate = nopol.toUpperCase().trim();
+    if (!cleanPlate) {
+      alert('Mohon masukkan Nomor Polisi (Plat) Truk!');
+      return;
+    }
+
+    if (liveComWeight <= 0) {
+      if (!window.confirm('Nilai timbangan saat ini 0 KG. Tetap simpan?')) return;
+    }
+
+    const custVal = customerName.trim() || 'UMUM';
+
+    // Auto save customer if new
+    if (custVal && !customers.some(c => c.name.toLowerCase() === custVal.toLowerCase())) {
+      addCustomer({
+        name: custVal,
+        credit_limit: 50000000,
+        payment_terms_days: 14,
+        phone: ''
+      });
+    }
+
+    const sup = suppliers.find(s => s.id === supplierId) || suppliers[0];
+
+    const newTicket = addWeighbridgeIn({
+      datetime_in: new Date().toISOString().replace('T', ' ').substring(0, 16),
+      nopol: cleanPlate,
+      supplier_id: sup?.id || 'sup-1',
+      supplier_name: sup?.name || custVal,
+      customer_name: custVal,
+      goods: goods.trim() || 'Beras Medium',
+      sacks: sacks || 0,
+      gross_weight: liveComWeight,
+      tare_weight: 0,
+      bag_deduction: 0,
+      net_weight: liveComWeight,
+      allocations: allocations
+    });
+
+    addLog(`SUKSES 1st WEIGH (MASUK) ${cleanPlate}: ${liveComWeight.toLocaleString('id-ID')} KG`, 'success');
+    handleResetForm();
+  };
+
+  // 2nd Weigh (KELUAR - Tara & Print)
+  const handleSaveSecondWeight = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedTruckForTare) {
+      alert('Pilih truk di panel antrean terlebih dahulu untuk timbang ke-2!');
+      return;
+    }
+
+    const w1 = selectedTruckForTare.gross_weight;
+    const w2 = liveComWeight;
+    const netto = Math.abs(w1 - w2);
+
+    updateTareAndFinishWeighbridge(selectedTruckForTare.id, w2, sacks || selectedTruckForTare.sacks, goods);
+
+    const ticketData = {
+      ...selectedTruckForTare,
+      customer_name: customerName || selectedTruckForTare.customer_name,
+      goods: goods || selectedTruckForTare.goods || 'Beras Medium',
+      sacks: sacks || selectedTruckForTare.sacks || 0,
+      tare_weight: w2,
+      net_weight: netto,
+      datetime_out: new Date().toISOString().replace('T', ' ').substring(0, 16),
+      status: 'SELESAI'
+    };
+
+    addLog(`SUKSES 2nd WEIGH: ${selectedTruckForTare.nopol} | Netto: ${netto.toLocaleString('id-ID')} KG`, 'success');
+    setIsReprint(false);
+    setPrintTicket(ticketData);
+    handleResetForm();
+  };
+
+  const handleResetForm = () => {
+    setSelectedTruckForTare(null);
+    setNopol('');
+    setCustomerName('');
+    setGoods('Beras Medium');
+    setSacks('');
+  };
+
+  // -------------------------------------------------------------
+  // Allocation rows helper
+  // -------------------------------------------------------------
   const handleAddAllocationRow = () => {
     setAllocations(prev => [
       ...prev,
@@ -233,7 +447,7 @@ export const Admin1WeighbridgeScreen: React.FC = () => {
       if (i === index) {
         if (field === 'stapel_id') {
           if (value === 'DIRECT_COR') {
-            return { ...item, stapel_id: undefined, stapel_name: 'Langsung Di-COR (Mesin Reprocessing)', is_direct_cor: true };
+            return { ...item, stapel_id: undefined, stapel_name: 'Langsung Di-COR (Reprocessing)', is_direct_cor: true };
           }
           const found = stapelPiles.find(s => s.id === value);
           return { ...item, stapel_id: found?.id, stapel_name: found?.name || 'Stapel', is_direct_cor: false };
@@ -246,721 +460,774 @@ export const Admin1WeighbridgeScreen: React.FC = () => {
     }));
   };
 
-  // Submit Timbang Masuk (Bruto)
-  const handleSubmitGross = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!nopol.trim()) {
-      alert('Mohon isi Nomor Polisi Truk (Nopol)!');
-      return;
-    }
-    const sup = suppliers.find(s => s.id === supplierId);
-    if (!sup) return;
-
-    const newTicket = addWeighbridgeIn({
-      datetime_in: new Date().toISOString().replace('T', ' ').substring(0, 16),
-      nopol: nopol.toUpperCase(),
-      supplier_id: sup.id,
-      supplier_name: sup.name,
-      gross_weight: grossWeight,
-      tare_weight: 0,
-      bag_deduction: 0,
-      net_weight: grossWeight,
-      allocations: allocations
-    });
-
-    setPrintTicket(newTicket);
-    setNopol('');
-    setGrossWeight(0);
-    setLiveComWeight(0);
-  };
-
-  // Submit Timbang Keluar (Tara)
-  const handleSubmitTare = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedTruckForTare) return;
-
-    updateTareAndFinishWeighbridge(selectedTruckForTare.id, tareWeightInput);
-
-    const updated = {
-      ...selectedTruckForTare,
-      tare_weight: tareWeightInput,
-      net_weight: Math.max(0, selectedTruckForTare.gross_weight - tareWeightInput),
-      datetime_out: new Date().toISOString().replace('T', ' ').substring(0, 16),
-      status: 'SELESAI'
-    };
-
-    setPrintTicket(updated);
-    setSelectedTruckForTare(null);
-    setTareWeightInput(0);
-    setLiveComWeight(0);
-  };
-
-  const handleSaveSupplier = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newSupName.trim()) return;
-    const added = addSupplier({
-      name: newSupName,
-      bank_name: newSupBank,
-      bank_account_number: newSupAcc,
-      phone: newSupPhone
-    });
-    setSupplierId(added.id);
-    setShowAddSupplier(false);
-    setNewSupName('');
-    setNewSupAcc('');
-    setNewSupPhone('');
-  };
-
-  const handleSaveStapel = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newStapelName.trim()) return;
-    const added = addStapelPile(newStapelName, newStapelGrade);
-    setAllocations(prev => [
-      ...prev.slice(0, -1),
-      { stapel_id: added.id, stapel_name: added.name, is_direct_cor: false, allocated_kg: 0 }
-    ]);
-    setShowAddStapel(false);
-    setNewStapelName('');
-  };
-
-  const pendingTareTrucks = weighbridgeInList.filter(w => !w.status || w.status === 'MASUK');
-
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">
-      {/* Header Banner */}
-      <div className="bg-[#0f3e2e] text-white p-6 rounded-2xl shadow-lg border border-emerald-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="flex items-center space-x-4">
+    <div className="max-w-[1400px] mx-auto px-3 py-4 space-y-4 font-sans text-slate-800">
+      
+      {/* =========================================================
+          HEADER BAR: BRANDING, LIVE CLOCK & CONNECTION STATUS
+      ========================================================= */}
+      <div className="bg-[#0f172a] text-white px-5 py-3.5 rounded-2xl shadow-md border border-slate-700 flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+        <div className="flex items-center space-x-3">
           <button 
             onClick={() => { setRole('PORTAL'); setActiveScreen('SCREEN_5'); }}
-            className="p-2 bg-[#08251b] rounded-xl hover:bg-emerald-900 transition text-emerald-300"
+            className="p-2 bg-[#1e293b] hover:bg-slate-700 rounded-xl transition text-slate-300"
+            title="Kembali ke Portal Menu"
           >
-            <ArrowLeft className="w-6 h-6" />
+            <ArrowLeft className="w-5 h-5" />
           </button>
           <div>
             <div className="flex items-center space-x-2">
-              <Scale className="w-6 h-6 text-amber-400" />
-              <span className="text-xs uppercase tracking-widest text-emerald-300 font-bold">KONSOL ADMIN 1 - KANTOR & TIMBANGAN</span>
+              <span className="text-base font-extrabold text-white tracking-wide">PT. BUMI MAS</span>
+              <span className="text-[10px] font-bold uppercase tracking-wider bg-sky-500/20 text-sky-300 px-2.5 py-0.5 rounded-full border border-sky-400/30">
+                WEIGHBRIDGE v2.0 PRO
+              </span>
             </div>
-            <h1 className="text-2xl md:text-3xl font-extrabold text-white mt-1">
-              Pos Timbangan Digital RS232 (2-Step Bruto / Tara)
-            </h1>
+            <div className="text-xs text-slate-400 mt-0.5 flex items-center space-x-2">
+              <Clock className="w-3.5 h-3.5 text-slate-500" />
+              <span>{currentClock || 'Memuat waktu...'}</span>
+            </div>
           </div>
         </div>
 
-        {/* COM Port Status Indicator */}
-        <div className="flex items-center space-x-3 bg-[#08251b] px-4 py-3 rounded-xl border border-emerald-700/60">
-          <Cpu className={`w-6 h-6 ${comPortConnected ? 'text-emerald-400 animate-pulse' : 'text-slate-500'}`} />
-          <div>
-            <div className="text-[11px] text-slate-300 font-medium">Port Serial RS232 (Timbangan Digital):</div>
-            <div className="text-xs font-bold flex items-center space-x-2">
-              <span className={comPortConnected ? 'text-emerald-400' : 'text-slate-400'}>
-                {comPortConnected
-                  ? (isSimulatedCom ? 'COM SIMULATED (9600 Bps)' : 'COM RS232: CONNECTED')
-                  : 'DISCONNECTED'}
-              </span>
+        {/* Right Header Controls: Riwayat, Port, Connect, Status */}
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            onClick={() => setShowHistoryModal(true)}
+            className="px-3 py-1.5 bg-[#1e293b] hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold transition flex items-center space-x-1.5 border border-slate-600"
+          >
+            <History className="w-3.5 h-3.5 text-sky-400" />
+            <span>📄 Riwayat Tiket ({completedTickets.length})</span>
+          </button>
+
+          <div className="flex items-center space-x-2 bg-[#1e293b] px-3 py-1.5 rounded-xl border border-slate-700 text-xs">
+            <span className="text-slate-400">Baud:</span>
+            <select
+              value={baudRate}
+              onChange={(e) => setBaudRate(parseInt(e.target.value, 10))}
+              disabled={comPortConnected}
+              className="bg-[#0f172a] text-slate-200 font-bold px-2 py-0.5 rounded outline-none border border-slate-600"
+            >
+              <option value={9600}>9600</option>
+              <option value={4800}>4800</option>
+              <option value={2400}>2400</option>
+              <option value={19200}>19200</option>
+              <option value={115200}>115200</option>
+            </select>
+          </div>
+
+          <button
+            onClick={handleConnectComPort}
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center space-x-1.5 ${
+              comPortConnected
+                ? 'bg-rose-600 hover:bg-rose-700 text-white'
+                : 'bg-sky-600 hover:bg-sky-700 text-white'
+            }`}
+          >
+            <Cpu className="w-3.5 h-3.5" />
+            <span>{comPortConnected ? 'Putuskan RS232' : 'Hubungkan RS232'}</span>
+          </button>
+
+          {/* Status Badge */}
+          <span className={`px-2.5 py-1 rounded-xl text-[11px] font-bold flex items-center space-x-1.5 ${
+            comPortConnected
+              ? 'bg-emerald-950 text-emerald-300 border border-emerald-700'
+              : 'bg-slate-800 text-slate-400 border border-slate-700'
+          }`}>
+            <span className={`w-2 h-2 rounded-full ${comPortConnected ? 'bg-emerald-400 animate-pulse' : 'bg-rose-500'}`} />
+            <span>{comPortConnected ? (isSimulatedCom ? '● COM SIMULASI' : '● RS232 CONNECTED') : '● TERPUTUS'}</span>
+          </span>
+        </div>
+      </div>
+
+      {/* =========================================================
+          DIGITAL WEIGH HUD (CENTER STAGE)
+      ========================================================= */}
+      <div className="bg-[#020617] rounded-2xl border-2 border-emerald-500 shadow-xl p-4 text-white">
+        {/* Top bar inside HUD: Stability, Zero, Simulation & CCTV */}
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-3">
+          <div className="flex items-center space-x-3">
+            <span className={`px-3 py-1 rounded-lg text-xs font-extrabold tracking-wider ${
+              isScaleStable 
+                ? 'bg-emerald-950 text-emerald-400 border border-emerald-700' 
+                : 'bg-amber-950 text-amber-400 border border-amber-700 animate-pulse'
+            }`}>
+              {isScaleStable ? '● STABIL' : '● BERGERAK (UNSTABLE)'}
+            </span>
+
+            <button
+              onClick={() => { setLiveComWeight(0); setIsScaleStable(true); }}
+              className="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-sky-400 text-xs font-extrabold rounded-lg border border-slate-700 transition"
+              title="Set tampilan timbangan ke 0.0 KG"
+            >
+              ZERO [ 0.0 ]
+            </button>
+          </div>
+
+          <div className="flex items-center space-x-2">
+            {/* CCTV Scan Button */}
+            <button
+              type="button"
+              onClick={handleScanNopolCctv}
+              disabled={isScanningCctv}
+              className={`px-3 py-1.5 rounded-xl font-extrabold text-xs transition flex items-center space-x-1.5 shadow ${
+                isScanningCctv
+                  ? 'bg-amber-950 text-amber-300 cursor-wait animate-pulse'
+                  : 'bg-amber-500 hover:bg-amber-600 text-slate-950'
+              }`}
+              title="Baca Nopol otomatis dari kamera CCTV via OCR"
+            >
+              <Camera className="w-3.5 h-3.5" />
+              <span>{isScanningCctv ? 'SCANNING CCTV...' : '📷 SCAN NOPOL CCTV'}</span>
+            </button>
+
+            {/* Simulation controls */}
+            <div className="flex items-center space-x-1.5 bg-slate-900 px-2.5 py-1 rounded-xl border border-slate-800 text-xs">
+              <span className="text-slate-500">Tes:</span>
+              <input
+                type="number"
+                value={simWeightInput}
+                onChange={(e) => setSimWeightInput(e.target.value)}
+                className="w-20 bg-slate-950 text-sky-400 px-2 py-0.5 rounded text-right font-mono font-bold outline-none border border-slate-700"
+              />
               <button
-                onClick={handleConnectComPort}
-                className="px-2 py-0.5 bg-amber-400/20 hover:bg-amber-400/30 text-amber-300 rounded font-bold text-[11px] transition border border-amber-400/40"
+                onClick={handleSetSimWeight}
+                className="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded font-bold transition"
               >
-                {comPortConnected ? 'Disconnect' : 'Connect RS232 / Simulasi'}
+                Set
               </button>
             </div>
           </div>
         </div>
+
+        {/* Large Glowing Readout */}
+        <div className="py-4 flex items-center justify-between px-6">
+          <div className="flex-1 text-center">
+            <span className="font-mono text-6xl md:text-7xl lg:text-8xl font-black text-[#22c55e] tracking-tight select-all">
+              {liveComWeight.toLocaleString('id-ID', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
+            </span>
+          </div>
+          <div className="text-right">
+            <span className="font-extrabold text-3xl md:text-4xl text-[#22c55e]">
+              KG
+            </span>
+            <div className="text-[11px] font-bold text-slate-500 mt-1 uppercase tracking-wider">
+              {selectedTruckForTare ? 'TIMBANG KE-2 (TARA)' : 'TIMBANG KE-1 (BRUTO)'}
+            </div>
+          </div>
+        </div>
+
+        {cctvError && (
+          <div className="text-xs text-amber-400 bg-amber-950/60 p-2 rounded-xl border border-amber-800 mt-1">
+            ⚠️ {cctvError}
+          </div>
+        )}
       </div>
 
-      {/* Mode Switcher: Timbang Masuk (Bruto) vs Timbang Keluar (Tara) */}
-      <div className="flex items-center justify-between bg-white p-3 rounded-2xl border border-slate-200 shadow-sm">
-        <div className="flex items-center space-x-2">
-          <button
-            onClick={() => { setWeighMode('MASUK'); setSelectedTruckForTare(null); }}
-            className={`px-5 py-3 rounded-xl font-extrabold text-sm transition flex items-center space-x-2 ${
-              weighMode === 'MASUK'
-                ? 'bg-[#0f3e2e] text-white shadow-md'
-                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-            }`}
-          >
-            <Truck className="w-4 h-4 text-amber-400" />
-            <span>1. TIMBANG MASUK (BRUTO)</span>
-          </button>
+      {/* =========================================================
+          MAIN 3-COLUMN INTEGRATED WORKSPACE (SAME AS DESKTOP APP)
+      ========================================================= */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
 
-          <button
-            onClick={() => setWeighMode('KELUAR')}
-            className={`px-5 py-3 rounded-xl font-extrabold text-sm transition flex items-center space-x-2 ${
-              weighMode === 'KELUAR'
-                ? 'bg-[#10b981] text-[#0f3e2e] shadow-md'
-                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-            }`}
-          >
-            <Scale className="w-4 h-4 text-[#0f3e2e]" />
-            <span>2. TIMBANG KELUAR (TARA KOSONG)</span>
-            {pendingTareTrucks.length > 0 && (
-              <span className="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full font-bold">
-                {pendingTareTrucks.length} Truk
+        {/* -------------------------------------------------------
+            PANEL 1: FORM PENIMBANGAN (5 COLS)
+        ------------------------------------------------------- */}
+        <div className="lg:col-span-5 bg-white rounded-2xl p-5 shadow-sm border border-slate-200 space-y-4">
+          <div className="border-b border-slate-100 pb-2.5 flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <FileText className="w-4 h-4 text-sky-600" />
+              <h2 className="text-sm font-extrabold text-slate-900 uppercase tracking-wide">
+                FORM PENIMBANGAN
+              </h2>
+            </div>
+            {selectedTruckForTare && (
+              <span className="text-[11px] bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded-full font-bold">
+                Mode: Timbang Keluar
               </span>
             )}
-          </button>
-        </div>
+          </div>
 
-        <div className="text-xs font-bold text-slate-500">
-          *Format Baku Pabrik: Berat Netto = Bruto (Berat Masuk) - Tara (Berat Keluar)
-        </div>
-      </div>
-
-      {/* MAIN CONTENT GRID */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Left Column: Form Timbangan */}
-        <div className="lg:col-span-2 space-y-6">
-          {weighMode === 'MASUK' ? (
-            /* ================= FORM TIMBANG MASUK (BRUTO) ================= */
-            <div className="bg-white rounded-2xl p-6 shadow-md border border-slate-200 space-y-6">
-              <h2 className="text-xl font-bold text-slate-900 border-b border-slate-100 pb-3 flex items-center justify-between">
-                <span>Input Timbang Masuk Armada Truk (Bruto)</span>
-                <span className="text-xs bg-amber-100 text-amber-900 px-3 py-1 rounded-full font-bold">
-                  Step 1: Gross Weight
-                </span>
-              </h2>
-
-              <form onSubmit={handleSubmitGross} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Nopol Truk */}
-                  <div>
-                    <div className="flex justify-between items-center mb-1">
-                      <label className="text-sm font-bold text-slate-800">
-                        Nomor Polisi Armada (Nopol):
-                      </label>
-                      <button
-                        type="button"
-                        onClick={handleScanNopolCctv}
-                        disabled={isScanningCctv}
-                        className={`px-3 py-1.5 rounded-xl font-extrabold text-xs transition flex items-center space-x-1.5 shadow-sm ${
-                          isScanningCctv
-                            ? 'bg-amber-100 text-amber-800 cursor-wait animate-pulse'
-                            : 'bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-[#0f3e2e] active:scale-95'
-                        }`}
-                        title="Ambil snapshot foto dari CCTV TP-Link dan baca Nopol otomatis via PaddleOCR"
-                      >
-                        <Camera className={`w-3.5 h-3.5 ${isScanningCctv ? 'animate-spin' : ''}`} />
-                        <span>{isScanningCctv ? 'SCANNING CCTV...' : '[ SCAN NOPOL CCTV ]'}</span>
-                      </button>
-                    </div>
-                    <div className="relative">
-                      <input
-                        type="text"
-                        required
-                        placeholder="Contoh: L 9482 UB"
-                        value={nopol}
-                        onChange={(e) => setNopol(e.target.value)}
-                        className="w-full px-4 py-3 text-xl font-extrabold uppercase bg-slate-50 border-2 border-slate-300 rounded-xl focus:border-[#10b981] outline-none text-[#0f3e2e]"
-                      />
-                      {isScanningCctv && (
-                        <span className="absolute right-3 top-3 text-xs font-bold text-amber-700 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200 animate-pulse">
-                          Reading RTSP TP-Link...
-                        </span>
-                      )}
-                    </div>
-                    {cctvError && (
-                      <p className="text-xs text-red-600 font-bold mt-1.5 bg-red-50 p-2 rounded-lg border border-red-200">
-                        ⚠️ {cctvError}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Supplier Dropdown */}
-                  <div>
-                    <div className="flex justify-between items-center mb-1">
-                      <label className="text-sm font-bold text-slate-800">
-                        Suplier Beras / Gabah:
-                      </label>
-                      <div className="flex items-center space-x-2">
-                        {suppliers.length === 0 && (
-                          <button
-                            type="button"
-                            onClick={loadSampleMasterData}
-                            className="text-xs bg-amber-100 hover:bg-amber-200 text-amber-900 font-extrabold px-2.5 py-0.5 rounded-lg transition border border-amber-300"
-                            title="Isi sampel data Suplier, Customer & Produk Pabrik"
-                          >
-                            🚀 Isi Data Awal Pabrik
-                          </button>
-                        )}
-                        <button
-                          type="button"
-                          onClick={() => setShowAddSupplier(true)}
-                          className="text-xs text-[#10b981] font-bold hover:underline flex items-center space-x-1"
-                        >
-                          <Plus className="w-3.5 h-3.5" />
-                          <span>Tambah Suplier</span>
-                        </button>
-                      </div>
-                    </div>
-                    <select
-                      value={supplierId}
-                      onChange={(e) => setSupplierId(e.target.value)}
-                      className="w-full px-4 py-3 text-base font-bold bg-slate-50 border-2 border-slate-300 rounded-xl focus:border-[#10b981] outline-none text-slate-900"
-                    >
-                      {suppliers.length === 0 ? (
-                        <option value="">-- Master Suplier Masih Kosong (Klik [🚀 Isi Data Awal Pabrik] di atas) --</option>
-                      ) : (
-                        suppliers.map((sup) => (
-                          <option key={sup.id} value={sup.id}>
-                            {sup.name} ({sup.bank_name} - {sup.bank_account_number})
-                          </option>
-                        ))
-                      )}
-                    </select>
-                  </div>
-                </div>
-
-                {/* Timbangan Gross Weight Box */}
-                <div className="bg-[#faf8ff] p-5 rounded-2xl border-2 border-emerald-200 space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-extrabold text-slate-800">BERAT MASUK (BRUTO TRUK + ISI):</span>
-                    <div className="flex items-center space-x-2">
-                      <button
-                        type="button"
-                        onClick={() => { setGrossWeight(0); setLiveComWeight(0); }}
-                        className="text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-3 py-1.5 rounded-lg transition"
-                        title="Set berat timbangan ke 0 KG"
-                      >
-                        Zero (0 KG)
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => simulateComRead(true)}
-                        className="text-xs bg-[#0f3e2e] hover:bg-emerald-900 text-white font-extrabold px-3 py-1.5 rounded-lg transition flex items-center space-x-1 shadow-sm"
-                        title="Tarik nilai dari timbangan digital RS232 atau aktifkan simulasi"
-                      >
-                        <RefreshCw className="w-3.5 h-3.5 text-amber-400" />
-                        <span>Tarik Nilai Timbangan (COM)</span>
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="bg-white p-4 rounded-xl border border-slate-200 text-center max-w-sm mx-auto">
-                    <div className="text-xs text-slate-500 font-bold mb-1">BRUTO (KG)</div>
-                    <input
-                      type="number"
-                      value={grossWeight}
-                      onChange={(e) => setGrossWeight(parseFloat(e.target.value) || 0)}
-                      className="w-full text-center text-4xl font-extrabold text-[#0f3e2e] outline-none"
-                    />
-                  </div>
-                </div>
-
-                {/* Alokasi Pembongkaran (Multi-Stapel / Direct Cor / Up to 20 Stapel) */}
-                <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <Layers className="w-5 h-5 text-[#10b981]" />
-                      <span className="text-sm font-extrabold text-slate-900">
-                        ALOKASI PEMBONGKARAN GUDANG (Pecah Tumpukan / Direct Cor):
-                      </span>
-                    </div>
-
-                    <div className="flex items-center space-x-2">
-                      <button
-                        type="button"
-                        onClick={() => setShowAddStapel(true)}
-                        className="text-xs bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold px-3 py-1 rounded-lg transition flex items-center space-x-1"
-                      >
-                        <Plus className="w-3.5 h-3.5" />
-                        <span>+ Tambah Stapel/Tumpukan Baru</span>
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="space-y-3">
-                    {allocations.map((item, idx) => (
-                      <div key={idx} className="flex flex-col sm:flex-row items-center gap-3 bg-white p-3 rounded-xl border border-slate-200">
-                        <span className="text-xs font-bold text-slate-500 w-6">#{idx + 1}</span>
-
-                        <select
-                          value={item.is_direct_cor ? 'DIRECT_COR' : item.stapel_id}
-                          onChange={(e) => handleAllocationChange(idx, 'stapel_id', e.target.value)}
-                          className="flex-1 px-3 py-2 text-xs font-bold bg-slate-50 border border-slate-300 rounded-lg outline-none text-slate-900"
-                        >
-                          <option value="DIRECT_COR">⚡ LANGSUNG DI-COR (Direct Reprocessing)</option>
-                          {stapelPiles.map((st) => (
-                            <option key={st.id} value={st.id}>
-                              📦 {st.name} ({st.quality_grade}) — Stok: {st.stock_kg.toLocaleString('id-ID')} KG
-                            </option>
-                          ))}
-                        </select>
-
-                        <div className="flex items-center space-x-2">
-                          <input
-                            type="number"
-                            placeholder="Alokasi KG (opsional)..."
-                            value={item.allocated_kg || ''}
-                            onChange={(e) => handleAllocationChange(idx, 'allocated_kg', e.target.value)}
-                            className="w-36 px-3 py-2 text-xs font-bold border border-slate-300 rounded-lg text-right outline-none"
-                          />
-                          <span className="text-xs font-bold text-slate-500">KG</span>
-                        </div>
-
-                        {allocations.length > 1 && (
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveAllocationRow(idx)}
-                            className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={handleAddAllocationRow}
-                    className="text-xs text-[#10b981] font-bold hover:underline flex items-center space-x-1 pt-1"
-                  >
-                    <Plus className="w-3.5 h-3.5" />
-                    <span>Pecah Alokasi Ke Tumpukan Tambahan</span>
-                  </button>
-                </div>
-
-                <button
-                  type="submit"
-                  className="w-full py-4 bg-[#0f3e2e] hover:bg-emerald-900 text-white font-extrabold text-base rounded-xl shadow-lg transition flex items-center justify-center space-x-2"
-                >
-                  <Printer className="w-5 h-5 text-amber-400" />
-                  <span>SIMPAN BRUTO & CETAK STT MASUK</span>
-                </button>
-              </form>
+          <form onSubmit={selectedTruckForTare ? handleSaveSecondWeight : handleSaveFirstWeight} className="space-y-3.5 text-xs">
+            {/* No Polisi Input */}
+            <div>
+              <label className="block text-slate-700 font-extrabold mb-1">
+                No Polisi (Plat Truk):
+              </label>
+              <input
+                type="text"
+                required
+                placeholder="Contoh: B 1234 ABC"
+                value={nopol}
+                onChange={(e) => {
+                  const val = e.target.value.toUpperCase();
+                  setNopol(val);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleLookupPlate(nopol);
+                  }
+                }}
+                className="w-full px-3 py-2 text-base font-extrabold bg-slate-50 border-2 border-slate-300 rounded-xl focus:border-sky-500 outline-none uppercase text-slate-900"
+              />
             </div>
-          ) : (
-            /* ================= FORM TIMBANG KELUAR (TARA) ================= */
-            <div className="bg-white rounded-2xl p-6 shadow-md border border-slate-200 space-y-6">
-              <h2 className="text-xl font-bold text-slate-900 border-b border-slate-100 pb-3 flex items-center justify-between">
-                <span>Input Timbang Keluar Truk Kosong (Tara)</span>
-                <span className="text-xs bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full font-bold">
-                  Step 2: Tare Weight & Netto Final
-                </span>
-              </h2>
 
-              {!selectedTruckForTare ? (
-                <div className="space-y-4">
-                  <p className="text-xs font-bold text-slate-600">
-                    Silakan pilih armada truk di antrean yang sudah selesai bongkar muatan:
-                  </p>
+            {/* Customer Input & Quick Chips */}
+            <div>
+              <div className="flex items-center justify-between mb-1">
+                <label className="text-slate-700 font-extrabold">Customer / Rekanan:</label>
+                <span className="text-[10px] text-slate-400 italic">Bisa klik dari panel tengah</span>
+              </div>
+              <input
+                type="text"
+                required
+                placeholder="Pilih dari daftar atau ketik nama..."
+                value={customerName}
+                onChange={(e) => setCustomerName(e.target.value)}
+                className="w-full px-3 py-2 font-bold bg-slate-50 border border-slate-300 rounded-xl focus:border-sky-500 outline-none text-slate-900"
+              />
 
-                  <div className="grid grid-cols-1 gap-3">
-                    {pendingTareTrucks.length === 0 ? (
-                      <div className="p-8 text-center text-slate-400 text-xs font-medium bg-slate-50 rounded-xl border border-dashed">
-                        Belum ada armada truk yang mengantre timbang keluar.
-                      </div>
-                    ) : (
-                      pendingTareTrucks.map((truck) => (
-                        <div
-                          key={truck.id}
-                          onClick={() => setSelectedTruckForTare(truck)}
-                          className="bg-slate-50 hover:bg-emerald-50 p-4 rounded-xl border-2 border-slate-200 hover:border-[#10b981] cursor-pointer transition flex items-center justify-between"
-                        >
-                          <div>
-                            <div className="flex items-center space-x-2">
-                              <span className="font-extrabold text-base text-[#0f3e2e]">{truck.nopol}</span>
-                              <span className="text-xs bg-amber-100 text-amber-900 px-2 py-0.5 rounded font-bold">{truck.ticket_number}</span>
-                            </div>
-                            <p className="text-xs text-slate-500 mt-1">Suplier: {truck.supplier_name} • Masuk: {truck.datetime_in}</p>
-                          </div>
-                          <div className="text-right">
-                            <span className="text-xs text-slate-400 font-bold block">BRUTO MASUK:</span>
-                            <span className="font-extrabold text-sm text-[#0f3e2e]">{truck.gross_weight.toLocaleString('id-ID')} KG</span>
-                          </div>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </div>
-              ) : (
-                <form onSubmit={handleSubmitTare} className="space-y-6">
-                  <div className="bg-emerald-50 p-4 rounded-xl border border-emerald-200 flex justify-between items-center">
-                    <div>
-                      <span className="text-xs text-slate-500 font-bold">TRUK TERPILIH:</span>
-                      <h3 className="text-xl font-extrabold text-[#0f3e2e]">{selectedTruckForTare.nopol} ({selectedTruckForTare.ticket_number})</h3>
-                      <p className="text-xs text-slate-600">Suplier: {selectedTruckForTare.supplier_name}</p>
-                    </div>
+              {/* Quick Customer Chips */}
+              <div className="flex flex-wrap gap-1.5 mt-1.5">
+                {customers.slice(0, 4).map((c) => (
+                  <button
+                    key={c.id}
+                    type="button"
+                    onClick={() => handleCustomerClick(c.name)}
+                    className="px-2 py-0.5 bg-slate-100 hover:bg-sky-100 hover:text-sky-800 text-slate-700 rounded-lg text-[10px] font-bold transition border border-slate-200"
+                  >
+                    {c.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Jenis Muatan */}
+            <div>
+              <label className="block text-slate-700 font-extrabold mb-1">Jenis Muatan:</label>
+              <input
+                id="weigh-goods-input"
+                type="text"
+                required
+                placeholder="Contoh: Beras Medium / Gabah / Pasir"
+                value={goods}
+                onChange={(e) => setGoods(e.target.value)}
+                className="w-full px-3 py-2 font-bold bg-slate-50 border border-slate-300 rounded-xl focus:border-sky-500 outline-none text-slate-900"
+              />
+              <div className="flex gap-1.5 mt-1">
+                {['Beras Medium', 'Gabah Basah', 'Beras Super', 'Katul / Dedak', 'Pasir'].map((item) => (
+                  <button
+                    key={item}
+                    type="button"
+                    onClick={() => setGoods(item)}
+                    className="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded text-[10px] font-medium"
+                  >
+                    {item}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Jumlah Sak */}
+            <div>
+              <label className="block text-slate-700 font-extrabold mb-1">Jumlah Sak (Opsional):</label>
+              <input
+                type="number"
+                placeholder="0"
+                value={sacks}
+                onChange={(e) => setSacks(e.target.value)}
+                className="w-32 px-3 py-2 font-bold bg-slate-50 border border-slate-300 rounded-xl focus:border-sky-500 outline-none text-slate-900"
+              />
+            </div>
+
+            {/* Optional Stapel Allocation (Kept for ERP Stapel inventory tracking) */}
+            <div className="pt-1">
+              <button
+                type="button"
+                onClick={() => setShowStapelAlloc(!showStapelAlloc)}
+                className="text-[11px] font-bold text-sky-600 hover:underline flex items-center space-x-1"
+              >
+                <Layers className="w-3.5 h-3.5" />
+                <span>{showStapelAlloc ? '▼ Tutup Alokasi Gudang (Stapel)' : '► Opsi Alokasi Gudang / Direct Cor'}</span>
+              </button>
+
+              {showStapelAlloc && (
+                <div className="mt-2 p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="font-bold text-slate-700">Tumpukan Stapel:</span>
                     <button
                       type="button"
-                      onClick={() => setSelectedTruckForTare(null)}
-                      className="text-xs text-red-600 font-bold hover:underline"
+                      onClick={handleAddAllocationRow}
+                      className="text-[10px] text-emerald-700 font-bold hover:underline"
                     >
-                      Ganti Truk
+                      + Tambah Pecah Tumpukan
                     </button>
                   </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
-                    <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                      <span className="text-xs text-slate-500 font-bold block">1. BRUTO (MASUK)</span>
-                      <span className="text-2xl font-extrabold text-slate-800">{selectedTruckForTare.gross_weight.toLocaleString('id-ID')} KG</span>
+                  {allocations.map((item, idx) => (
+                    <div key={idx} className="flex items-center gap-2">
+                      <select
+                        value={item.is_direct_cor ? 'DIRECT_COR' : item.stapel_id}
+                        onChange={(e) => handleAllocationChange(idx, 'stapel_id', e.target.value)}
+                        className="flex-1 p-1.5 text-xs font-bold bg-white border rounded-lg"
+                      >
+                        <option value="DIRECT_COR">⚡ LANGSUNG DI-COR</option>
+                        {stapelPiles.map((st) => (
+                          <option key={st.id} value={st.id}>
+                            📦 {st.name} ({st.stock_kg.toLocaleString('id-ID')} KG)
+                          </option>
+                        ))}
+                      </select>
+                      {allocations.length > 1 && (
+                        <button type="button" onClick={() => handleRemoveAllocationRow(idx)} className="text-rose-500">
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      )}
                     </div>
-
-                    <div className="bg-emerald-100 p-4 rounded-xl border-2 border-emerald-400">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-xs text-emerald-900 font-bold">2. TARA (KELUAR)</span>
-                        <div className="flex items-center space-x-1">
-                          <button
-                            type="button"
-                            onClick={() => { setTareWeightInput(0); setLiveComWeight(0); }}
-                            className="text-[10px] bg-slate-200 hover:bg-slate-300 text-slate-700 px-1.5 py-0.5 rounded font-bold"
-                          >
-                            0 KG
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => simulateComRead(false)}
-                            className="text-[10px] bg-emerald-800 text-white px-2 py-0.5 rounded"
-                          >
-                            COM Read
-                          </button>
-                        </div>
-                      </div>
-                      <input
-                        type="number"
-                        required
-                        value={tareWeightInput}
-                        onChange={(e) => setTareWeightInput(parseFloat(e.target.value) || 0)}
-                        className="w-full text-center text-3xl font-extrabold text-[#0f3e2e] outline-none bg-white rounded-lg p-1 border"
-                      />
-                    </div>
-
-                    <div className="bg-[#0f3e2e] text-white p-4 rounded-xl border border-emerald-800">
-                      <span className="text-xs text-amber-300 font-bold block">3. NETTO FINAL (BERAS)</span>
-                      <span className="text-2xl font-extrabold text-amber-400">
-                        {Math.max(0, selectedTruckForTare.gross_weight - tareWeightInput).toLocaleString('id-ID')} KG
-                      </span>
-                    </div>
-                  </div>
-
-                  <button
-                    type="submit"
-                    className="w-full py-4 bg-[#10b981] hover:bg-emerald-600 text-[#0f3e2e] font-extrabold text-base rounded-xl shadow-lg transition flex items-center justify-center space-x-2"
-                  >
-                    <Printer className="w-5 h-5 text-[#0f3e2e]" />
-                    <span>SIMPAN TARA & CETAK SLIP STT FINAL</span>
-                  </button>
-                </form>
+                  ))}
+                </div>
               )}
             </div>
-          )}
-        </div>
 
-        {/* Right Column: Antrean & Riwayat STT */}
-        <div className="space-y-6">
-          <div className="bg-white rounded-2xl p-6 shadow-md border border-slate-200 space-y-4">
-            <h3 className="text-lg font-bold text-slate-900 border-b border-slate-100 pb-3 flex justify-between items-center">
-              <span>Riwayat Timbangan Hari Ini</span>
-              <span className="text-xs bg-slate-100 px-2 py-1 rounded font-mono text-slate-600">
-                {weighbridgeInList.length} STT
-              </span>
-            </h3>
+            {/* Selected Truck Tare Info Banner (When in 2nd Weigh Mode) */}
+            {selectedTruckForTare && (
+              <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-200 space-y-1">
+                <div className="flex justify-between items-center text-xs">
+                  <span className="text-slate-500">Berat Masuk (1st Weigh):</span>
+                  <span className="font-mono font-extrabold text-slate-900">
+                    {selectedTruckForTare.gross_weight.toLocaleString('id-ID')} KG
+                  </span>
+                </div>
+                <div className="flex justify-between items-center text-xs">
+                  <span className="text-slate-500">Berat Keluar (Saat Ini):</span>
+                  <span className="font-mono font-extrabold text-slate-900">
+                    {liveComWeight.toLocaleString('id-ID')} KG
+                  </span>
+                </div>
+                <div className="flex justify-between items-center text-xs font-extrabold text-emerald-800 pt-1 border-t border-emerald-200">
+                  <span>ESTIMASI NETTO:</span>
+                  <span className="font-mono text-sm">
+                    {Math.max(0, selectedTruckForTare.gross_weight - liveComWeight).toLocaleString('id-ID')} KG
+                  </span>
+                </div>
+              </div>
+            )}
 
-            <div className="space-y-3 max-h-[500px] overflow-y-auto pr-1">
-              {weighbridgeInList.map((ticket) => (
-                <div key={ticket.id} className="bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs space-y-2">
-                  <div className="flex justify-between items-start">
-                    <span className="font-extrabold text-slate-900">{ticket.ticket_number}</span>
-                    <span className="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-mono font-bold">
-                      {ticket.net_weight.toLocaleString('id-ID')} KG
-                    </span>
-                  </div>
+            {/* Dual Action Buttons (Same as Desktop App) */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2">
+              <button
+                type="button"
+                disabled={!!selectedTruckForTare}
+                onClick={handleSaveFirstWeight}
+                className={`py-3 rounded-xl font-extrabold text-xs flex items-center justify-center space-x-1.5 transition shadow-sm ${
+                  selectedTruckForTare
+                    ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                    : 'bg-sky-600 hover:bg-sky-700 text-white active:scale-98'
+                }`}
+              >
+                <Truck className="w-4 h-4" />
+                <span>📥 1st WEIGH (MASUK)</span>
+              </button>
 
-                  <div className="flex justify-between text-slate-600 font-medium">
-                    <span>Nopol: <strong>{ticket.nopol}</strong></span>
-                    <span>Suplier: {ticket.supplier_name}</span>
-                  </div>
+              <button
+                type="button"
+                disabled={!selectedTruckForTare}
+                onClick={handleSaveSecondWeight}
+                className={`py-3 rounded-xl font-extrabold text-xs flex items-center justify-center space-x-1.5 transition shadow-sm ${
+                  !selectedTruckForTare
+                    ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                    : 'bg-emerald-600 hover:bg-emerald-700 text-white animate-pulse active:scale-98'
+                }`}
+              >
+                <Printer className="w-4 h-4" />
+                <span>🖨️ 2nd WEIGH & PRINT</span>
+              </button>
+            </div>
 
-                  <div className="pt-2 border-t border-slate-200 flex items-center justify-between">
-                    <span className="text-[10px] text-slate-400">
-                      Bruto: {ticket.gross_weight.toLocaleString('id-ID')} KG | Tara: {ticket.tare_weight.toLocaleString('id-ID')} KG
-                    </span>
-                    <button
-                      onClick={() => setPrintTicket(ticket)}
-                      className="text-xs text-[#10b981] font-bold hover:underline flex items-center space-x-1"
-                    >
-                      <Printer className="w-3.5 h-3.5" />
-                      <span>Cetak STT</span>
-                    </button>
-                  </div>
+            <button
+              type="button"
+              onClick={handleResetForm}
+              className="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-xl text-xs flex items-center justify-center space-x-1 transition"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+              <span>Reset Form Input</span>
+            </button>
+          </form>
+
+          {/* Activity Log Terminal */}
+          <div className="pt-2 border-t border-slate-100">
+            <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider block mb-1">
+              Terminal Log Aktivitas:
+            </span>
+            <div className="bg-[#0f172a] text-slate-300 p-2.5 rounded-xl font-mono text-[11px] max-h-28 overflow-y-auto space-y-1">
+              {activityLogs.map((log, i) => (
+                <div key={i} className="flex space-x-2">
+                  <span className="text-slate-500">[{log.time}]</span>
+                  <span className={log.type === 'success' ? 'text-emerald-400' : log.type === 'warn' ? 'text-amber-400' : 'text-slate-300'}>
+                    {log.msg}
+                  </span>
                 </div>
               ))}
             </div>
           </div>
         </div>
+
+        {/* -------------------------------------------------------
+            PANEL 2: DATABASE CUSTOMER (3 COLS) - KLIK LANGSUNG
+        ------------------------------------------------------- */}
+        <div className="lg:col-span-3 bg-white rounded-2xl p-5 shadow-sm border border-slate-200 space-y-3 flex flex-col">
+          <div className="border-b border-slate-100 pb-2.5 flex items-center justify-between">
+            <h2 className="text-sm font-extrabold text-slate-900 uppercase tracking-wide">
+              👥 DATABASE CUSTOMER
+            </h2>
+            <span className="text-[11px] font-bold bg-sky-100 text-sky-800 px-2 py-0.5 rounded-full">
+              {customers.length} Cust
+            </span>
+          </div>
+
+          <div className="text-[11px] text-sky-700 italic">
+            *Klik nama untuk langsung memilih ke formulir:
+          </div>
+
+          {/* Search bar */}
+          <div className="relative">
+            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" />
+            <input
+              type="text"
+              placeholder="Cari customer..."
+              value={custFilter}
+              onChange={(e) => setCustFilter(e.target.value)}
+              className="w-full pl-8 pr-3 py-1.5 text-xs font-bold bg-slate-50 border border-slate-200 rounded-xl focus:border-sky-500 outline-none"
+            />
+          </div>
+
+          {/* Customer Listbox */}
+          <div className="flex-1 overflow-y-auto max-h-[360px] border border-slate-200 rounded-xl divide-y divide-slate-100">
+            {filteredCustomers.length === 0 ? (
+              <div className="p-4 text-center text-slate-400 text-xs italic">
+                {customers.length === 0 ? 'Belum ada customer di database.' : 'Tidak ada customer yang cocok.'}
+              </div>
+            ) : (
+              filteredCustomers.map((c) => {
+                const isSelected = customerName.toLowerCase() === c.name.toLowerCase();
+                return (
+                  <div
+                    key={c.id}
+                    onClick={() => handleCustomerClick(c.name)}
+                    onDoubleClick={() => handleCustomerClick(c.name, true)}
+                    className={`p-2.5 flex items-center justify-between cursor-pointer transition text-xs ${
+                      isSelected
+                        ? 'bg-sky-100 text-sky-900 font-extrabold'
+                        : 'hover:bg-slate-50 text-slate-800 font-bold'
+                    }`}
+                  >
+                    <div className="flex items-center space-x-2 truncate">
+                      {isSelected && <Check className="w-3.5 h-3.5 text-sky-600 flex-shrink-0" />}
+                      <span className="truncate">{c.name}</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteCustomer(c.id, c.name);
+                      }}
+                      className="text-slate-300 hover:text-rose-500 p-1"
+                      title="Hapus customer"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                );
+              })
+            )}
+          </div>
+
+          {/* Add New Customer Bar */}
+          <form onSubmit={handleAddNewCustomer} className="pt-2 border-t border-slate-100 flex gap-2">
+            <input
+              type="text"
+              placeholder="Nama customer baru..."
+              value={newCustInput}
+              onChange={(e) => setNewCustInput(e.target.value)}
+              className="flex-1 px-3 py-2 text-xs font-bold bg-slate-50 border border-slate-300 rounded-xl focus:border-sky-500 outline-none"
+            />
+            <button
+              type="submit"
+              className="px-3 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-extrabold rounded-xl transition"
+            >
+              + Tambah
+            </button>
+          </form>
+        </div>
+
+        {/* -------------------------------------------------------
+            PANEL 3: TRUK DI DALAM / MENUNGGU TIMBANG 2 (4 COLS)
+        ------------------------------------------------------- */}
+        <div className="lg:col-span-4 bg-white rounded-2xl p-5 shadow-sm border border-slate-200 space-y-3 flex flex-col">
+          <div className="border-b border-slate-100 pb-2.5 flex items-center justify-between">
+            <h2 className="text-sm font-extrabold text-slate-900 uppercase tracking-wide">
+              🚛 TRUK DI DALAM (TIMBANG 2)
+            </h2>
+            <span className="text-[11px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">
+              {inboundTrucks.length} Truk
+            </span>
+          </div>
+
+          {/* Quick-Click Number Plate Badges (TNKB Style, Same as App) */}
+          <div>
+            <div className="text-[10px] font-extrabold text-emerald-700 uppercase tracking-wider mb-1.5">
+              KLIK PLAT CEPAT (TIMBANG 2):
+            </div>
+            <div className="flex flex-wrap gap-1.5 min-h-[36px] items-center p-2 bg-slate-50 rounded-xl border border-slate-200">
+              {inboundTrucks.length === 0 ? (
+                <span className="text-[11px] text-slate-400 italic">Belum ada antrean truk di dalam</span>
+              ) : (
+                inboundTrucks.slice(0, 8).map((t) => (
+                  <button
+                    key={t.id}
+                    type="button"
+                    onClick={() => handleSelectTruckForTare(t)}
+                    className="px-2.5 py-1 bg-[#1e293b] hover:bg-slate-700 active:scale-95 text-white font-mono text-xs font-black rounded-lg border border-slate-600 shadow-sm transition"
+                    title={`Pilih ${t.nopol} untuk Timbang 2`}
+                  >
+                    {t.nopol}
+                  </button>
+                ))
+              )}
+            </div>
+          </div>
+
+          {/* Search queue input */}
+          <div className="relative">
+            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" />
+            <input
+              type="text"
+              placeholder="Cari plat atau customer..."
+              value={plateFilter}
+              onChange={(e) => setPlateFilter(e.target.value)}
+              className="w-full pl-8 pr-3 py-1.5 text-xs font-bold bg-slate-50 border border-slate-200 rounded-xl focus:border-sky-500 outline-none"
+            />
+          </div>
+
+          {/* Inbound Trucks Table */}
+          <div className="flex-1 overflow-y-auto max-h-[330px] border border-slate-200 rounded-xl divide-y divide-slate-100">
+            {filteredInboundTrucks.length === 0 ? (
+              <div className="p-6 text-center text-slate-400 text-xs italic">
+                {inboundTrucks.length === 0 ? 'Semua truk telah selesai timbang keluar.' : 'Tidak ada antrean yang cocok.'}
+              </div>
+            ) : (
+              filteredInboundTrucks.map((t) => {
+                const isSelected = selectedTruckForTare?.id === t.id;
+                return (
+                  <div
+                    key={t.id}
+                    onClick={() => handleSelectTruckForTare(t)}
+                    className={`p-3 cursor-pointer transition text-xs space-y-1 ${
+                      isSelected
+                        ? 'bg-emerald-50 border-l-4 border-emerald-600'
+                        : 'hover:bg-slate-50'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="font-mono text-sm font-black text-slate-900 bg-slate-100 px-2 py-0.5 rounded">
+                        {t.nopol}
+                      </span>
+                      <span className="font-mono text-xs font-extrabold text-[#0f3e2e]">
+                        {t.gross_weight.toLocaleString('id-ID')} KG
+                      </span>
+                    </div>
+
+                    <div className="flex items-center justify-between text-slate-600 font-medium">
+                      <span className="truncate">{t.customer_name || t.supplier_name}</span>
+                      <span className="text-[10px] text-slate-400">{t.datetime_in.split(' ')[1] || t.datetime_in}</span>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-1">
+                      <span className="text-[10px] text-slate-400 italic">
+                        Muatan: {t.goods || 'Beras'}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleCancelInboundTruck(t.id, t.nopol);
+                        }}
+                        className="text-[10px] text-rose-500 hover:underline"
+                      >
+                        Batal
+                      </button>
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </div>
+
       </div>
 
-      {/* Modal Tambah Supplier Baru */}
-      {showAddSupplier && (
+      {/* =========================================================
+          MODAL RIWAYAT TIKET & REPRINT
+      ========================================================= */}
+      {showHistoryModal && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 space-y-4 border-4 border-[#0f3e2e]">
-            <h3 className="text-lg font-extrabold text-slate-900 border-b pb-2">Tambah Suplier Baru</h3>
-            <form onSubmit={handleSaveSupplier} className="space-y-3 text-xs font-bold">
-              <div>
-                <label className="block text-slate-700 mb-1">Nama Suplier:</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="Contoh: H. Ahmad (Jombang)"
-                  value={newSupName}
-                  onChange={(e) => setNewSupName(e.target.value)}
-                  className="w-full p-2.5 bg-slate-50 border rounded-xl"
-                />
+          <div className="bg-white rounded-3xl max-w-3xl w-full p-6 space-y-4 shadow-2xl border-4 border-[#0f172a]">
+            <div className="flex justify-between items-center border-b pb-3">
+              <div className="flex items-center space-x-2">
+                <History className="w-5 h-5 text-sky-600" />
+                <h3 className="text-base font-extrabold text-slate-900">
+                  Riwayat Tiket Penimbangan Selesai ({completedTickets.length})
+                </h3>
               </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-slate-700 mb-1">Bank:</label>
-                  <select
-                    value={newSupBank}
-                    onChange={(e) => setNewSupBank(e.target.value)}
-                    className="w-full p-2.5 bg-slate-50 border rounded-xl"
-                  >
-                    <option value="BCA">BCA</option>
-                    <option value="BRI">BRI</option>
-                    <option value="Mandiri">Mandiri</option>
-                    <option value="BNI">BNI</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-slate-700 mb-1">No Rekening:</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="0182xxxx"
-                    value={newSupAcc}
-                    onChange={(e) => setNewSupAcc(e.target.value)}
-                    className="w-full p-2.5 bg-slate-50 border rounded-xl"
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="block text-slate-700 mb-1">No Telepon/HP:</label>
-                <input
-                  type="text"
-                  placeholder="0812xxxx"
-                  value={newSupPhone}
-                  onChange={(e) => setNewSupPhone(e.target.value)}
-                  className="w-full p-2.5 bg-slate-50 border rounded-xl"
-                />
-              </div>
-              <div className="flex justify-end space-x-2 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setShowAddSupplier(false)}
-                  className="px-4 py-2 bg-slate-200 text-slate-700 rounded-xl"
-                >
-                  Batal
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-[#0f3e2e] text-white rounded-xl font-extrabold"
-                >
-                  Simpan Suplier
-                </button>
-              </div>
-            </form>
+              <button 
+                onClick={() => setShowHistoryModal(false)}
+                className="p-1 text-slate-400 hover:text-slate-600 rounded-lg"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Filter */}
+            <div className="relative">
+              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+              <input
+                type="text"
+                placeholder="Cari berdasarkan No Polisi, No Tiket, atau Customer..."
+                value={historySearch}
+                onChange={(e) => setHistorySearch(e.target.value)}
+                className="w-full pl-9 pr-4 py-2 text-xs font-bold bg-slate-50 border rounded-xl outline-none"
+              />
+            </div>
+
+            {/* History Table */}
+            <div className="max-h-[380px] overflow-y-auto border rounded-xl divide-y divide-slate-100 text-xs">
+              {filteredHistory.length === 0 ? (
+                <div className="p-8 text-center text-slate-400">Belum ada riwayat transaksi tiket selesai.</div>
+              ) : (
+                filteredHistory.map((ticket) => (
+                  <div key={ticket.id} className="p-3.5 flex items-center justify-between hover:bg-slate-50 transition">
+                    <div>
+                      <div className="flex items-center space-x-2">
+                        <span className="font-mono text-xs font-bold bg-slate-100 px-2 py-0.5 rounded">
+                          {ticket.ticket_number}
+                        </span>
+                        <span className="font-mono text-sm font-extrabold text-slate-900">
+                          {ticket.nopol}
+                        </span>
+                        <span className="text-slate-600 font-bold">
+                          • {ticket.customer_name || ticket.supplier_name}
+                        </span>
+                      </div>
+                      <div className="text-[11px] text-slate-500 mt-1">
+                        Timbang 1: {ticket.gross_weight.toLocaleString('id-ID')} KG | Timbang 2: {ticket.tare_weight.toLocaleString('id-ID')} KG | Waktu: {ticket.datetime_out}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center space-x-4">
+                      <div className="text-right">
+                        <span className="text-[10px] text-slate-400 block font-bold">NETTO:</span>
+                        <span className="font-mono font-black text-sm text-emerald-700">
+                          {ticket.net_weight.toLocaleString('id-ID')} KG
+                        </span>
+                      </div>
+
+                      <button
+                        onClick={() => {
+                          setIsReprint(true);
+                          setPrintTicket(ticket);
+                        }}
+                        className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-xs flex items-center space-x-1"
+                      >
+                        <Printer className="w-3.5 h-3.5" />
+                        <span>Cetak Ulang</span>
+                      </button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+
+            <div className="flex justify-end pt-2">
+              <button
+                onClick={() => setShowHistoryModal(false)}
+                className="px-4 py-2 bg-slate-200 text-slate-700 rounded-xl font-bold text-xs"
+              >
+                Tutup
+              </button>
+            </div>
           </div>
         </div>
       )}
 
-      {/* Modal Tambah Stapel / Tumpukan Baru (Up to 20 Stapel) */}
-      {showAddStapel && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 space-y-4 border-4 border-[#0f3e2e]">
-            <h3 className="text-lg font-extrabold text-slate-900 border-b pb-2">Tambah Tumpukan / Stapel Gudang Baru</h3>
-            <form onSubmit={handleSaveStapel} className="space-y-3 text-xs font-bold">
-              <div>
-                <label className="block text-slate-700 mb-1">Nama Tumpukan / Stapel:</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="Contoh: Stapel 9 (Gudang Timur)"
-                  value={newStapelName}
-                  onChange={(e) => setNewStapelName(e.target.value)}
-                  className="w-full p-2.5 bg-slate-50 border rounded-xl"
-                />
-              </div>
-              <div>
-                <label className="block text-slate-700 mb-1">Kualitas / Grade Padi/Beras:</label>
-                <input
-                  type="text"
-                  placeholder="Contoh: Gabah Wet / Medium / Kiby"
-                  value={newStapelGrade}
-                  onChange={(e) => setNewStapelGrade(e.target.value)}
-                  className="w-full p-2.5 bg-slate-50 border rounded-xl"
-                />
-              </div>
-              <div className="flex justify-end space-x-2 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setShowAddStapel(false)}
-                  className="px-4 py-2 bg-slate-200 text-slate-700 rounded-xl"
-                >
-                  Batal
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-[#0f3e2e] text-white rounded-xl font-extrabold"
-                >
-                  Simpan Stapel Baru
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Print STT Modal */}
+      {/* =========================================================
+          PRINT SLIP TIKET (EXACT PT. BUMI MAS APP FORMAT)
+      ========================================================= */}
       {printTicket && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 space-y-4 border-4 border-[#0f3e2e]">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 space-y-4 border-4 border-[#0f172a] shadow-2xl">
             <div className="flex justify-between items-center border-b pb-3">
-              <h3 className="font-extrabold text-[#0f3e2e]">SLIP TIMBANG TRUK (STT) - RESMI</h3>
-              <button onClick={() => setPrintTicket(null)} className="text-slate-400 hover:text-slate-600">✕</button>
+              <div className="flex items-center space-x-2">
+                <Printer className="w-5 h-5 text-emerald-600" />
+                <h3 className="font-extrabold text-slate-900">
+                  {isReprint ? 'CETAK ULANG TIKET TIMBANGAN' : 'SLIP TIKET PENIMBANGAN RESMI'}
+                </h3>
+              </div>
+              <button onClick={() => setPrintTicket(null)} className="text-slate-400 hover:text-slate-600">
+                <X className="w-5 h-5" />
+              </button>
             </div>
 
-            <div id="printable-stt-slip" className="border border-slate-300 p-5 rounded-2xl font-mono text-xs space-y-3 bg-slate-50">
-              <div className="text-center font-bold text-sm border-b pb-2">
-                PP BUMI MAS WONOSOBO
-                <div className="text-[10px] font-normal text-slate-600">Reprocessing & Penggilingan Beras</div>
+            {/* Ticket Printable Body matching Desktop App layout */}
+            <div id="printable-stt-slip" className="border border-slate-300 p-6 rounded-2xl font-mono text-xs bg-slate-50 space-y-3 leading-relaxed">
+              <div className="text-center font-bold text-base tracking-widest border-b pb-2">
+                PT. BUMI MAS
+                {isReprint && <span className="block text-xs text-rose-600 font-bold">(CETAK ULANG)</span>}
               </div>
 
-              <div className="flex justify-between">
-                <span>NO STT: <strong>{printTicket.ticket_number}</strong></span>
-                <span>NOPOL: <strong>{printTicket.nopol}</strong></span>
-              </div>
-              <div className="flex justify-between">
-                <span>SUPLIER: <strong>{printTicket.supplier_name}</strong></span>
-                <span>TGL MASUK: {printTicket.datetime_in}</span>
+              <div className="space-y-1.5 pt-2">
+                <div className="flex justify-between">
+                  <span>No Polisi</span>
+                  <span>: <strong>{printTicket.nopol}</strong></span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Customers</span>
+                  <span>: <strong>{printTicket.customer_name || printTicket.supplier_name || 'PT. BUMI MAS'}</strong></span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Jenis Muatan</span>
+                  <span>: {printTicket.goods || 'Beras Medium'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>1st Weighing</span>
+                  <span>: {printTicket.datetime_in}   {printTicket.gross_weight?.toLocaleString('id-ID', { minimumFractionDigits: 2 })} kg</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>2nd Weighing</span>
+                  <span>: {printTicket.datetime_out || '-'}   {printTicket.tare_weight?.toLocaleString('id-ID', { minimumFractionDigits: 2 })} kg</span>
+                </div>
+                
+                <div className="border-t border-b border-dashed my-2 py-2 flex justify-between font-extrabold text-sm text-[#0f172a]">
+                  <span>Netto</span>
+                  <span>: {printTicket.net_weight?.toLocaleString('id-ID', { minimumFractionDigits: 2 })} kg</span>
+                </div>
+
+                <div className="flex justify-between">
+                  <span>Jumlah Sak</span>
+                  <span>: {printTicket.sacks || 0}</span>
+                </div>
               </div>
 
-              <div className="border-t border-b border-dashed py-2 space-y-1 font-bold">
-                <div className="flex justify-between"><span>BERAT MASUK (BRUTO):</span><span>{printTicket.gross_weight?.toLocaleString('id-ID')} KG</span></div>
-                <div className="flex justify-between"><span>BERAT KELUAR (TARA):</span><span>{(printTicket.tare_weight || 0).toLocaleString('id-ID')} KG</span></div>
-                <div className="flex justify-between text-base text-[#0f3e2e] pt-1 border-t"><span>NETTO FINAL:</span><span>{printTicket.net_weight?.toLocaleString('id-ID')} KG</span></div>
-              </div>
-
-              <div className="text-[11px]">
-                <span className="font-bold">ALOKASI BONGKARAN:</span>
-                <ul className="list-disc pl-4 pt-1">
-                  {printTicket.allocations && printTicket.allocations.length > 0 ? (
-                    printTicket.allocations.map((a: any, i: number) => (
-                      <li key={i}>{a.stapel_name} {a.allocated_kg > 0 ? `(${a.allocated_kg.toLocaleString('id-ID')} KG)` : ''}</li>
-                    ))
-                  ) : (
-                    <li>{printTicket.assigned_stapel_name || 'Stapel 1'}</li>
-                  )}
-                </ul>
-              </div>
-
-              <div className="flex justify-between pt-4 text-center text-[10px]">
-                <div>Sopir Truk<br /><br /><br />(.....................)</div>
-                <div>Timbangan RS232<br /><br /><br />( Admin 1 )</div>
+              <div className="border-t border-slate-300 pt-4 flex justify-between text-center text-[10px] text-slate-500">
+                <div>
+                  Sopir Truk<br /><br /><br />
+                  (.....................)
+                </div>
+                <div>
+                  Petugas Timbangan<br /><br /><br />
+                  ( Admin 1 )
+                </div>
               </div>
             </div>
 
-            <div className="flex justify-end space-x-2">
+            <div className="flex justify-end space-x-2 pt-2">
               <button
                 onClick={() => setPrintTicket(null)}
                 className="px-4 py-2 bg-slate-200 text-slate-700 font-bold rounded-xl text-xs"
@@ -969,15 +1236,16 @@ export const Admin1WeighbridgeScreen: React.FC = () => {
               </button>
               <button
                 onClick={() => window.print()}
-                className="px-5 py-2 bg-[#0f3e2e] text-white font-extrabold rounded-xl text-xs flex items-center space-x-1"
+                className="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-xl text-xs flex items-center space-x-1.5 shadow"
               >
-                <Printer className="w-4 h-4 text-amber-400" />
-                <span>Cetak Slip STT (Printer)</span>
+                <Printer className="w-4 h-4" />
+                <span>Cetak Tiket (Print)</span>
               </button>
             </div>
           </div>
         </div>
       )}
+
     </div>
   );
 };

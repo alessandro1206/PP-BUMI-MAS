@@ -168,6 +168,9 @@ export interface WeighbridgeIn {
   nopol: string;
   supplier_id: string;
   supplier_name: string;
+  customer_name?: string;
+  goods?: string;
+  sacks?: string | number;
   gross_weight: number; // Berat Masuk (Bruto)
   tare_weight: number;  // Berat Keluar (Tara)
   bag_deduction: number;

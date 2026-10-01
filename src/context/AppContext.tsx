@@ -85,6 +85,7 @@ interface AppContextType {
   updateSupplier: (supplier: Supplier) => void;
   addCustomer: (customer: Omit<Customer, 'id'>) => Customer;
   updateCustomer: (customer: Customer) => void;
+  deleteCustomer: (id: string) => void;
   addProduct: (product: Omit<ProductItem, 'id'>) => ProductItem;
   updateProduct: (product: ProductItem) => void;
   adjustStapelStock: (stapelId: string, newStockKg: number, reason: string) => void;
@@ -92,7 +93,8 @@ interface AppContextType {
   addExpense: (expense: Omit<ExpenseTransaction, 'id' | 'expense_date'>) => ExpenseTransaction;
   
   addWeighbridgeIn: (data: Omit<WeighbridgeIn, 'id' | 'ticket_number' | 'transfer_status' | 'transfer_proof_file' | 'price_per_kg' | 'total_payment' | 'transfer_plan_date'>) => WeighbridgeIn;
-  updateTareAndFinishWeighbridge: (id: string, tareWeight: number) => void;
+  updateTareAndFinishWeighbridge: (id: string, tareWeight: number, sacks?: string | number, goods?: string) => void;
+  deleteWeighbridgeIn: (id: string) => void;
   setOwnerPriceAndSchedule: (id: string, pricePerKg: number, planDate: string) => void;
   confirmOwnerTransfer: (id: string, proofFile: string) => void;
   createCorBatch: (batch: Omit<MillingCorBatch, 'id'>) => void;
@@ -449,6 +451,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     addAuditLog(`Update Customer`, `Ubah data customer: ${customer.name}`);
   };
 
+  const deleteCustomer = (id: string) => {
+    setCustomers(prev => prev.filter(c => c.id !== id));
+    addAuditLog(`Hapus Customer`, `Customer ID: ${id}`);
+  };
+
   const addProduct = (product: Omit<ProductItem, 'id'>): ProductItem => {
     const newProd: ProductItem = {
       ...product,
@@ -576,7 +583,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return newEntry;
   };
 
-  const updateTareAndFinishWeighbridge = (id: string, tareWeight: number) => {
+  const updateTareAndFinishWeighbridge = (id: string, tareWeight: number, sacks?: string | number, goods?: string) => {
     setWeighbridgeInList(prev => prev.map(item => {
       if (item.id === id) {
         const netWeight = Math.max(0, item.gross_weight - tareWeight);
@@ -597,11 +604,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           datetime_out: datetimeOut,
           tare_weight: tareWeight,
           net_weight: netWeight,
+          sacks: sacks !== undefined ? sacks : item.sacks,
+          goods: goods !== undefined ? goods : item.goods,
           status: 'SELESAI'
         };
       }
       return item;
     }));
+  };
+
+  const deleteWeighbridgeIn = (id: string) => {
+    setWeighbridgeInList(prev => prev.filter(item => item.id !== id));
+    addAuditLog(`Hapus Antrean Timbangan`, `Truk ID: ${id}`);
   };
 
   const setOwnerPriceAndSchedule = (id: string, pricePerKg: number, planDate: string) => {
@@ -899,6 +913,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         updateSupplier,
         addCustomer,
         updateCustomer,
+        deleteCustomer,
         addProduct,
         updateProduct,
         adjustStapelStock,
@@ -906,6 +921,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         addExpense,
         addWeighbridgeIn,
         updateTareAndFinishWeighbridge,
+        deleteWeighbridgeIn,
         setOwnerPriceAndSchedule,
         confirmOwnerTransfer,
         createCorBatch,
