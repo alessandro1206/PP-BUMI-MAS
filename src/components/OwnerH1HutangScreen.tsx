@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { Shield, Truck, Calendar, ArrowLeft, ArrowRight, DollarSign, Building, CheckCircle2, CreditCard, Eye, Layers, FileText } from 'lucide-react';
+import { Shield, Truck, Calendar, ArrowLeft, ArrowRight, DollarSign, Building, CheckCircle2, CreditCard, Eye, Layers, FileText, Info, X } from 'lucide-react';
 import { SalesDeliveryOrder, WeighbridgeIn } from '../types';
 
 export const OwnerH1HutangScreen: React.FC = () => {
@@ -28,67 +28,71 @@ export const OwnerH1HutangScreen: React.FC = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">
+    <div className="max-w-7xl mx-auto px-4 py-8 space-y-6">
       {/* Top Banner */}
-      <div className="bg-[#0f3e2e] text-white p-6 rounded-2xl shadow-lg border border-emerald-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-slate-900 text-white p-6 rounded-2xl shadow-xl border border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4 relative overflow-hidden">
+        <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-emerald-500 to-transparent"></div>
         <div className="flex items-center space-x-4">
           <button 
             onClick={() => { setRole('OWNER'); setActiveScreen('SCREEN_13'); }}
-            className="p-2 bg-[#08251b] rounded-xl hover:bg-emerald-900 transition text-emerald-300"
+            className="p-2 bg-slate-800 rounded-xl hover:bg-slate-700 transition text-slate-200"
           >
-            <ArrowLeft className="w-6 h-6" />
+            <ArrowLeft className="w-5 h-5" />
           </button>
           <div>
             <div className="flex items-center space-x-2">
-              <Shield className="w-6 h-6 text-[#f59e0b]" />
-              <span className="text-xs uppercase tracking-widest text-emerald-300 font-bold">KONSOL OWNER - DASHBOARD REKAP HUTANG & PIUTANG</span>
+              <span className="px-2.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 uppercase tracking-wider">
+                KONSOL OWNER
+              </span>
+              <span className="text-xs text-slate-400 font-mono">• POSISI REKAP HUTANG &amp; PIUTANG</span>
             </div>
-            <h1 className="text-2xl md:text-3xl font-extrabold text-white mt-1">
-              Pengawasan Posisi Rekap Hutang & Piutang Pabrik
+            <h1 className="text-xl md:text-2xl font-extrabold text-slate-100 mt-1">
+              Pengawasan Posisi Rekap Hutang &amp; Piutang Pabrik
             </h1>
           </div>
         </div>
 
         {/* Summary Stat Cards */}
-        <div className="flex items-center space-x-6 bg-[#08251b] px-6 py-3 rounded-xl border border-emerald-700/60">
+        <div className="flex items-center space-x-6 bg-slate-950/80 px-6 py-3 rounded-xl border border-slate-800">
           <div>
-            <div className="text-xs text-slate-300">Total Piutang Customer:</div>
-            <div className="text-xl font-extrabold text-amber-400">{formatRp(totalPiutangCustomer)}</div>
+            <div className="text-xs text-slate-400 font-mono">Total Piutang Customer:</div>
+            <div className="text-lg font-bold font-mono text-amber-400 tabular-nums">{formatRp(totalPiutangCustomer)}</div>
           </div>
-          <div className="h-8 w-[1px] bg-emerald-800"></div>
+          <div className="h-8 w-[1px] bg-slate-800"></div>
           <div>
-            <div className="text-xs text-slate-300">Total Hutang Pembelian Beras:</div>
-            <div className="text-xl font-extrabold text-red-400">{formatRp(totalHutangSuplier)}</div>
+            <div className="text-xs text-slate-400 font-mono">Total Hutang Pembelian Beras:</div>
+            <div className="text-lg font-bold font-mono text-rose-400 tabular-nums">{formatRp(totalHutangSuplier)}</div>
           </div>
         </div>
       </div>
 
       {/* Main Tabs Navigation */}
       <div className="flex items-center justify-between border-b border-slate-200 pb-2">
-        <div className="flex space-x-3">
+        <div className="flex space-x-2">
           <button
             onClick={() => setActiveTab('PIUTANG')}
-            className={`px-5 py-2.5 rounded-xl font-extrabold text-xs transition flex items-center space-x-2 ${
-              activeTab === 'PIUTANG' ? 'bg-[#0f3e2e] text-white shadow-md' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+            className={`px-4 py-2 rounded-xl font-bold text-xs transition flex items-center space-x-2 ${
+              activeTab === 'PIUTANG' ? 'bg-slate-900 text-amber-400 shadow-sm' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
             }`}
           >
             <CreditCard className="w-4 h-4 text-amber-400" />
-            <span>1. Rekap Piutang Penjualan Customer ({invoicedOrders.length})</span>
+            <span>1. Rekap Piutang Customer ({invoicedOrders.length})</span>
           </button>
 
           <button
             onClick={() => setActiveTab('HUTANG')}
-            className={`px-5 py-2.5 rounded-xl font-extrabold text-xs transition flex items-center space-x-2 ${
-              activeTab === 'HUTANG' ? 'bg-[#0f3e2e] text-white shadow-md' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+            className={`px-4 py-2 rounded-xl font-bold text-xs transition flex items-center space-x-2 ${
+              activeTab === 'HUTANG' ? 'bg-slate-900 text-emerald-400 shadow-sm' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
             }`}
           >
             <Truck className="w-4 h-4 text-emerald-400" />
-            <span>2. Rekap Hutang Pembelian Beras Suplier ({scheduledHutangList.length})</span>
+            <span>2. Rekap Hutang Suplier ({scheduledHutangList.length})</span>
           </button>
         </div>
 
-        <span className="text-xs text-slate-500 font-bold hidden sm:inline">
-          💡 Klik baris manapun untuk melihat rincian barang & harga
+        <span className="text-xs text-slate-500 font-medium hidden sm:flex items-center space-x-1.5">
+          <Info className="w-3.5 h-3.5 text-slate-400" />
+          <span>Klik baris untuk rincian barang &amp; harga</span>
         </span>
       </div>
 
@@ -228,13 +232,15 @@ export const OwnerH1HutangScreen: React.FC = () => {
       {/* Detail Item Modal Piutang Customer */}
       {selectedInvoiceDetail && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 space-y-4 border-4 border-[#0f3e2e]">
+          <div className="bg-white rounded-2xl max-w-lg w-full p-6 space-y-4 border border-slate-200 shadow-2xl">
             <div className="flex justify-between items-center border-b pb-2">
               <div>
-                <h3 className="font-extrabold text-[#0f3e2e] text-lg">RINCIAN NOTA PIUTANG PENJUALAN</h3>
+                <h3 className="font-extrabold text-slate-900 text-lg">RINCIAN NOTA PIUTANG PENJUALAN</h3>
                 <span className="text-xs text-slate-500 font-mono">Invoice: {selectedInvoiceDetail.invoice_number}</span>
               </div>
-              <button onClick={() => setSelectedInvoiceDetail(null)} className="text-slate-400 font-bold">✕</button>
+              <button onClick={() => setSelectedInvoiceDetail(null)} className="p-1 text-slate-400 hover:text-slate-600 rounded-lg">
+                <X className="w-5 h-5" />
+              </button>
             </div>
 
             <div className="bg-amber-50 p-4 rounded-2xl border border-amber-200 text-xs space-y-1">
@@ -300,13 +306,15 @@ export const OwnerH1HutangScreen: React.FC = () => {
       {/* Detail Item Modal Hutang Suplier */}
       {selectedSTTDetail && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 space-y-4 border-4 border-[#0f3e2e]">
+          <div className="bg-white rounded-2xl max-w-lg w-full p-6 space-y-4 border border-slate-200 shadow-2xl">
             <div className="flex justify-between items-center border-b pb-2">
               <div>
-                <h3 className="font-extrabold text-[#0f3e2e] text-lg">RINCIAN NOTA TIMBANGAN PEMBELIAN BERAS</h3>
+                <h3 className="font-extrabold text-slate-900 text-lg">RINCIAN NOTA TIMBANGAN PEMBELIAN BERAS</h3>
                 <span className="text-xs text-slate-500 font-mono">No STT: {selectedSTTDetail.ticket_number}</span>
               </div>
-              <button onClick={() => setSelectedSTTDetail(null)} className="text-slate-400 font-bold">✕</button>
+              <button onClick={() => setSelectedSTTDetail(null)} className="p-1 text-slate-400 hover:text-slate-600 rounded-lg">
+                <X className="w-5 h-5" />
+              </button>
             </div>
 
             <div className="bg-slate-50 p-4 rounded-2xl border text-xs space-y-1">

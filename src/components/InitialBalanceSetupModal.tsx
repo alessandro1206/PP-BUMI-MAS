@@ -85,7 +85,7 @@ export const InitialBalanceSetupModal: React.FC<InitialBalanceSetupModalProps> =
 
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto animate-in fade-in">
-      <div className="bg-white rounded-3xl max-w-4xl w-full p-7 space-y-6 shadow-2xl border-4 border-[#0f3e2e] max-h-[90vh] overflow-y-auto">
+      <div className="bg-white rounded-2xl max-w-4xl w-full p-7 space-y-6 shadow-2xl border border-slate-200 max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex justify-between items-start border-b border-slate-200 pb-4">
           <div className="flex items-center space-x-3">

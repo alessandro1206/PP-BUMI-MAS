@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { UserAccount, RoleType } from '../types';
-import { Shield, Scale, Smartphone, UserPlus, Key, Eye, EyeOff, Edit3, Trash2, CheckCircle, AlertCircle, X, Search, Lock, UserCheck } from 'lucide-react';
+import { Shield, ShieldCheck, Scale, Smartphone, UserPlus, Key, Eye, EyeOff, Edit3, Trash2, CheckCircle, AlertCircle, X, Search, Lock, UserCheck } from 'lucide-react';
 
 export const UserManagementScreen: React.FC = () => {
   const { userAccounts, addUserAccount, updateUserAccount, deleteUserAccount, currentUser } = useApp();
@@ -140,8 +140,9 @@ export const UserManagementScreen: React.FC = () => {
     switch (r) {
       case 'SUPER_ADMIN':
         return (
-          <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-[#08251b] text-amber-400 border border-amber-400/50 flex items-center space-x-1 inline-flex">
-            <span>★ SUPER ADMIN (Akses Penuh & Pajak)</span>
+          <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-[#08251b] text-amber-400 border border-amber-400/50 flex items-center space-x-1.5 inline-flex">
+            <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
+            <span>SUPER ADMIN (Akses Penuh &amp; Pajak)</span>
           </span>
         );
       case 'OWNER':
@@ -383,7 +384,7 @@ export const UserManagementScreen: React.FC = () => {
       {/* MODAL TAMBAH / EDIT USER */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 space-y-5 shadow-2xl border-4 border-[#0f3e2e]">
+          <div className="bg-white rounded-2xl max-w-lg w-full p-6 space-y-5 shadow-2xl border border-slate-200">
             <div className="flex justify-between items-center border-b border-slate-100 pb-4">
               <div className="flex items-center space-x-3">
                 <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center">

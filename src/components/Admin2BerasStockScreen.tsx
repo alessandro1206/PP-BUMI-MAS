@@ -55,11 +55,11 @@ export const Admin2BerasStockScreen: React.FC = () => {
       </div>
 
       {/* Tab Bar */}
-      <div className="grid grid-cols-3 gap-1 p-1.5 bg-slate-200 rounded-xl font-bold text-xs text-center">
+      <div className="grid grid-cols-3 gap-1.5 p-1.5 bg-slate-200/80 rounded-xl font-bold text-xs text-center">
         {(['BAHAN', 'JADI', 'LIMBAH'] as const).map(tab => (
           <button key={tab} onClick={() => setActiveTab(tab)}
-            className={`py-2.5 rounded-lg transition font-extrabold ${activeTab === tab ? 'bg-[#0f3e2e] text-white shadow' : 'bg-white text-slate-700'}`}>
-            {tab === 'BAHAN' ? '🌾 Bahan Beras' : tab === 'JADI' ? '📦 Beras Jadi' : '♻️ Limbah Giling'}
+            className={`py-2.5 rounded-lg transition font-bold ${activeTab === tab ? 'bg-slate-900 text-emerald-400 shadow' : 'bg-white text-slate-700 hover:text-slate-900'}`}>
+            {tab === 'BAHAN' ? 'Bahan Beras' : tab === 'JADI' ? 'Beras Jadi' : 'Limbah Giling'}
           </button>
         ))}
       </div>

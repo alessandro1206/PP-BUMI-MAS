@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { AppProvider, useApp } from './context/AppContext';
 import { Header } from './components/Header';
 import { PortalScreen } from './components/PortalScreen';
@@ -18,7 +18,6 @@ import { Admin2ByproductOpnameScreen } from './components/Admin2ByproductOpnameS
 import { Admin2TruckTierScreen } from './components/Admin2TruckTierScreen';
 import { Admin2PaperCorPlanScreen } from './components/Admin2PaperCorPlanScreen';
 
-
 // Core Master Data & Laporan
 import { MasterSupplierScreen } from './components/MasterSupplierScreen';
 import { MasterCustomerScreen } from './components/MasterCustomerScreen';
@@ -28,13 +27,10 @@ import { ReportsScreen } from './components/ReportsScreen';
 import { UserManagementScreen } from './components/UserManagementScreen';
 import { SuperAdminAccountingScreen } from './components/SuperAdminAccountingScreen';
 
-import { Monitor, Tablet, Smartphone, Maximize2 } from 'lucide-react';
-
-type DeviceType = 'FULL' | 'DESKTOP' | 'TABLET' | 'MOBILE';
+import { Activity, Radio, Cpu, ShieldCheck } from 'lucide-react';
 
 const MainContent: React.FC = () => {
-  const { activeScreen, role } = useApp();
-  const [deviceMode, setDeviceMode] = useState<DeviceType>('FULL');
+  const { activeScreen, role, currentUser } = useApp();
 
   const renderScreen = () => {
     switch (activeScreen) {
@@ -51,7 +47,7 @@ const MainContent: React.FC = () => {
       case 'SCREEN_FAKTUR_JUAL':
         return <OwnerFakturJualScreen />;
 
-      // Admin 1 Screens
+      // Admin 1 Screens (Weighbridge, Kasir & Delivery Order)
       case 'SCREEN_16':
         return <Admin1WeighbridgeScreen />;
       case 'SCREEN_31':
@@ -63,7 +59,7 @@ const MainContent: React.FC = () => {
       case 'SCREEN_BERAS_STOCK':
         return <Admin2BerasStockScreen />;
 
-      // Admin 2 Screens
+      // Admin 2 Screens (Produksi Pabrik & Logistik)
       case 'SCREEN_42':
         return <Admin2CorPlanScreen />;
       case 'SCREEN_8':
@@ -71,14 +67,13 @@ const MainContent: React.FC = () => {
       case 'SCREEN_SAK_STOCK':
         return <Admin2SakStockScreen />;
       case 'SCREEN_36':
-
         return <Admin2ByproductOpnameScreen />;
       case 'SCREEN_24':
         return <Admin2TruckTierScreen />;
       case 'SCREEN_39':
         return <Admin2PaperCorPlanScreen />;
 
-      // Core Modules
+      // Master Data & Laporan
       case 'SCREEN_MASTER_SUPPLIER':
         return <MasterSupplierScreen />;
       case 'SCREEN_MASTER_CUSTOMER':
@@ -99,105 +94,45 @@ const MainContent: React.FC = () => {
     }
   };
 
-  // Helper container size per device preview
-  const getDeviceContainerClass = () => {
-    switch (deviceMode) {
-      case 'MOBILE':
-        return 'max-w-[400px] mx-auto border-8 border-slate-800 rounded-[36px] shadow-2xl overflow-hidden my-6 bg-white min-h-[780px]';
-      case 'TABLET':
-        return 'max-w-[820px] mx-auto border-8 border-slate-800 rounded-[28px] shadow-2xl overflow-hidden my-6 bg-white min-h-[850px]';
-      case 'DESKTOP':
-        return 'max-w-[1280px] mx-auto border border-slate-300 rounded-2xl shadow-lg my-4 bg-white p-2';
-      case 'FULL':
-      default:
-        return 'w-full';
-    }
-  };
-
   return (
-    <div className="min-h-screen flex flex-col bg-[#08251b]">
-      {/* Interactive Device View Mode Switcher Bar */}
-      <div className="bg-[#08251b] text-white py-2 px-4 border-b border-emerald-900 sticky top-0 z-50 text-xs shadow-md">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
-          <div className="flex items-center space-x-2 text-emerald-200">
-            <span className="font-bold text-white">Pratinjau Layar ERP:</span>
-            <span className="hidden sm:inline">Pilih mode simulasi tampilan perangkat:</span>
-          </div>
-
-          <div className="flex items-center space-x-1.5 bg-[#0f3e2e] p-1 rounded-xl border border-emerald-800">
-            <button
-              onClick={() => setDeviceMode('FULL')}
-              className={`px-3 py-1 rounded-lg font-bold transition flex items-center space-x-1.5 ${
-                deviceMode === 'FULL'
-                  ? 'bg-[#10b981] text-[#0f3e2e] shadow'
-                  : 'text-emerald-200 hover:text-white hover:bg-emerald-800/50'
-              }`}
-              title="Responsif Otomatis (Full Screen)"
-            >
-              <Maximize2 className="w-3.5 h-3.5" />
-              <span>Full Screen</span>
-            </button>
-
-            <button
-              onClick={() => setDeviceMode('DESKTOP')}
-              className={`px-3 py-1 rounded-lg font-bold transition flex items-center space-x-1.5 ${
-                deviceMode === 'DESKTOP'
-                  ? 'bg-[#10b981] text-[#0f3e2e] shadow'
-                  : 'text-emerald-200 hover:text-white hover:bg-emerald-800/50'
-              }`}
-              title="Simulasi Layar Komputer / PC Monitor"
-            >
-              <Monitor className="w-3.5 h-3.5" />
-              <span>Desktop</span>
-            </button>
-
-            <button
-              onClick={() => setDeviceMode('TABLET')}
-              className={`px-3 py-1 rounded-lg font-bold transition flex items-center space-x-1.5 ${
-                deviceMode === 'TABLET'
-                  ? 'bg-amber-400 text-[#0f3e2e] shadow'
-                  : 'text-emerald-200 hover:text-white hover:bg-emerald-800/50'
-              }`}
-              title="Simulasi Layar Tablet / iPad"
-            >
-              <Tablet className="w-3.5 h-3.5" />
-              <span>Tablet</span>
-            </button>
-
-            <button
-              onClick={() => setDeviceMode('MOBILE')}
-              className={`px-3 py-1 rounded-lg font-bold transition flex items-center space-x-1.5 ${
-                deviceMode === 'MOBILE'
-                  ? 'bg-amber-500 text-[#0f3e2e] shadow'
-                  : 'text-emerald-200 hover:text-white hover:bg-emerald-800/50'
-              }`}
-              title="Simulasi Layar HP Smartphone Outdoor"
-            >
-              <Smartphone className="w-3.5 h-3.5" />
-              <span>HP Mobile</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
+    <div className="min-h-screen flex flex-col bg-[#0b0f17] text-slate-100 selection:bg-emerald-500 selection:text-slate-950">
+      {/* Sleek Enterprise Top Application Header */}
       <Header />
 
-      <main className={`flex-1 transition-all duration-300 ${getDeviceContainerClass()}`}>
+      {/* Main Dynamic Workspace Area */}
+      <main className="flex-1 w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {renderScreen()}
       </main>
 
-      {/* Persistent Footer */}
-      <footer className="bg-[#08251b] text-slate-400 py-4 border-t border-emerald-900 text-xs mt-12">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-center sm:text-left">
-          <div className="flex items-center space-x-2">
-            <span className="font-bold text-white">PP BUMI MAS</span>
-            <span>• Wonosobo, Srono, Banyuwangi</span>
-            <span className="bg-[#10b981]/20 text-[#10b981] px-2 py-0.5 rounded font-mono text-[10px]">
-              {activeScreen} ({role})
-            </span>
+      {/* Professional Industrial Status Bar / Footer */}
+      <footer className="border-t border-slate-800/80 bg-[#090d16] text-slate-400 text-xs py-3 px-4 sm:px-8 mt-auto">
+        <div className="max-w-[1600px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
+          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3">
+            <div className="flex items-center space-x-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span>
+              <span className="font-bold text-slate-200">PP BUMI MAS</span>
+              <span className="text-slate-500">•</span>
+              <span className="text-slate-400">Wonosobo, Srono, Banyuwangi</span>
+            </div>
+
+            <span className="hidden md:inline text-slate-700">|</span>
+
+            <div className="hidden md:flex items-center space-x-1.5 text-slate-400 font-mono text-[11px]">
+              <Cpu className="w-3.5 h-3.5 text-slate-500" />
+              <span>Weighbridge PRO v1.2</span>
+              <span>•</span>
+              <span className="text-emerald-400">Native RS-232 Ready</span>
+            </div>
           </div>
-          <div className="text-emerald-300 font-medium">
-            Format Tampilan: <span className="font-bold text-amber-400">{deviceMode}</span> | Multi-Device Responsive
+
+          <div className="flex items-center space-x-3 text-[11px] font-mono">
+            <span className="px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
+              Modul: <strong className="text-white">{activeScreen}</strong>
+            </span>
+            <span className="px-2.5 py-0.5 rounded-full bg-emerald-950/60 text-emerald-400 border border-emerald-800/50 flex items-center space-x-1">
+              <ShieldCheck className="w-3 h-3 text-emerald-400" />
+              <span>{currentUser ? `${currentUser.name} (${currentUser.role})` : 'Tamu'}</span>
+            </span>
           </div>
         </div>
       </footer>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { Shield, ArrowLeft, CheckCircle2, Upload, FileText, DollarSign, Building, AlertCircle, Eye } from 'lucide-react';
+import { Shield, ArrowLeft, CheckCircle2, Upload, FileText, DollarSign, Building, AlertCircle, Eye, X } from 'lucide-react';
 
 export const OwnerHDayTransferScreen: React.FC = () => {
   const { weighbridgeInList, confirmOwnerTransfer, bankBalance, setRole, setActiveScreen, suppliers } = useApp();
@@ -192,10 +192,12 @@ export const OwnerHDayTransferScreen: React.FC = () => {
       {/* Modal View Struk */}
       {viewingProof && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+          <div className="bg-white rounded-2xl max-w-md w-full p-5 space-y-4 border border-slate-200 shadow-2xl">
             <div className="flex justify-between items-center">
-              <h3 className="text-lg font-bold text-slate-900">Bukti Transfer M-Banking</h3>
-              <button onClick={() => setViewingProof(null)} className="text-slate-400 hover:text-slate-600 font-bold text-lg">✕</button>
+              <h3 className="text-base font-bold text-slate-900">Bukti Transfer M-Banking</h3>
+              <button onClick={() => setViewingProof(null)} className="p-1 text-slate-400 hover:text-slate-600 rounded-lg">
+                <X className="w-5 h-5" />
+              </button>
             </div>
             <img src={viewingProof} alt="Bukti Transfer" className="w-full h-64 object-cover rounded-xl border border-slate-200" />
             <button onClick={() => setViewingProof(null)} className="w-full py-2 bg-slate-100 text-slate-800 font-bold text-xs rounded-xl">

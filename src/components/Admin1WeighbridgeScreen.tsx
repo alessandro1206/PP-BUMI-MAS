@@ -23,7 +23,10 @@ import {
   Activity,
   Radio,
   Wifi,
-  WifiOff
+  WifiOff,
+  AlertTriangle,
+  Info,
+  Users
 } from 'lucide-react';
 import { StapelAllocationItem } from '../types';
 
@@ -74,27 +77,108 @@ export const Admin1WeighbridgeScreen: React.FC = () => {
   const [isScaleStable, setIsScaleStable] = useState<boolean>(true);
   const [simWeightInput, setSimWeightInput] = useState<string>('15450.0');
 
-  // Multi-Mode & Advanced Indicator Settings
-  const [connectionMode, setConnectionMode] = useState<'webserial' | 'localbridge' | 'simulated'>('webserial');
-  const [availablePorts, setAvailablePorts] = useState<string[]>(['COM3', 'COM4', 'COM5', 'COM6', 'COM1', 'COM2']);
-  const [selectedPort, setSelectedPort] = useState<string>('COM3');
+  // Multi-Mode & Advanced Indicator Settings (RiceFlow Enterprise Native Engine supported)
+  const [connectionMode, setConnectionMode] = useState<'native' | 'webserial' | 'localbridge' | 'simulated'>('native');
+  const [availablePorts, setAvailablePorts] = useState<string[]>(['COM4', 'COM3', 'COM5', 'COM6', 'COM1', 'COM2']);
+  const [selectedPort, setSelectedPort] = useState<string>('COM4');
   const [indicatorProtocol, setIndicatorProtocol] = useState<'universal' | 'yaohua' | 'toledo' | 'cas' | 'gedge'>('universal');
   const [showSettingsModal, setShowSettingsModal] = useState<boolean>(false);
   const [settingsActiveTab, setSettingsActiveTab] = useState<'config' | 'terminal'>('config');
+  const [cameraIp, setCameraIp] = useState<string>('192.168.1.108');
+  const [cameraSnapshotPreview, setCameraSnapshotPreview] = useState<string | null>(null);
   const [rawStreamLogs, setRawStreamLogs] = useState<string[]>([
     `[${new Date().toLocaleTimeString('id-ID')}] Terminal diagnostik siap. Menunggu stream data RS232...`
   ]);
   const [localBridgeInterval, setLocalBridgeInterval] = useState<any | null>(null);
 
-  // Auto-scan COM ports from local Python service on mount
+  // Auto-scan COM ports and initialize Electron SerialPort listener on mount
   useEffect(() => {
-    refreshAvailablePorts();
-    return () => {
-      if (localBridgeInterval) clearInterval(localBridgeInterval);
-    };
+    const electron = (window as any).electron || (window as any).electronAPI;
+    const isElectronEnv = !!electron?.isElectron;
+
+    if (isElectronEnv) {
+      setConnectionMode('native');
+      addLog('Lingkungan Electron terdeteksi: Mode Native SerialPort diaktifkan.', 'info');
+
+      // 1. Ambil daftar COM port dari modul native Node serialport
+      if (electron.getComPorts) {
+        electron.getComPorts().then((res: any) => {
+          if (res?.ports && res.ports.length > 0) {
+            setAvailablePorts(res.ports);
+            if (res.ports.includes('COM4')) setSelectedPort('COM4');
+            else setSelectedPort(res.ports[0]);
+            addLog(`Port serial terdeteksi: ${res.ports.join(', ')}`, 'info');
+          }
+        }).catch(() => {});
+      }
+
+      // 2. Pasang listener stream timbangan (scale-data)
+      const cleanScale = electron.on?.('scale-data', (data: any) => {
+        if (data && data.weight !== null && data.weight !== undefined && !isNaN(data.weight)) {
+          setLiveComWeight(data.weight);
+          setIsScaleStable(data.stable !== false);
+          if (data.raw) {
+            const nowStr = new Date().toLocaleTimeString('id-ID');
+            setRawStreamLogs(prev => [`[${nowStr}] Rx: ${data.raw}`, ...prev.slice(0, 49)]);
+          }
+        }
+      });
+
+      // 3. Pasang listener status timbangan (scale-status)
+      const cleanStatus = electron.on?.('scale-status', (status: any) => {
+        if (status.connected) {
+          setComPortConnected(true);
+          setIsSimulatedCom(false);
+          if (status.port) setSelectedPort(status.port);
+          addLog(`Indikator Timbangan Terhubung (${status.port || 'COM4'})`, 'success');
+        } else {
+          setComPortConnected(false);
+          if (status.error) {
+            addLog(`Status Timbangan: ${status.error}`, 'warn');
+          }
+        }
+      });
+
+      // 4. Pasang listener kamera live frame jika aktif
+      const cleanFrame = electron.on?.('live-frame', (frameData: string) => {
+        setCameraSnapshotPreview(frameData);
+      });
+
+      // 5. Pasang listener diagnostic log
+      const cleanDiag = electron.on?.('diagnostic-log', (msg: string) => {
+        addLog(msg, 'info');
+      });
+
+      return () => {
+        if (cleanScale) cleanScale();
+        if (cleanStatus) cleanStatus();
+        if (cleanFrame) cleanFrame();
+        if (cleanDiag) cleanDiag();
+        if (localBridgeInterval) clearInterval(localBridgeInterval);
+      };
+    } else {
+      setConnectionMode('webserial');
+      refreshAvailablePorts();
+      return () => {
+        if (localBridgeInterval) clearInterval(localBridgeInterval);
+      };
+    }
   }, []);
 
   const refreshAvailablePorts = async () => {
+    const electron = (window as any).electron || (window as any).electronAPI;
+    if (electron?.getComPorts) {
+      try {
+        const res = await electron.getComPorts();
+        if (res?.ports && res.ports.length > 0) {
+          setAvailablePorts(res.ports);
+          if (!res.ports.includes(selectedPort)) setSelectedPort(res.ports[0]);
+          addLog(`Port serial terdeteksi (Electron): ${res.ports.join(', ')}`, 'info');
+          return;
+        }
+      } catch (e) {}
+    }
+
     try {
       const res = await fetch('http://localhost:5000/ports', { method: 'GET' });
       if (res.ok) {
@@ -153,6 +237,30 @@ export const Admin1WeighbridgeScreen: React.FC = () => {
     if (comPortConnected) {
       handleDisconnect();
       return;
+    }
+
+    const electron = (window as any).electron || (window as any).electronAPI;
+
+    // MODE 0: Native Electron SerialPort (RiceFlow Enterprise Engine)
+    if (connectionMode === 'native' && electron?.connectScale) {
+      try {
+        addLog(`Menghubungkan ke ${selectedPort} (${baudRate} Bps) via Native Electron SerialPort...`, 'info');
+        const res = await electron.connectScale({
+          port: selectedPort,
+          baudRate,
+          protocol: indicatorProtocol
+        });
+        if (res?.success) {
+          setComPortConnected(true);
+          setIsSimulatedCom(false);
+          addLog(`Native SerialPort diaktifkan pada ${selectedPort}`, 'success');
+          return;
+        } else if (res?.error) {
+          addLog(`Gagal Native SerialPort: ${res.error}`, 'warn');
+        }
+      } catch (err: any) {
+        addLog(`Error Native SerialPort: ${err.message || err}`, 'warn');
+      }
     }
 
     // MODE 1: Web Serial API (Chrome / Edge)
@@ -229,6 +337,13 @@ export const Admin1WeighbridgeScreen: React.FC = () => {
   };
 
   const handleDisconnect = async () => {
+    const electron = (window as any).electron || (window as any).electronAPI;
+    if (electron?.disconnectScale) {
+      try {
+        await electron.disconnectScale();
+      } catch (e) {}
+    }
+
     if (localBridgeInterval) {
       clearInterval(localBridgeInterval);
       setLocalBridgeInterval(null);
@@ -298,10 +413,27 @@ export const Admin1WeighbridgeScreen: React.FC = () => {
     }
   };
 
-  // CCTV OCR Scanner
+  // CCTV OCR Scanner (Dahua Digest Snapshot via Electron or Local Python OCR)
   const handleScanNopolCctv = async () => {
     setIsScanningCctv(true);
     setCctvError(null);
+    const electron = (window as any).electron || (window as any).electronAPI;
+
+    // 1. Ambil snapshot langsung dari IP Camera Dahua via Electron (RiceFlow Engine)
+    if (electron?.getSnapshot) {
+      try {
+        addLog(`Mengambil snapshot CCTV dari ${cameraIp}...`, 'info');
+        const snap = await electron.getSnapshot(cameraIp);
+        if (snap && snap.startsWith('data:image')) {
+          setCameraSnapshotPreview(snap);
+          addLog('Snapshot CCTV Dahua berhasil diambil via Electron.', 'success');
+        }
+      } catch (e: any) {
+        addLog(`Kamera snapshot: ${e.message}`, 'warn');
+      }
+    }
+
+    // 2. Scan OCR Plat (Local Python OCR server jika tersedia)
     try {
       const response = await fetch('http://localhost:5000/scan-nopol', {
         method: 'GET',
@@ -314,15 +446,18 @@ export const Admin1WeighbridgeScreen: React.FC = () => {
         setNopol(detected);
         handleLookupPlate(detected);
         addLog(`CCTV OCR Berhasil Mendeteksi Plat: ${detected}`, 'success');
+        return;
       } else {
         const err = data.message || 'Teks plat tidak terdeteksi dari CCTV.';
         setCctvError(err);
         addLog(`Gagal Scan CCTV: ${err}`, 'warn');
       }
     } catch (err: any) {
-      const msg = 'CCTV Server offline (localhost:5000). Jalankan jalankan_server_cctv.bat.';
-      setCctvError(msg);
-      addLog(msg, 'warn');
+      if (!cameraSnapshotPreview) {
+        const msg = 'CCTV Server offline (localhost:5000). Snapshot kamera langsung tersedia via Electron.';
+        setCctvError(msg);
+        addLog(msg, 'warn');
+      }
     } finally {
       setIsScanningCctv(false);
     }
@@ -675,32 +810,36 @@ export const Admin1WeighbridgeScreen: React.FC = () => {
           {/* Riwayat Tiket Button */}
           <button
             onClick={() => setShowHistoryModal(true)}
-            className="px-3 py-1.5 bg-[#1e293b] hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold transition flex items-center space-x-1.5 border border-slate-600"
+            className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-semibold transition flex items-center space-x-1.5 border border-slate-700 shadow-sm"
           >
             <History className="w-3.5 h-3.5 text-sky-400" />
-            <span>📄 Riwayat ({completedTickets.length})</span>
+            <span>Riwayat Tiket ({completedTickets.length})</span>
           </button>
         </div>
       </div>
 
       {/* =========================================================
-          DIGITAL WEIGH HUD (CENTER STAGE)
+          DIGITAL WEIGH HUD (PRECISION INDUSTRIAL SCADA PANEL)
       ========================================================= */}
-      <div className="bg-[#020617] rounded-2xl border-2 border-emerald-500 shadow-xl p-4 text-white">
+      <div className="bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 rounded-2xl border border-slate-800 shadow-2xl p-5 text-white relative overflow-hidden">
+        {/* Top ambient status accent */}
+        <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-emerald-500 to-transparent"></div>
+
         {/* Top bar inside HUD: Stability, Zero, Simulation & CCTV */}
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-3">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800/80 pb-3.5">
           <div className="flex items-center space-x-3">
-            <span className={`px-3 py-1 rounded-lg text-xs font-extrabold tracking-wider ${
+            <span className={`px-3 py-1 rounded-lg text-xs font-mono font-bold tracking-wider flex items-center space-x-1.5 ${
               isScaleStable 
-                ? 'bg-emerald-950 text-emerald-400 border border-emerald-700' 
-                : 'bg-amber-950 text-amber-400 border border-amber-700 animate-pulse'
+                ? 'bg-emerald-950/80 text-emerald-400 border border-emerald-700/60' 
+                : 'bg-amber-950/80 text-amber-400 border border-amber-700/60 animate-pulse'
             }`}>
-              {isScaleStable ? '● STABIL' : '● BERGERAK (UNSTABLE)'}
+              <span className={`w-2 h-2 rounded-full ${isScaleStable ? 'bg-emerald-400' : 'bg-amber-400'}`} />
+              <span>{isScaleStable ? 'STABIL (READY)' : 'BERGERAK (MOTION)'}</span>
             </span>
 
             <button
               onClick={() => { setLiveComWeight(0); setIsScaleStable(true); }}
-              className="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-sky-400 text-xs font-extrabold rounded-lg border border-slate-700 transition"
+              className="px-3 py-1 bg-slate-800/90 hover:bg-slate-700 text-sky-400 text-xs font-mono font-bold rounded-lg border border-slate-700 transition active:scale-95"
               title="Set tampilan timbangan ke 0.0 KG"
             >
               ZERO [ 0.0 ]
@@ -713,29 +852,40 @@ export const Admin1WeighbridgeScreen: React.FC = () => {
               type="button"
               onClick={handleScanNopolCctv}
               disabled={isScanningCctv}
-              className={`px-3 py-1.5 rounded-xl font-extrabold text-xs transition flex items-center space-x-1.5 shadow ${
+              className={`px-3.5 py-1.5 rounded-xl font-bold text-xs transition flex items-center space-x-1.5 shadow ${
                 isScanningCctv
-                  ? 'bg-amber-950 text-amber-300 cursor-wait animate-pulse'
-                  : 'bg-amber-500 hover:bg-amber-600 text-slate-950'
+                  ? 'bg-amber-950 text-amber-300 cursor-wait animate-pulse border border-amber-700'
+                  : 'bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-amber-500/10'
               }`}
               title="Baca Nopol otomatis dari kamera CCTV via OCR"
             >
               <Camera className="w-3.5 h-3.5" />
-              <span>{isScanningCctv ? 'SCANNING CCTV...' : '📷 SCAN NOPOL CCTV'}</span>
+              <span>{isScanningCctv ? 'Scanning CCTV...' : 'Scan Nopol CCTV'}</span>
             </button>
 
+            {cameraSnapshotPreview && (
+              <div className="flex items-center space-x-1.5 bg-slate-900/90 px-2 py-0.5 rounded-xl border border-amber-500/40">
+                <img 
+                  src={cameraSnapshotPreview} 
+                  alt="CCTV Snapshot" 
+                  className="h-6 w-9 object-cover rounded border border-amber-500/60"
+                />
+                <span className="text-[10px] text-amber-300 font-bold font-mono">Foto CCTV</span>
+              </div>
+            )}
+
             {/* Simulation controls */}
-            <div className="flex items-center space-x-1.5 bg-slate-900 px-2.5 py-1 rounded-xl border border-slate-800 text-xs">
-              <span className="text-slate-500">Tes:</span>
+            <div className="flex items-center space-x-1.5 bg-slate-900/90 px-2.5 py-1 rounded-xl border border-slate-800 text-xs">
+              <span className="text-slate-500 font-mono">Tes:</span>
               <input
                 type="number"
                 value={simWeightInput}
                 onChange={(e) => setSimWeightInput(e.target.value)}
-                className="w-20 bg-slate-950 text-sky-400 px-2 py-0.5 rounded text-right font-mono font-bold outline-none border border-slate-700"
+                className="w-20 bg-slate-950 text-sky-400 px-2 py-0.5 rounded text-right font-mono font-bold outline-none border border-slate-700 focus:border-sky-500"
               />
               <button
                 onClick={handleSetSimWeight}
-                className="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded font-bold transition"
+                className="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded font-bold transition font-mono text-xs"
               >
                 Set
               </button>
@@ -744,25 +894,26 @@ export const Admin1WeighbridgeScreen: React.FC = () => {
         </div>
 
         {/* Large Glowing Readout */}
-        <div className="py-4 flex items-center justify-between px-6">
+        <div className="py-6 flex items-center justify-between px-6">
           <div className="flex-1 text-center">
-            <span className="font-mono text-6xl md:text-7xl lg:text-8xl font-black text-[#22c55e] tracking-tight select-all">
+            <span className="font-mono text-6xl md:text-7xl lg:text-8xl font-black text-emerald-400 tracking-tight drop-shadow-[0_0_24px_rgba(52,211,153,0.3)] select-all tabular-nums">
               {liveComWeight.toLocaleString('id-ID', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
             </span>
           </div>
           <div className="text-right">
-            <span className="font-extrabold text-3xl md:text-4xl text-[#22c55e]">
+            <span className="font-extrabold text-3xl md:text-4xl text-emerald-400 tracking-wider">
               KG
             </span>
-            <div className="text-[11px] font-bold text-slate-500 mt-1 uppercase tracking-wider">
+            <div className="text-[11px] font-mono font-bold text-slate-400 mt-1 uppercase tracking-wider">
               {selectedTruckForTare ? 'TIMBANG KE-2 (TARA)' : 'TIMBANG KE-1 (BRUTO)'}
             </div>
           </div>
         </div>
 
         {cctvError && (
-          <div className="text-xs text-amber-400 bg-amber-950/60 p-2 rounded-xl border border-amber-800 mt-1">
-            ⚠️ {cctvError}
+          <div className="text-xs text-amber-300 bg-amber-950/40 p-2.5 rounded-xl border border-amber-800/80 mt-2 flex items-center space-x-2">
+            <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
+            <span>{cctvError}</span>
           </div>
         )}
       </div>
@@ -913,10 +1064,10 @@ export const Admin1WeighbridgeScreen: React.FC = () => {
                         onChange={(e) => handleAllocationChange(idx, 'stapel_id', e.target.value)}
                         className="flex-1 p-1.5 text-xs font-bold bg-white border rounded-lg"
                       >
-                        <option value="DIRECT_COR">⚡ LANGSUNG DI-COR</option>
+                        <option value="DIRECT_COR">Langsung Di-COR (Proses Mesin)</option>
                         {stapelPiles.map((st) => (
                           <option key={st.id} value={st.id}>
-                            📦 {st.name} ({st.stock_kg.toLocaleString('id-ID')} KG)
+                            {st.name} ({st.stock_kg.toLocaleString('id-ID')} KG)
                           </option>
                         ))}
                       </select>
@@ -933,22 +1084,22 @@ export const Admin1WeighbridgeScreen: React.FC = () => {
 
             {/* Selected Truck Tare Info Banner (When in 2nd Weigh Mode) */}
             {selectedTruckForTare && (
-              <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-200 space-y-1">
+              <div className="p-3 bg-emerald-500/10 rounded-xl border border-emerald-500/30 space-y-1">
                 <div className="flex justify-between items-center text-xs">
-                  <span className="text-slate-500">Berat Masuk (1st Weigh):</span>
-                  <span className="font-mono font-extrabold text-slate-900">
+                  <span className="text-slate-400">Berat Masuk (1st Weigh):</span>
+                  <span className="font-mono font-extrabold text-slate-100">
                     {selectedTruckForTare.gross_weight.toLocaleString('id-ID')} KG
                   </span>
                 </div>
                 <div className="flex justify-between items-center text-xs">
-                  <span className="text-slate-500">Berat Keluar (Saat Ini):</span>
-                  <span className="font-mono font-extrabold text-slate-900">
+                  <span className="text-slate-400">Berat Keluar (Saat Ini):</span>
+                  <span className="font-mono font-extrabold text-slate-100">
                     {liveComWeight.toLocaleString('id-ID')} KG
                   </span>
                 </div>
-                <div className="flex justify-between items-center text-xs font-extrabold text-emerald-800 pt-1 border-t border-emerald-200">
+                <div className="flex justify-between items-center text-xs font-extrabold text-emerald-400 pt-1 border-t border-emerald-500/20">
                   <span>ESTIMASI NETTO:</span>
-                  <span className="font-mono text-sm">
+                  <span className="font-mono text-sm font-bold">
                     {Math.max(0, selectedTruckForTare.gross_weight - liveComWeight).toLocaleString('id-ID')} KG
                   </span>
                 </div>
@@ -961,28 +1112,28 @@ export const Admin1WeighbridgeScreen: React.FC = () => {
                 type="button"
                 disabled={!!selectedTruckForTare}
                 onClick={handleSaveFirstWeight}
-                className={`py-3 rounded-xl font-extrabold text-xs flex items-center justify-center space-x-1.5 transition shadow-sm ${
+                className={`py-3 rounded-xl font-bold text-xs flex items-center justify-center space-x-1.5 transition shadow-sm ${
                   selectedTruckForTare
-                    ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
-                    : 'bg-sky-600 hover:bg-sky-700 text-white active:scale-98'
+                    ? 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700/50'
+                    : 'bg-sky-600 hover:bg-sky-500 text-white active:scale-98 shadow-sky-600/20'
                 }`}
               >
                 <Truck className="w-4 h-4" />
-                <span>📥 1st WEIGH (MASUK)</span>
+                <span>1st Weigh (Timbang Masuk)</span>
               </button>
 
               <button
                 type="button"
                 disabled={!selectedTruckForTare}
                 onClick={handleSaveSecondWeight}
-                className={`py-3 rounded-xl font-extrabold text-xs flex items-center justify-center space-x-1.5 transition shadow-sm ${
+                className={`py-3 rounded-xl font-bold text-xs flex items-center justify-center space-x-1.5 transition shadow-sm ${
                   !selectedTruckForTare
-                    ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
-                    : 'bg-emerald-600 hover:bg-emerald-700 text-white animate-pulse active:scale-98'
+                    ? 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700/50'
+                    : 'bg-emerald-600 hover:bg-emerald-500 text-white animate-pulse active:scale-98 shadow-emerald-600/20'
                 }`}
               >
                 <Printer className="w-4 h-4" />
-                <span>🖨️ 2nd WEIGH & PRINT</span>
+                <span>2nd Weigh &amp; Cetak STT</span>
               </button>
             </div>
 
@@ -1019,10 +1170,13 @@ export const Admin1WeighbridgeScreen: React.FC = () => {
         ------------------------------------------------------- */}
         <div className="lg:col-span-3 bg-white rounded-2xl p-5 shadow-sm border border-slate-200 space-y-3 flex flex-col">
           <div className="border-b border-slate-100 pb-2.5 flex items-center justify-between">
-            <h2 className="text-sm font-extrabold text-slate-900 uppercase tracking-wide">
-              👥 DATABASE CUSTOMER
-            </h2>
-            <span className="text-[11px] font-bold bg-sky-100 text-sky-800 px-2 py-0.5 rounded-full">
+            <div className="flex items-center space-x-2">
+              <Users className="w-4 h-4 text-sky-600" />
+              <h2 className="text-sm font-extrabold text-slate-900 uppercase tracking-wide">
+                Database Customer
+              </h2>
+            </div>
+            <span className="text-[11px] font-bold bg-sky-100 text-sky-800 px-2 py-0.5 rounded-full font-mono">
               {customers.length} Cust
             </span>
           </div>
@@ -1107,10 +1261,13 @@ export const Admin1WeighbridgeScreen: React.FC = () => {
         ------------------------------------------------------- */}
         <div className="lg:col-span-4 bg-white rounded-2xl p-5 shadow-sm border border-slate-200 space-y-3 flex flex-col">
           <div className="border-b border-slate-100 pb-2.5 flex items-center justify-between">
-            <h2 className="text-sm font-extrabold text-slate-900 uppercase tracking-wide">
-              🚛 TRUK DI DALAM (TIMBANG 2)
-            </h2>
-            <span className="text-[11px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">
+            <div className="flex items-center space-x-2">
+              <Truck className="w-4 h-4 text-emerald-600" />
+              <h2 className="text-sm font-extrabold text-slate-900 uppercase tracking-wide">
+                Truk Di Dalam (Timbang 2)
+              </h2>
+            </div>
+            <span className="text-[11px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-mono">
               {inboundTrucks.length} Truk
             </span>
           </div>
@@ -1213,7 +1370,7 @@ export const Admin1WeighbridgeScreen: React.FC = () => {
       ========================================================= */}
       {showHistoryModal && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-3xl w-full p-6 space-y-4 shadow-2xl border-4 border-[#0f172a]">
+          <div className="bg-white rounded-2xl max-w-3xl w-full p-6 space-y-4 shadow-2xl border border-slate-200">
             <div className="flex justify-between items-center border-b pb-3">
               <div className="flex items-center space-x-2">
                 <History className="w-5 h-5 text-sky-600" />
@@ -1306,13 +1463,13 @@ export const Admin1WeighbridgeScreen: React.FC = () => {
       ========================================================= */}
       {showSettingsModal && (
         <div className="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-2xl w-full p-6 space-y-4 shadow-2xl border-4 border-[#0f172a]">
+          <div className="bg-white rounded-2xl max-w-2xl w-full p-6 space-y-4 shadow-2xl border border-slate-200">
             {/* Header */}
             <div className="flex justify-between items-center border-b pb-3">
               <div className="flex items-center space-x-2">
                 <Settings className="w-5 h-5 text-sky-600" />
                 <h3 className="text-base font-extrabold text-slate-900">
-                  ⚙️ Pengaturan Koneksi Indikator Timbangan (RS232 / COM)
+                  Pengaturan Koneksi Indikator Timbangan (RS-232 / COM)
                 </h3>
               </div>
               <button 
@@ -1335,7 +1492,7 @@ export const Admin1WeighbridgeScreen: React.FC = () => {
                 }`}
               >
                 <Cpu className="w-4 h-4" />
-                <span>🔌 Konfigurasi Port & Protokol</span>
+                <span>Konfigurasi Port &amp; Protokol</span>
               </button>
               <button
                 type="button"
@@ -1347,7 +1504,7 @@ export const Admin1WeighbridgeScreen: React.FC = () => {
                 }`}
               >
                 <Terminal className="w-4 h-4" />
-                <span>💻 Terminal Diagnostik Stream ({rawStreamLogs.length})</span>
+                <span>Terminal Diagnostik Stream ({rawStreamLogs.length})</span>
               </button>
             </div>
 
@@ -1357,11 +1514,27 @@ export const Admin1WeighbridgeScreen: React.FC = () => {
                 {/* Mode Koneksi */}
                 <div>
                   <label className="block text-slate-700 font-bold mb-1.5">Metode Koneksi:</label>
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setConnectionMode('native')}
+                      className={`p-2.5 rounded-xl border text-left font-bold transition ${
+                        connectionMode === 'native'
+                          ? 'border-indigo-600 bg-indigo-50 text-indigo-900 shadow-sm ring-2 ring-indigo-500/20'
+                          : 'border-slate-200 hover:border-slate-300 text-slate-600'
+                      }`}
+                    >
+                      <div className="flex items-center space-x-1.5 mb-1">
+                        <Cpu className="w-4 h-4 text-indigo-600" />
+                        <span className="text-[11px]">Native Electron</span>
+                      </div>
+                      <p className="text-[9px] text-slate-500 font-normal">Engine RiceFlow (Auto COM / CAS 200i)</p>
+                    </button>
+
                     <button
                       type="button"
                       onClick={() => setConnectionMode('webserial')}
-                      className={`p-3 rounded-xl border text-left font-bold transition ${
+                      className={`p-2.5 rounded-xl border text-left font-bold transition ${
                         connectionMode === 'webserial'
                           ? 'border-sky-600 bg-sky-50 text-sky-900 shadow-sm'
                           : 'border-slate-200 hover:border-slate-300 text-slate-600'
@@ -1369,15 +1542,15 @@ export const Admin1WeighbridgeScreen: React.FC = () => {
                     >
                       <div className="flex items-center space-x-1.5 mb-1">
                         <Radio className="w-4 h-4 text-sky-600" />
-                        <span>Web Serial API</span>
+                        <span className="text-[11px]">Web Serial</span>
                       </div>
-                      <p className="text-[10px] text-slate-500 font-normal">Browser Chrome/Edge langsung ke USB-to-RS232</p>
+                      <p className="text-[9px] text-slate-500 font-normal">Browser Chrome/Edge direct USB</p>
                     </button>
 
                     <button
                       type="button"
                       onClick={() => setConnectionMode('localbridge')}
-                      className={`p-3 rounded-xl border text-left font-bold transition ${
+                      className={`p-2.5 rounded-xl border text-left font-bold transition ${
                         connectionMode === 'localbridge'
                           ? 'border-emerald-600 bg-emerald-50 text-emerald-900 shadow-sm'
                           : 'border-slate-200 hover:border-slate-300 text-slate-600'
@@ -1385,15 +1558,15 @@ export const Admin1WeighbridgeScreen: React.FC = () => {
                     >
                       <div className="flex items-center space-x-1.5 mb-1">
                         <Wifi className="w-4 h-4 text-emerald-600" />
-                        <span>Local Scale Bridge</span>
+                        <span className="text-[11px]">Python Bridge</span>
                       </div>
-                      <p className="text-[10px] text-slate-500 font-normal">Background Python port 5000 (Semua Browser)</p>
+                      <p className="text-[9px] text-slate-500 font-normal">Service Lokal (Port 5000)</p>
                     </button>
 
                     <button
                       type="button"
                       onClick={() => setConnectionMode('simulated')}
-                      className={`p-3 rounded-xl border text-left font-bold transition ${
+                      className={`p-2.5 rounded-xl border text-left font-bold transition ${
                         connectionMode === 'simulated'
                           ? 'border-amber-600 bg-amber-50 text-amber-900 shadow-sm'
                           : 'border-slate-200 hover:border-slate-300 text-slate-600'
@@ -1401,9 +1574,9 @@ export const Admin1WeighbridgeScreen: React.FC = () => {
                     >
                       <div className="flex items-center space-x-1.5 mb-1">
                         <Activity className="w-4 h-4 text-amber-600" />
-                        <span>Mode Simulasi</span>
+                        <span className="text-[11px]">Simulasi</span>
                       </div>
-                      <p className="text-[10px] text-slate-500 font-normal">Input bobot manual untuk pengetesan sistem</p>
+                      <p className="text-[9px] text-slate-500 font-normal">Input bobot manual untuk testing</p>
                     </button>
                   </div>
                 </div>
@@ -1522,7 +1695,10 @@ export const Admin1WeighbridgeScreen: React.FC = () => {
                 </div>
 
                 <div className="flex items-center justify-between text-[11px] text-slate-500">
-                  <span>💡 Tips: Jika angka timbangan tidak muncul, periksa Baud Rate dan kabel USB-to-RS232.</span>
+                  <span className="flex items-center space-x-1.5">
+                    <Info className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                    <span>Tips: Jika berat timbangan tidak muncul, periksa Baud Rate dan kabel USB-to-RS232.</span>
+                  </span>
                   <span className="font-mono text-emerald-700 font-bold">Live: {liveComWeight.toLocaleString('id-ID')} KG</span>
                 </div>
               </div>
@@ -1533,7 +1709,7 @@ export const Admin1WeighbridgeScreen: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setShowSettingsModal(false)}
-                className="px-5 py-2 bg-[#0f172a] hover:bg-slate-800 text-white font-bold rounded-xl text-xs transition"
+                className="px-5 py-2 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-xs transition"
               >
                 Selesai / Tutup
               </button>
@@ -1547,7 +1723,7 @@ export const Admin1WeighbridgeScreen: React.FC = () => {
       ========================================================= */}
       {printTicket && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 space-y-4 border-4 border-[#0f172a] shadow-2xl">
+          <div className="bg-white rounded-2xl max-w-lg w-full p-6 space-y-4 border border-slate-200 shadow-2xl">
             <div className="flex justify-between items-center border-b pb-3">
               <div className="flex items-center space-x-2">
                 <Printer className="w-5 h-5 text-emerald-600" />

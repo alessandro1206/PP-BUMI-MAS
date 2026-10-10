@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { Lock, User, Key, LogIn, X, Shield, Scale, Smartphone, AlertCircle, ArrowLeft, ArrowRight } from 'lucide-react';
+import { Lock, User, Key, LogIn, X, Shield, ShieldCheck, Scale, Smartphone, AlertCircle, ArrowLeft, ArrowRight } from 'lucide-react';
 import { RoleType } from '../types';
 
 interface LoginModalProps {
@@ -73,7 +73,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ targetRole: initialRole,
 
   return (
     <div className="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in">
-      <div className="bg-white rounded-3xl max-w-md w-full p-7 space-y-6 shadow-2xl border-4 border-[#0f3e2e] relative overflow-hidden">
+      <div className="bg-white rounded-2xl max-w-md w-full p-7 space-y-6 shadow-2xl border border-slate-200 relative overflow-hidden">
         {/* Top Header */}
         <div className="flex justify-between items-start border-b border-slate-100 pb-4">
           <div className="flex items-center space-x-3">
@@ -114,8 +114,8 @@ export const LoginModal: React.FC<LoginModalProps> = ({ targetRole: initialRole,
                 className="group bg-[#08251b] hover:bg-[#0f3e2e] p-4 rounded-2xl border-2 border-amber-400/60 transition flex items-center justify-between text-left shadow-md text-white"
               >
                 <div className="flex items-center space-x-3">
-                  <div className="w-12 h-12 rounded-xl bg-amber-400 text-[#0f3e2e] flex items-center justify-center font-black">
-                    ★
+                  <div className="w-12 h-12 rounded-xl bg-amber-400 text-slate-950 flex items-center justify-center">
+                    <ShieldCheck className="w-6 h-6" />
                   </div>
                   <div>
                     <h4 className="font-extrabold text-amber-400 text-sm">Super Admin (Akses Penuh + Pajak)</h4>

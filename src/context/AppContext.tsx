@@ -586,7 +586,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const updateTareAndFinishWeighbridge = (id: string, tareWeight: number, sacks?: string | number, goods?: string) => {
     setWeighbridgeInList(prev => prev.map(item => {
       if (item.id === id) {
-        const netWeight = Math.max(0, item.gross_weight - tareWeight);
+        // Standar Operasional Jembatan Timbang Indonesia:
+        // Bruto = bobot truk terisi (lebih besar), Tara = bobot truk kosong (lebih kecil), Netto = selisih mutlak
+        const w1 = item.gross_weight;
+        const w2 = tareWeight;
+        const trueGross = Math.max(w1, w2);
+        const trueTare = Math.min(w1, w2);
+        const netWeight = Math.abs(w1 - w2);
         const datetimeOut = new Date().toISOString().replace('T', ' ').substring(0, 16);
 
         if (item.allocations && item.allocations.length > 0) {
@@ -597,12 +603,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           });
         }
 
-        addAuditLog(`Timbang Keluar (Tara)`, `No STT: ${item.ticket_number}, Nopol: ${item.nopol}, Bruto: ${item.gross_weight} KG, Tara: ${tareWeight} KG, Netto: ${netWeight.toLocaleString('id-ID')} KG`);
+        addAuditLog(`Timbang Keluar Selesai`, `No STT: ${item.ticket_number}, Nopol: ${item.nopol}, Bruto: ${trueGross.toLocaleString('id-ID')} KG, Tara: ${trueTare.toLocaleString('id-ID')} KG, Netto: ${netWeight.toLocaleString('id-ID')} KG`);
 
         return {
           ...item,
           datetime_out: datetimeOut,
-          tare_weight: tareWeight,
+          gross_weight: trueGross,
+          tare_weight: trueTare,
           net_weight: netWeight,
           sacks: sacks !== undefined ? sacks : item.sacks,
           goods: goods !== undefined ? goods : item.goods,

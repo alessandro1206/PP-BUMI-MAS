@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { FileText, Printer, Plus, ArrowLeft, DollarSign, CheckCircle2, Building, Eye, Trash2, Calendar, Layers, Check, Share2, Split, Download, ExternalLink } from 'lucide-react';
+import { FileText, Printer, Plus, ArrowLeft, DollarSign, CheckCircle2, Building, Eye, Trash2, Calendar, Layers, Check, Share2, Split, Download, ExternalLink, Wand2, X } from 'lucide-react';
 import { SalesDeliveryOrderItem, SalesDeliveryOrder, Customer } from '../types';
 
 export const Admin1DeliveryOrderScreen: React.FC = () => {
@@ -236,7 +236,7 @@ export const Admin1DeliveryOrderScreen: React.FC = () => {
     });
 
     setShowGCalModal(false);
-    alert(`✅ BERHASIL TERBIT! Surat Jalan ${newDO.do_number} untuk "${preset.customer_name} (${preset.brand_aka || ''})" (Total: ${(totalKgSum/1000).toFixed(1)} Ton) LANGSUNG MASUK ke Daftar Surat Jalan & Invoice di panel kanan!`);
+    alert(`Surat Jalan ${newDO.do_number} untuk "${preset.customer_name} (${preset.brand_aka || ''})" (Total: ${(totalKgSum/1000).toFixed(1)} Ton) berhasil diterbitkan dan masuk ke Daftar Surat Jalan & Invoice.`);
   };
 
   const handleParseGCalText = () => {
@@ -334,7 +334,7 @@ export const Admin1DeliveryOrderScreen: React.FC = () => {
     });
 
     setShowGCalModal(false);
-    alert(`✅ BERHASIL TERBIT! Surat Jalan ${newDO.do_number} untuk "${cName} (${bAka})" (Parsed ${activeItems.length} barang = ${(totalKgSum/1000).toFixed(1)} Ton) LANGSUNG MASUK ke Daftar Surat Jalan & Invoice di panel kanan!`);
+    alert(`Surat Jalan ${newDO.do_number} untuk "${cName} (${bAka})" (Total: ${(totalKgSum/1000).toFixed(1)} Ton) berhasil diterbitkan dan masuk ke Daftar Surat Jalan & Invoice.`);
   };
 
 
@@ -650,17 +650,17 @@ export const Admin1DeliveryOrderScreen: React.FC = () => {
                           setActualShipDate(new Date().toISOString().split('T')[0]);
                           setShowShipModal(true);
                         }}
-                        className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-900 hover:bg-blue-200 active:bg-blue-300 transition border border-blue-200 cursor-pointer"
+                        className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-sky-100 text-sky-800 hover:bg-sky-200 transition border border-sky-200 cursor-pointer font-mono"
                         title="Klik untuk konfirmasi pengiriman"
                       >
-                        RENCANA_JADWAL ✎
+                        RENCANA JADWAL
                       </button>
                     ) : (doItem.status as string) === 'TERKIRIM' ? (
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-600 text-white">
-                        ✓ TERKIRIM {(doItem as any).actual_ship_date ? `(${(doItem as any).actual_ship_date})` : ''}
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-600 text-white font-mono">
+                        TERKIRIM {(doItem as any).actual_ship_date ? `(${(doItem as any).actual_ship_date})` : ''}
                       </span>
                     ) : (
-                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold font-mono ${
                         doItem.status === 'DI_MUAT_TRUK' ? 'bg-amber-100 text-amber-900' : 'bg-emerald-100 text-emerald-900'
                       }`}>
                         {doItem.status}
@@ -694,15 +694,18 @@ export const Admin1DeliveryOrderScreen: React.FC = () => {
                   </div>
 
                   <div className="flex justify-between items-center text-xs font-bold pt-1">
-                    <span className="text-slate-500">Total Berat:</span>
-                    <span className="text-[#0f3e2e] font-extrabold text-sm">{doItem.total_kg?.toLocaleString('id-ID')} KG</span>
+                    <span className="text-slate-500 font-mono">Total Berat:</span>
+                    <span className="text-slate-900 font-extrabold text-sm font-mono tabular-nums">{doItem.total_kg?.toLocaleString('id-ID')} KG</span>
                   </div>
 
                   {/* Invoice Status & Price setting — hidden if TERKIRIM */}
                   {(doItem.status as string) === 'TERKIRIM' ? (
                     <div className="bg-emerald-50 p-2.5 rounded-lg border border-emerald-200 flex justify-between items-center text-xs">
-                      <span className="text-emerald-800 font-bold text-[11px]">✓ Sudah Terkirim — Invoice di Owner</span>
-                      <span className="text-[10px] bg-emerald-700 text-white px-2 py-0.5 rounded font-bold">{(doItem as any).actual_ship_date || '-'}</span>
+                      <span className="text-emerald-800 font-bold text-[11px] flex items-center space-x-1">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                        <span>Sudah Terkirim — Invoice di Owner</span>
+                      </span>
+                      <span className="text-[10px] bg-emerald-700 text-white px-2 py-0.5 rounded font-bold font-mono">{(doItem as any).actual_ship_date || '-'}</span>
                     </div>
                   ) : doItem.total_invoice_amount ? (
                     <div className="bg-emerald-50 p-2.5 rounded-lg border border-emerald-200 flex justify-between items-center text-xs">
@@ -771,19 +774,21 @@ export const Admin1DeliveryOrderScreen: React.FC = () => {
       {/* Ship Confirmation Modal */}
       {showShipModal && shipTargetDO && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-sm w-full p-6 space-y-4 border-4 border-emerald-600">
+          <div className="bg-white rounded-2xl max-w-sm w-full p-6 space-y-4 border border-slate-200 shadow-2xl">
             <div className="flex justify-between items-center border-b pb-2">
-              <h3 className="font-extrabold text-[#0f3e2e] text-base flex items-center space-x-2">
+              <h3 className="font-extrabold text-slate-900 text-base flex items-center space-x-2">
                 <CheckCircle2 className="w-5 h-5 text-emerald-600" />
                 <span>Konfirmasi Pengiriman</span>
               </h3>
-              <button onClick={() => setShowShipModal(false)} className="text-slate-400 text-xl">✕</button>
+              <button onClick={() => setShowShipModal(false)} className="p-1 text-slate-400 hover:text-slate-600 rounded-lg">
+                <X className="w-5 h-5" />
+              </button>
             </div>
 
             <div className="text-sm text-slate-600 space-y-1">
-              <p>DO: <strong className="text-[#0f3e2e]">{shipTargetDO.do_number}</strong></p>
+              <p>DO: <strong className="text-slate-900 font-mono">{shipTargetDO.do_number}</strong></p>
               <p>Customer: <strong>{shipTargetDO.customer_name}</strong></p>
-              <p>Total: <strong>{shipTargetDO.total_kg?.toLocaleString('id-ID')} KG</strong></p>
+              <p>Total: <strong className="font-mono">{shipTargetDO.total_kg?.toLocaleString('id-ID')} KG</strong></p>
             </div>
 
             <div>
@@ -792,7 +797,7 @@ export const Admin1DeliveryOrderScreen: React.FC = () => {
                 type="date"
                 value={actualShipDate}
                 onChange={(e) => setActualShipDate(e.target.value)}
-                className="w-full px-3 py-2 border-2 border-emerald-300 rounded-xl font-bold text-sm text-[#0f3e2e]"
+                className="w-full px-3 py-2 border border-slate-300 rounded-xl font-bold text-sm text-slate-900 focus:outline-none focus:border-emerald-500"
               />
             </div>
 
@@ -800,14 +805,14 @@ export const Admin1DeliveryOrderScreen: React.FC = () => {
               <button
                 type="button"
                 onClick={handleConfirmShip}
-                className="flex-1 py-3 bg-emerald-600 text-white font-extrabold text-sm rounded-xl shadow"
+                className="flex-1 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-sm rounded-xl shadow transition"
               >
-                ✓ Konfirmasi TERKIRIM
+                Konfirmasi Pengiriman
               </button>
               <button
                 type="button"
                 onClick={() => setShowShipModal(false)}
-                className="px-4 py-3 bg-slate-200 text-slate-700 font-bold text-sm rounded-xl"
+                className="px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm rounded-xl transition"
               >
                 Batal
               </button>
@@ -819,13 +824,15 @@ export const Admin1DeliveryOrderScreen: React.FC = () => {
       {/* Split PO to Multi-Truck Modal */}
       {showSplitModal && splitTargetDO && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 space-y-4 border-4 border-[#0f3e2e]">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 border border-slate-200 shadow-2xl">
             <div className="flex justify-between items-center border-b pb-2">
-              <h3 className="font-extrabold text-[#0f3e2e] text-base flex items-center space-x-2">
+              <h3 className="font-extrabold text-slate-900 text-base flex items-center space-x-2">
                 <Split className="w-5 h-5 text-amber-500" />
                 <span>Pecah PO 1 Order ke 2 Truk Berbeda</span>
               </h3>
-              <button onClick={() => setShowSplitModal(false)} className="text-slate-400">✕</button>
+              <button onClick={() => setShowSplitModal(false)} className="p-1 text-slate-400 hover:text-slate-600 rounded-lg">
+                <X className="w-5 h-5" />
+              </button>
             </div>
 
             <p className="text-xs text-slate-600">
@@ -893,18 +900,20 @@ export const Admin1DeliveryOrderScreen: React.FC = () => {
       {/* Google Calendar Sync Modal */}
       {showGCalModal && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-xl w-full p-6 space-y-4 border-4 border-[#0f3e2e] max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-2xl max-w-xl w-full p-6 space-y-4 border border-slate-200 shadow-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center border-b pb-2">
               <div>
-                <h3 className="font-extrabold text-[#0f3e2e] text-base flex items-center space-x-2">
+                <h3 className="font-extrabold text-slate-900 text-base flex items-center space-x-2">
                   <Calendar className="w-5 h-5 text-amber-500" />
                   <span>Sync Google Calendar Order Konsumen</span>
                 </h3>
-                <span className="text-[10px] bg-emerald-100 text-emerald-800 font-extrabold px-2 py-0.5 rounded">
+                <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold font-mono px-2 py-0.5 rounded">
                   Akun: juwitasriwulandari@gmail.com
                 </span>
               </div>
-              <button onClick={() => setShowGCalModal(false)} className="text-slate-400 hover:text-slate-600 font-bold">✕</button>
+              <button onClick={() => setShowGCalModal(false)} className="p-1 text-slate-400 hover:text-slate-600 rounded-lg">
+                <X className="w-5 h-5" />
+              </button>
             </div>
 
             {/* Event List Selector matching Juwita's Google Calendar */}
@@ -923,14 +932,14 @@ export const Admin1DeliveryOrderScreen: React.FC = () => {
                 <div className="bg-emerald-50 border-2 border-emerald-400 p-3.5 rounded-2xl space-y-2">
                   <div className="flex justify-between items-start">
                     <div>
-                      <span className="text-xs font-extrabold text-[#0f3e2e] block">
+                      <span className="text-xs font-extrabold text-slate-900 block">
                         9am bcamp 25 BM (Rencana Kirim BCAMP)
                       </span>
-                      <span className="text-[10px] font-bold bg-amber-400 text-[#0f3e2e] px-1.5 py-0.2 rounded font-mono">
+                      <span className="text-[10px] font-bold bg-amber-400 text-slate-950 px-1.5 py-0.2 rounded font-mono">
                         Merek: BCAMP / DM — Total: 25 Ton (25.000 KG)
                       </span>
                     </div>
-                    <span className="text-[10px] bg-emerald-700 text-white font-bold px-2 py-0.5 rounded">
+                    <span className="text-[10px] bg-emerald-700 text-white font-bold px-2 py-0.5 rounded font-mono">
                       21 Sep 2026 (Hari Ini)
                     </span>
                   </div>
@@ -959,10 +968,10 @@ export const Admin1DeliveryOrderScreen: React.FC = () => {
                         { id: 'it-5', product_name: 'Beras Cap Putri Thailand @10 KG', unit: 'ZAK', qty: 500, weight_per_unit_kg: 10, total_kg: 5000 }
                       ]
                     })}
-                    className="w-full py-2.5 bg-[#0f3e2e] hover:bg-emerald-900 text-white font-extrabold text-xs rounded-xl shadow flex items-center justify-center space-x-1.5"
+                    className="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow flex items-center justify-center space-x-1.5 transition"
                   >
-                    <Download className="w-4 h-4 text-amber-400" />
-                    <span>📥 Klik 1-Kali: Auto-Fill &amp; Terbitkan Surat Jalan Ini</span>
+                    <Download className="w-4 h-4 text-emerald-400" />
+                    <span>Auto-Fill &amp; Terbitkan Surat Jalan Ini</span>
                   </button>
                 </div>
 
@@ -1001,10 +1010,10 @@ export const Admin1DeliveryOrderScreen: React.FC = () => {
                         { id: 'it-1', product_name: 'BERAS PREMIUM CAP PANDAN @(5X10) KG', unit: 'ZAK', qty: 500, weight_per_unit_kg: 50, total_kg: 25000 }
                       ]
                     })}
-                    className="w-full py-2 bg-slate-800 hover:bg-slate-900 text-white font-extrabold text-xs rounded-xl shadow flex items-center justify-center space-x-1"
+                    className="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow flex items-center justify-center space-x-1.5 transition"
                   >
-                    <Download className="w-3.5 h-3.5 text-amber-400" />
-                    <span>📥 Klik 1-Kali: Auto-Fill Form Surat Jalan Ini</span>
+                    <Download className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>Auto-Fill Form Surat Jalan Ini</span>
                   </button>
                 </div>
 
@@ -1043,10 +1052,10 @@ export const Admin1DeliveryOrderScreen: React.FC = () => {
                         { id: 'it-1', product_name: 'BERAS PREMIUM CAP PUTRI THAILAND @50 KG', unit: 'ZAK', qty: 500, weight_per_unit_kg: 50, total_kg: 25000 }
                       ]
                     })}
-                    className="w-full py-2 bg-slate-800 hover:bg-slate-900 text-white font-extrabold text-xs rounded-xl shadow flex items-center justify-center space-x-1"
+                    className="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow flex items-center justify-center space-x-1.5 transition"
                   >
-                    <Download className="w-3.5 h-3.5 text-amber-400" />
-                    <span>📥 Klik 1-Kali: Auto-Fill Form Surat Jalan Ini</span>
+                    <Download className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>Auto-Fill Form Surat Jalan Ini</span>
                   </button>
                 </div>
 
@@ -1085,10 +1094,10 @@ export const Admin1DeliveryOrderScreen: React.FC = () => {
                         { id: 'it-1', product_name: 'BERAS PREMIUM CAP PUTRI THAILAND @50 KG', unit: 'ZAK', qty: 300, weight_per_unit_kg: 50, total_kg: 15000 }
                       ]
                     })}
-                    className="w-full py-2 bg-slate-800 hover:bg-slate-900 text-white font-extrabold text-xs rounded-xl shadow flex items-center justify-center space-x-1"
+                    className="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow flex items-center justify-center space-x-1.5 transition"
                   >
-                    <Download className="w-3.5 h-3.5 text-amber-400" />
-                    <span>📥 Klik 1-Kali: Auto-Fill Form Surat Jalan Ini</span>
+                    <Download className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>Auto-Fill Form Surat Jalan Ini</span>
                   </button>
                 </div>
               </div>
@@ -1112,17 +1121,17 @@ export const Admin1DeliveryOrderScreen: React.FC = () => {
                 <button
                   type="button"
                   onClick={handleParseGCalText}
-                  className="flex-1 py-2.5 bg-amber-500 hover:bg-amber-600 text-[#0f3e2e] font-extrabold text-xs rounded-xl shadow flex items-center justify-center space-x-1"
+                  className="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow flex items-center justify-center space-x-1.5 transition"
                 >
-                  <Download className="w-4 h-4" />
-                  <span>🪄 Auto-Parse &amp; Import Text ke Form</span>
+                  <Wand2 className="w-4 h-4 text-emerald-200" />
+                  <span>Auto-Parse &amp; Import Text ke Form</span>
                 </button>
 
                 <a
                   href="https://calendar.google.com/calendar"
                   target="_blank"
                   rel="noreferrer"
-                  className="px-4 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-xs rounded-xl flex items-center justify-center space-x-1"
+                  className="px-4 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-xs rounded-xl flex items-center justify-center space-x-1 transition"
                 >
                   <ExternalLink className="w-4 h-4" />
                   <span>Buka Calendar</span>
@@ -1137,15 +1146,15 @@ export const Admin1DeliveryOrderScreen: React.FC = () => {
       {/* Print Surat Jalan & Faktur Penjualan (Exact Excel Match) Modal */}
       {viewDOModal && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-2xl w-full p-6 space-y-4 border-4 border-[#0f3e2e] max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-2xl max-w-2xl w-full p-6 space-y-4 border border-slate-200 shadow-2xl max-h-[90vh] overflow-y-auto">
             {/* Modal Header Tabs */}
-            <div className="flex items-center justify-between border-b pb-3">
+            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
               <div className="flex items-center space-x-2 bg-slate-100 p-1 rounded-xl">
                 <button
                   type="button"
                   onClick={() => setPrintTab('SURAT_JALAN')}
-                  className={`px-4 py-2 rounded-lg text-xs font-extrabold transition ${
-                    printTab === 'SURAT_JALAN' ? 'bg-[#0f3e2e] text-white shadow' : 'text-slate-600'
+                  className={`px-4 py-2 rounded-lg text-xs font-bold transition ${
+                    printTab === 'SURAT_JALAN' ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
                   FORMAT SURAT JALAN
@@ -1153,14 +1162,16 @@ export const Admin1DeliveryOrderScreen: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setPrintTab('FAKTUR')}
-                  className={`px-4 py-2 rounded-lg text-xs font-extrabold transition ${
-                    printTab === 'FAKTUR' ? 'bg-[#0f3e2e] text-white shadow' : 'text-slate-600'
+                  className={`px-4 py-2 rounded-lg text-xs font-bold transition ${
+                    printTab === 'FAKTUR' ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
                   FORMAT FAKTUR PENJUALAN
                 </button>
               </div>
-              <button onClick={() => setViewDOModal(null)} className="text-slate-400 hover:text-slate-600 font-bold">✕</button>
+              <button onClick={() => setViewDOModal(null)} className="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-100 transition">
+                <X className="w-5 h-5" />
+              </button>
             </div>
 
             {/* TAB 1: EXACT MATCH SURAT JALAN EXCEL (Tujuan Ekspedisi + Merek Konsumen) */}

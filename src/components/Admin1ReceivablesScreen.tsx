@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { CreditCard, ArrowLeft, CheckSquare, DollarSign, Calendar, Search, Filter, History, CheckCircle2, AlertCircle } from 'lucide-react';
+import { CreditCard, ArrowLeft, CheckSquare, DollarSign, Calendar, Search, Filter, History, CheckCircle2, AlertCircle, X } from 'lucide-react';
 import { SalesDeliveryOrder } from '../types';
 
 export const Admin1ReceivablesScreen: React.FC = () => {
@@ -228,13 +228,15 @@ export const Admin1ReceivablesScreen: React.FC = () => {
       {/* Payment / Pelunasan Modal */}
       {payTargetDO && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <form onSubmit={handleSubmitPayment} className="bg-white rounded-3xl max-w-md w-full p-6 space-y-4 border-4 border-[#0f3e2e]">
-            <div className="flex justify-between items-center border-b pb-2">
+          <form onSubmit={handleSubmitPayment} className="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 border border-slate-200 shadow-2xl">
+            <div className="flex justify-between items-center border-b border-slate-200 pb-3">
               <h3 className="font-extrabold text-[#0f3e2e] text-lg flex items-center space-x-2">
                 <CheckSquare className="w-5 h-5 text-amber-500" />
                 <span>Input Pelunasan / Cicilan Piutang</span>
               </h3>
-              <button type="button" onClick={() => setPayTargetDO(null)} className="text-slate-400">✕</button>
+              <button type="button" onClick={() => setPayTargetDO(null)} className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition">
+                <X className="w-5 h-5" />
+              </button>
             </div>
 
             <div className="bg-slate-50 p-3 rounded-2xl border text-xs space-y-1">

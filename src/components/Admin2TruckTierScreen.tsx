@@ -118,7 +118,7 @@ export const Admin2TruckTierScreen: React.FC = () => {
       updateDOItemLoadedQty(selectedDO.id, selectedDO.items[0].id, totalKgActual);
     }
 
-    alert(`✅ Data Tally Muat Truk ${nopol} Berhasil Disimpan!\nTotal Tally: ${totalSakActual} Sak (${totalKgActual.toLocaleString('id-ID')} KG)\nTarget Surat Jalan: ${targetSakSJ} Sak (${sakDiff === 0 ? 'SESUAI' : `Selisih ${sakDiff > 0 ? '+' : ''}${sakDiff} Sak`})`);
+    alert(`Data Tally Muat Truk ${nopol} Berhasil Disimpan!\nTotal Tally: ${totalSakActual} Sak (${totalKgActual.toLocaleString('id-ID')} KG)\nTarget Surat Jalan: ${targetSakSJ} Sak (${sakDiff === 0 ? 'SESUAI' : `Selisih ${sakDiff > 0 ? '+' : ''}${sakDiff} Sak`})`);
   };
 
   return (
@@ -292,17 +292,17 @@ export const Admin2TruckTierScreen: React.FC = () => {
             <span className="text-xl font-extrabold text-[#0f3e2e]">{totalSakActual} Sak ({totalKgActual.toLocaleString('id-ID')} KG)</span>
           </div>
 
-          <div className="flex items-center space-x-1 text-xs font-extrabold pt-1 border-t border-slate-200">
+          <div className="flex items-center space-x-1.5 text-xs font-bold pt-1 border-t border-slate-200">
             {sakDiff === 0 ? (
               <>
                 <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                <span className="text-emerald-700">✓ SESUAI DENGAN SURAT JALAN ({targetSakSJ} Sak)</span>
+                <span className="text-emerald-700">SESUAI DENGAN SURAT JALAN ({targetSakSJ} Sak)</span>
               </>
             ) : (
               <>
                 <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
                 <span className="text-amber-800">
-                  ⚠️ SELISIH: {sakDiff > 0 ? `+${sakDiff}` : sakDiff} Sak dari Surat Jalan (Tally: {totalSakActual} / SJ: {targetSakSJ} Sak)
+                  SELISIH: {sakDiff > 0 ? `+${sakDiff}` : sakDiff} Sak dari Surat Jalan (Tally: {totalSakActual} / SJ: {targetSakSJ} Sak)
                 </span>
               </>
             )}

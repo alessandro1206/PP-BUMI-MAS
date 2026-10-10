@@ -18,7 +18,7 @@ export const AuditLogModal: React.FC<{ onClose: () => void }> = ({ onClose }) =>
 
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in">
-      <div className="bg-white rounded-3xl max-w-4xl w-full p-6 space-y-6 shadow-2xl border-4 border-[#0f3e2e] relative overflow-hidden max-h-[85vh] flex flex-col">
+      <div className="bg-white rounded-2xl max-w-4xl w-full p-6 space-y-6 shadow-2xl border border-slate-200 relative overflow-hidden max-h-[85vh] flex flex-col">
         {/* Header */}
         <div className="flex justify-between items-center border-b border-slate-100 pb-4 shrink-0">
           <div className="flex items-center space-x-3">
