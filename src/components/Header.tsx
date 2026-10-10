@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { Shield, Scale, Smartphone, Sparkles, UserCheck, LogOut, FileText, BarChart3, Users, Package, Wallet, Receipt, Layers, Key, BookOpen } from 'lucide-react';
+import { Shield, Scale, Smartphone, Building2, UserCheck, LogOut, FileText, BarChart3, Users, Package, Wallet, Receipt, Layers, Key, BookOpen } from 'lucide-react';
 import { LoginModal } from './LoginModal';
 import { AuditLogModal } from './AuditLogModal';
 import { InitialBalanceSetupModal } from './InitialBalanceSetupModal';
@@ -125,8 +125,8 @@ export const Header: React.FC = () => {
                     : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
                 }`}
               >
-                <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-                <span className="hidden sm:inline">Website</span>
+                <Building2 className="w-3.5 h-3.5 text-slate-300" />
+                <span className="hidden sm:inline">Portal</span>
               </button>
 
               {currentUser ? (
