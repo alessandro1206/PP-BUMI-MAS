@@ -35,10 +35,10 @@ export const Header: React.FC = () => {
 
   return (
     <>
-      <header className="bg-slate-950/90 backdrop-blur-md text-white shadow-xl sticky top-0 z-50 border-b border-slate-800/80">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <header className="bg-[#171721]/80 backdrop-blur-xl text-[#ededf3] sticky top-0 z-50 border-b border-[#70707d]/20 transition-all">
+        <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between h-16 sm:h-20">
-            {/* Logo & Mill Title */}
+            {/* Mercury Concentric Ring Logo & Brand Mark */}
             <div 
               className="flex items-center space-x-3 cursor-pointer group" 
               onClick={() => { 
@@ -50,130 +50,133 @@ export const Header: React.FC = () => {
                 }
               }}
             >
-              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-[#0e382b] to-[#082018] border border-[#d4af37]/50 flex items-center justify-center text-amber-300 shadow-md group-hover:border-[#d4af37] transition">
-                <svg className="w-6 h-6 text-[#d4af37]" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 3L2 19h20L12 3zm0 4.5l6.5 10.5h-13L12 7.5zM12 11c-.83 0-1.5.67-1.5 1.5S11.17 14 12 14s1.5-.67 1.5-1.5S12.83 11 12 11z"/>
+              <div className="w-9 h-9 rounded-full bg-[#1e1e2a] border border-[#70707d]/30 flex items-center justify-center text-[#ededf3] group-hover:border-[#ededf3]/60 transition">
+                <svg className="w-5 h-5 text-[#ededf3]" viewBox="0 0 32 32" fill="none">
+                  <circle cx="16" cy="16" r="13" stroke="currentColor" strokeWidth="1.2" opacity="0.4" />
+                  <circle cx="16" cy="16" r="8.5" stroke="currentColor" strokeWidth="1.4" opacity="0.75" />
+                  <circle cx="16" cy="16" r="4" fill="currentColor" />
                 </svg>
               </div>
               <div>
                 <div className="flex items-center space-x-2">
-                  <span className="font-extrabold text-lg sm:text-xl tracking-tight text-white group-hover:text-amber-300 transition">PP BUMI MAS</span>
-                  <span className="text-[10px] font-mono uppercase bg-emerald-950/90 text-amber-300 px-2 py-0.5 rounded-md font-semibold border border-[#d4af37]/30 tracking-wider">
+                  <span className="text-base sm:text-lg font-normal tracking-[0.02em] text-[#ededf3] group-hover:text-white transition">
+                    PP BUMI MAS
+                  </span>
+                  <span className="text-[10px] font-mono uppercase bg-[#1e1e2a] text-[#c3c3cc] px-2 py-0.5 rounded-full border border-[#70707d]/30 tracking-widest">
                     BANYUWANGI
                   </span>
                 </div>
-                <p className="text-[11px] text-slate-400 font-medium">Sustainable Rice Factory &amp; Milling System</p>
+                <p className="text-[11px] text-[#c3c3cc] font-normal">Alpine Banking Craft • Premium Rice Mill</p>
               </div>
             </div>
 
             {/* Balance & Stats Bar (OWNER ONLY - hidden for Admin 1, Admin 2, and Portal) */}
             {currentUser?.role === 'OWNER' ? (
-              <div className="hidden xl:flex items-center space-x-3 bg-slate-900/90 px-3.5 py-1.5 rounded-xl border border-slate-800 text-xs">
+              <div className="hidden xl:flex items-center space-x-3 bg-[#1e1e2a] px-3.5 py-1.5 rounded-full border border-[#70707d]/30 text-xs">
                 <div className="px-2 py-0.5">
-                  <div className="text-[10px] uppercase font-mono tracking-wider text-slate-400">Kas Brankas</div>
-                  <div className="font-mono font-bold text-amber-400 text-xs">{formatRp(cashBalance)}</div>
+                  <div className="text-[10px] uppercase font-mono tracking-wider text-[#c3c3cc]">Kas Brankas</div>
+                  <div className="font-mono font-medium text-[#ededf3] text-xs">{formatRp(cashBalance)}</div>
                 </div>
-                <div className="h-6 w-[1px] bg-slate-800"></div>
+                <div className="h-6 w-[1px] bg-[#70707d]/30"></div>
                 <div className="px-2 py-0.5">
-                  <div className="text-[10px] uppercase font-mono tracking-wider text-slate-400">Bank BCA</div>
-                  <div className="font-mono font-bold text-emerald-400 text-xs">{formatRp(bankBalance)}</div>
+                  <div className="text-[10px] uppercase font-mono tracking-wider text-[#c3c3cc]">Bank BCA</div>
+                  <div className="font-mono font-medium text-[#ededf3] text-xs">{formatRp(bankBalance)}</div>
                 </div>
-                <div className="h-6 w-[1px] bg-slate-800"></div>
+                <div className="h-6 w-[1px] bg-[#70707d]/30"></div>
                 
                 <button
                   onClick={() => setShowInitialSetupModal(true)}
-                  className="px-2.5 py-1 bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 font-semibold border border-amber-500/30 rounded-lg text-xs flex items-center space-x-1.5 transition"
-                  title="Form Terpadu Input Saldo Awal Kas, Bank, Utang Bawaan, Piutang Bawaan & Stok Awal"
+                  className="px-3 py-1 bg-[#272735] hover:bg-[#323244] text-[#ededf3] rounded-full text-xs flex items-center space-x-1.5 transition"
+                  title="Form Terpadu Input Saldo Awal"
                 >
-                  <Wallet className="w-3.5 h-3.5 text-amber-400" />
+                  <Wallet className="w-3.5 h-3.5 text-[#ededf3]" />
                   <span>Saldo Awal</span>
                 </button>
 
                 <button
                   onClick={() => setActiveScreen('SCREEN_REPORTS')}
-                  className="px-2.5 py-1 bg-slate-800/90 hover:bg-slate-700/90 text-slate-200 font-semibold border border-slate-700/80 rounded-lg text-xs flex items-center space-x-1.5 transition"
+                  className="px-3 py-1 bg-[#272735] hover:bg-[#323244] text-[#ededf3] rounded-full text-xs flex items-center space-x-1.5 transition"
                 >
-                  <BarChart3 className="w-3.5 h-3.5 text-emerald-400" />
+                  <BarChart3 className="w-3.5 h-3.5 text-[#ededf3]" />
                   <span>Laporan</span>
                 </button>
 
                 <button
                   onClick={() => setActiveScreen('SCREEN_USER_MGMT')}
-                  className="px-2.5 py-1 bg-slate-800/90 hover:bg-slate-700/90 text-slate-200 font-semibold border border-slate-700/80 rounded-lg text-xs flex items-center space-x-1.5 transition"
+                  className="px-3 py-1 bg-[#272735] hover:bg-[#323244] text-[#ededf3] rounded-full text-xs flex items-center space-x-1.5 transition"
                 >
-                  <Key className="w-3.5 h-3.5 text-amber-400" />
-                  <span>User &amp; Akses</span>
+                  <Key className="w-3.5 h-3.5 text-[#ededf3]" />
+                  <span>User</span>
                 </button>
 
                 <button
                   onClick={() => setShowAuditModal(true)}
-                  className="px-2.5 py-1 bg-slate-800/90 hover:bg-slate-700/90 text-slate-200 font-semibold border border-slate-700/80 rounded-lg text-xs flex items-center space-x-1.5 transition"
+                  className="px-3 py-1 bg-[#272735] hover:bg-[#323244] text-[#ededf3] rounded-full text-xs flex items-center space-x-1.5 transition"
                 >
-                  <FileText className="w-3.5 h-3.5 text-sky-400" />
+                  <FileText className="w-3.5 h-3.5 text-[#ededf3]" />
                   <span>Audit</span>
                 </button>
               </div>
-            ) : role !== 'PORTAL' && currentUser ? (
-              <div className="hidden xl:flex items-center space-x-2 bg-slate-900/90 px-3 py-1.5 rounded-xl border border-slate-800 text-xs">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span className="text-slate-300 font-medium">{currentUser.name} ({currentUser.role})</span>
-              </div>
             ) : role === 'PORTAL' && !currentUser ? (
-              <nav className="hidden lg:flex items-center space-x-6 text-xs font-semibold text-slate-300">
-                <a href="#our-grains" className="hover:text-amber-300 transition">Our Grains</a>
-                <a href="#factory-process" className="hover:text-amber-300 transition">Factory &amp; Process</a>
-                <a href="#contact" className="hover:text-amber-300 transition">Hubungi Kami</a>
+              /* Mercury Centered Navigation Pill Links */
+              <nav className="hidden lg:flex items-center space-x-1 text-sm font-normal text-[#ededf3]">
+                <a href="#our-grains" className="px-4 py-2 rounded-full hover:bg-[#272735] transition text-[#ededf3]">Our Grains</a>
+                <a href="#factory-process" className="px-4 py-2 rounded-full hover:bg-[#272735] transition text-[#ededf3]">Factory &amp; Process</a>
+                <a href="#heritage" className="px-4 py-2 rounded-full hover:bg-[#272735] transition text-[#ededf3]">Heritage</a>
+                <a href="#contact" className="px-4 py-2 rounded-full hover:bg-[#272735] transition text-[#ededf3]">Contact</a>
               </nav>
             ) : (
-              <div className="hidden lg:flex items-center space-x-2.5 bg-slate-900/90 px-3 py-1.5 rounded-xl border border-slate-800 text-xs">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span className="text-slate-400 font-medium">
-                  {currentUser ? `Pengguna: ${currentUser.name} (${currentUser.role})` : 'Akses Publik / Tamu'}
+              <div className="hidden lg:flex items-center space-x-2 bg-[#1e1e2a] px-3.5 py-1.5 rounded-full border border-[#70707d]/30 text-xs">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#5266eb] animate-pulse"></span>
+                <span className="text-[#c3c3cc]">
+                  {currentUser ? `${currentUser.name} (${currentUser.role})` : 'Akses Publik'}
                 </span>
               </div>
             )}
 
-            {/* Role Switcher & Authentication */}
-            <div className="flex items-center space-x-1.5 bg-slate-900/90 p-1 rounded-xl border border-slate-800">
+            {/* Right Side: Primary Cobalt Action & Ghost Controls */}
+            <div className="flex items-center space-x-3">
               {currentUser ? (
                 <>
                   <button
                     onClick={() => setActiveScreen('SCREEN_WORKSTATIONS')}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center space-x-1.5 ${
+                    className={`px-4 py-1.5 rounded-full text-xs font-normal transition flex items-center space-x-1.5 ${
                       activeScreen === 'SCREEN_WORKSTATIONS'
-                        ? 'bg-[#0f3e2e] text-emerald-300 border border-emerald-500/50 shadow-sm'
-                        : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
+                        ? 'bg-[#5266eb] text-white shadow-none'
+                        : 'bg-[#272735] text-[#ededf3] hover:bg-[#323244]'
                     }`}
-                    title="Pintu Masuk Stasiun Kerja Staf Pabrik"
                   >
-                    <Building2 className="w-3.5 h-3.5 text-emerald-400" />
+                    <Building2 className="w-3.5 h-3.5" />
                     <span className="hidden sm:inline">Stasiun Kerja</span>
                   </button>
 
                   <button
                     onClick={() => { setRole('PORTAL'); setActiveScreen('SCREEN_5'); }}
-                    className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold transition flex items-center space-x-1.5 ${
+                    className={`px-3 py-1.5 rounded-full text-xs font-normal border transition flex items-center space-x-1.5 ${
                       activeScreen === 'SCREEN_5'
-                        ? 'bg-slate-800 text-amber-300 border border-amber-500/30'
-                        : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
+                        ? 'border-[#ededf3] text-white bg-[#272735]'
+                        : 'border-[#70707d]/40 text-[#c3c3cc] hover:text-[#ededf3] hover:border-[#ededf3]/60'
                     }`}
-                    title="Lihat Website Landing Page Publik"
                   >
                     <span className="hidden md:inline">Web Publik</span>
                   </button>
                 </>
               ) : (
-                <button
-                  onClick={() => handleRoleClick('PORTAL', 'SCREEN_5')}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center space-x-1.5 ${
-                    role === 'PORTAL' && activeScreen === 'SCREEN_5'
-                      ? 'bg-slate-800 text-emerald-300 border border-slate-700 shadow-sm'
-                      : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
-                  }`}
-                >
-                  <Building2 className="w-3.5 h-3.5 text-slate-300" />
-                  <span className="hidden sm:inline">Portal</span>
-                </button>
+                <>
+                  <button
+                    onClick={() => setShowLoginModal(true)}
+                    className="mercury-btn-ghost text-xs px-4 py-2 font-normal"
+                  >
+                    Login Staff
+                  </button>
+
+                  <a
+                    href="#quote"
+                    className="mercury-btn-cobalt text-xs px-5 py-2 font-normal flex items-center space-x-1.5"
+                  >
+                    <span>Request a Quote</span>
+                  </a>
+                </>
               )}
 
               {currentUser ? (
