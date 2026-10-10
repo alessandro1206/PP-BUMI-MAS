@@ -39,18 +39,20 @@ export const Header: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 sm:h-20">
             {/* Logo & Mill Title */}
-            <div className="flex items-center space-x-3.5 cursor-pointer group" onClick={() => { setRole('PORTAL'); setActiveScreen('SCREEN_5'); }}>
-              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-mono font-black text-lg shadow-inner group-hover:border-emerald-500/60 transition">
-                BM
+            <div className="flex items-center space-x-3 cursor-pointer group" onClick={() => { setRole('PORTAL'); setActiveScreen('SCREEN_5'); }}>
+              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-[#0e382b] to-[#082018] border border-[#d4af37]/50 flex items-center justify-center text-amber-300 shadow-md group-hover:border-[#d4af37] transition">
+                <svg className="w-6 h-6 text-[#d4af37]" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 3L2 19h20L12 3zm0 4.5l6.5 10.5h-13L12 7.5zM12 11c-.83 0-1.5.67-1.5 1.5S11.17 14 12 14s1.5-.67 1.5-1.5S12.83 11 12 11z"/>
+                </svg>
               </div>
               <div>
                 <div className="flex items-center space-x-2">
-                  <span className="font-extrabold text-lg sm:text-xl tracking-tight text-slate-100 group-hover:text-emerald-300 transition">PP BUMI MAS</span>
-                  <span className="text-[10px] font-mono uppercase bg-slate-800/90 text-emerald-400 px-2 py-0.5 rounded-md font-semibold border border-slate-700 tracking-wider">
-                    PENGGILINGAN BERAS
+                  <span className="font-extrabold text-lg sm:text-xl tracking-tight text-white group-hover:text-amber-300 transition">PP BUMI MAS</span>
+                  <span className="text-[10px] font-mono uppercase bg-emerald-950/90 text-amber-300 px-2 py-0.5 rounded-md font-semibold border border-[#d4af37]/30 tracking-wider">
+                    BANYUWANGI
                   </span>
                 </div>
-                <p className="text-[11px] text-slate-400 font-medium">Reprocessing & Milling Operational ERP System</p>
+                <p className="text-[11px] text-slate-400 font-medium">Sustainable Rice Factory &amp; Milling System</p>
               </div>
             </div>
 
@@ -106,6 +108,12 @@ export const Header: React.FC = () => {
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
                 <span className="text-slate-300 font-medium">{currentUser.name} ({currentUser.role})</span>
               </div>
+            ) : role === 'PORTAL' && !currentUser ? (
+              <nav className="hidden lg:flex items-center space-x-6 text-xs font-semibold text-slate-300">
+                <a href="#our-grains" className="hover:text-amber-300 transition">Our Grains</a>
+                <a href="#factory-process" className="hover:text-amber-300 transition">Factory &amp; Process</a>
+                <a href="#workstations" className="hover:text-amber-300 transition">Workstations</a>
+              </nav>
             ) : (
               <div className="hidden lg:flex items-center space-x-2.5 bg-slate-900/90 px-3 py-1.5 rounded-xl border border-slate-800 text-xs">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
