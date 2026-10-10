@@ -2,6 +2,7 @@ import React from 'react';
 import { AppProvider, useApp } from './context/AppContext';
 import { Header } from './components/Header';
 import { PortalScreen } from './components/PortalScreen';
+import { WorkstationHubScreen } from './components/WorkstationHubScreen';
 import { OwnerPriceScheduleScreen } from './components/OwnerPriceScheduleScreen';
 import { OwnerH1HutangScreen } from './components/OwnerH1HutangScreen';
 import { OwnerHDayTransferScreen } from './components/OwnerHDayTransferScreen';
@@ -36,6 +37,8 @@ const MainContent: React.FC = () => {
     switch (activeScreen) {
       case 'SCREEN_5':
         return <PortalScreen />;
+      case 'SCREEN_WORKSTATIONS':
+        return <WorkstationHubScreen />;
 
       // Owner Screens
       case 'SCREEN_13':

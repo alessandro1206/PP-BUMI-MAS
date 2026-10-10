@@ -25,7 +25,7 @@ export const Header: React.FC = () => {
       setActiveScreen('SCREEN_5');
       return;
     }
-    if (currentUser && currentUser.role === targetRole) {
+    if (currentUser && (currentUser.role === targetRole || currentUser.role === 'SUPER_ADMIN')) {
       setRole(targetRole);
       setActiveScreen(defaultScreen);
     } else {
@@ -39,7 +39,17 @@ export const Header: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 sm:h-20">
             {/* Logo & Mill Title */}
-            <div className="flex items-center space-x-3 cursor-pointer group" onClick={() => { setRole('PORTAL'); setActiveScreen('SCREEN_5'); }}>
+            <div 
+              className="flex items-center space-x-3 cursor-pointer group" 
+              onClick={() => { 
+                if (currentUser) {
+                  setActiveScreen('SCREEN_WORKSTATIONS');
+                } else {
+                  setRole('PORTAL'); 
+                  setActiveScreen('SCREEN_5'); 
+                }
+              }}
+            >
               <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-[#0e382b] to-[#082018] border border-[#d4af37]/50 flex items-center justify-center text-amber-300 shadow-md group-hover:border-[#d4af37] transition">
                 <svg className="w-6 h-6 text-[#d4af37]" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M12 3L2 19h20L12 3zm0 4.5l6.5 10.5h-13L12 7.5zM12 11c-.83 0-1.5.67-1.5 1.5S11.17 14 12 14s1.5-.67 1.5-1.5S12.83 11 12 11z"/>
@@ -56,7 +66,7 @@ export const Header: React.FC = () => {
               </div>
             </div>
 
-            {/* Balance & Stats Bar (OWNER ONLY — hidden for Admin 1, Admin 2, and Portal) */}
+            {/* Balance & Stats Bar (OWNER ONLY - hidden for Admin 1, Admin 2, and Portal) */}
             {currentUser?.role === 'OWNER' ? (
               <div className="hidden xl:flex items-center space-x-3 bg-slate-900/90 px-3.5 py-1.5 rounded-xl border border-slate-800 text-xs">
                 <div className="px-2 py-0.5">
@@ -112,7 +122,7 @@ export const Header: React.FC = () => {
               <nav className="hidden lg:flex items-center space-x-6 text-xs font-semibold text-slate-300">
                 <a href="#our-grains" className="hover:text-amber-300 transition">Our Grains</a>
                 <a href="#factory-process" className="hover:text-amber-300 transition">Factory &amp; Process</a>
-                <a href="#workstations" className="hover:text-amber-300 transition">Workstations</a>
+                <a href="#contact" className="hover:text-amber-300 transition">Hubungi Kami</a>
               </nav>
             ) : (
               <div className="hidden lg:flex items-center space-x-2.5 bg-slate-900/90 px-3 py-1.5 rounded-xl border border-slate-800 text-xs">
@@ -125,17 +135,46 @@ export const Header: React.FC = () => {
 
             {/* Role Switcher & Authentication */}
             <div className="flex items-center space-x-1.5 bg-slate-900/90 p-1 rounded-xl border border-slate-800">
-              <button
-                onClick={() => handleRoleClick('PORTAL', 'SCREEN_5')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center space-x-1.5 ${
-                  role === 'PORTAL'
-                    ? 'bg-slate-800 text-emerald-300 border border-slate-700 shadow-sm'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
-                }`}
-              >
-                <Building2 className="w-3.5 h-3.5 text-slate-300" />
-                <span className="hidden sm:inline">Portal</span>
-              </button>
+              {currentUser ? (
+                <>
+                  <button
+                    onClick={() => setActiveScreen('SCREEN_WORKSTATIONS')}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center space-x-1.5 ${
+                      activeScreen === 'SCREEN_WORKSTATIONS'
+                        ? 'bg-[#0f3e2e] text-emerald-300 border border-emerald-500/50 shadow-sm'
+                        : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
+                    }`}
+                    title="Pintu Masuk Stasiun Kerja Staf Pabrik"
+                  >
+                    <Building2 className="w-3.5 h-3.5 text-emerald-400" />
+                    <span className="hidden sm:inline">Stasiun Kerja</span>
+                  </button>
+
+                  <button
+                    onClick={() => { setRole('PORTAL'); setActiveScreen('SCREEN_5'); }}
+                    className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold transition flex items-center space-x-1.5 ${
+                      activeScreen === 'SCREEN_5'
+                        ? 'bg-slate-800 text-amber-300 border border-amber-500/30'
+                        : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
+                    }`}
+                    title="Lihat Website Landing Page Publik"
+                  >
+                    <span className="hidden md:inline">Web Publik</span>
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={() => handleRoleClick('PORTAL', 'SCREEN_5')}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center space-x-1.5 ${
+                    role === 'PORTAL' && activeScreen === 'SCREEN_5'
+                      ? 'bg-slate-800 text-emerald-300 border border-slate-700 shadow-sm'
+                      : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
+                  }`}
+                >
+                  <Building2 className="w-3.5 h-3.5 text-slate-300" />
+                  <span className="hidden sm:inline">Portal</span>
+                </button>
+              )}
 
               {currentUser ? (
                 <>
@@ -422,9 +461,7 @@ export const Header: React.FC = () => {
           onSuccess={(roleToSet) => {
             setShowLoginModal(false);
             setRole(roleToSet);
-            if (roleToSet === 'OWNER') setActiveScreen('SCREEN_13');
-            if (roleToSet === 'ADMIN1') setActiveScreen('SCREEN_16');
-            if (roleToSet === 'ADMIN2') setActiveScreen('SCREEN_42');
+            setActiveScreen('SCREEN_WORKSTATIONS');
           }}
         />
       )}

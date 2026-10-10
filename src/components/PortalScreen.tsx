@@ -1,12 +1,10 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { 
-  Scale, Package, Shield, FileSpreadsheet, MapPin, Clock, Phone, Mail, 
+  Scale, Package, Mail, 
   Award, CheckCircle2, ChevronRight, Leaf, Sprout, Factory, 
   ShieldCheck, ArrowRight, Layers, Truck, Check, Droplets, Sun, Sparkles
 } from 'lucide-react';
-import { LoginModal } from './LoginModal';
-import { RoleType } from '../types';
 
 /* =========================================================================
    TRADITIONAL BANYUWANGI BATIK GAJAH OLING ABSTRACT COMPONENTS
@@ -74,19 +72,9 @@ const BatikDivider: React.FC<{ text?: string }> = ({ text }) => (
 
 export const PortalScreen: React.FC = () => {
   const { setRole, setActiveScreen, currentUser } = useApp();
-  const [loginTargetRole, setLoginTargetRole] = useState<RoleType | null>(null);
   const [quoteModalOpen, setQuoteModalOpen] = useState(false);
   const [quoteSubmitted, setQuoteSubmitted] = useState(false);
   const [activeGrainTab, setActiveGrainTab] = useState<'PUTRI' | 'BETET' | 'PANDAN'>('PUTRI');
-
-  const handleOpenWorkstation = (targetRole: RoleType, defaultScreen: string) => {
-    if (currentUser && currentUser.role === targetRole) {
-      setRole(targetRole);
-      setActiveScreen(defaultScreen);
-    } else {
-      setLoginTargetRole(targetRole);
-    }
-  };
 
   const handleQuoteSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -183,17 +171,6 @@ export const PortalScreen: React.FC = () => {
                 >
                   <span>Request a Quote</span>
                   <ArrowRight className="w-4 h-4" />
-                </button>
-              </div>
-
-              {/* Quick Jump for Staff */}
-              <div className="pt-2 flex items-center space-x-3 text-xs text-slate-400">
-                <span className="font-mono text-[11px] text-emerald-400/90">Akses Staf Internal:</span>
-                <button
-                  onClick={() => setLoginTargetRole('ADMIN1')}
-                  className="text-slate-300 hover:text-amber-300 underline font-semibold transition"
-                >
-                  Masuk ke Workstation Timbangan &amp; ERP &rarr;
                 </button>
               </div>
             </div>
@@ -669,147 +646,12 @@ export const PortalScreen: React.FC = () => {
       </section>
 
       {/* Decorative Traditional Gajah Oling Divider */}
-      <BatikDivider text="GERBANG STASIUN KERJA OPERASIONAL PABRIK" />
+      <BatikDivider text="KANTOR PUSAT &amp; LAYANAN DISTRIBUSI PABRIK" />
 
       {/* =========================================================================
-          6. SECTION: INTERNAL WORKSTATION ACCESS (STASIUN KERJA OPERASIONAL)
+          6. FOOTER: PLANT CONTACT & REGIONAL HEADQUARTERS
           ========================================================================= */}
-      <section id="workstations" className="relative py-20 px-6 sm:px-10 lg:px-14 bg-[#07110c] border-b border-slate-800/80">
-        <BatikGajahOlingPattern opacity={0.05} />
-
-        <div className="relative z-10 max-w-[1560px] mx-auto space-y-10">
-          
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-slate-800 pb-6">
-            <div className="space-y-3 max-w-2xl">
-              <span className="text-xs font-mono uppercase tracking-[0.2em] text-[#d4af37] font-semibold">
-                Internal Operational Gateway
-              </span>
-              <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-                Pintu Masuk Stasiun Kerja Staf Pabrik
-              </h2>
-              <p className="text-sm text-slate-300 leading-relaxed">
-                Pilih peran operasional untuk membuka konsol kerja masing-masing stasiun pabrik secara aman.
-              </p>
-            </div>
-
-            {currentUser && (
-              <div className="px-4 py-2 rounded-xl bg-emerald-950/80 border border-emerald-700/60 text-xs font-mono text-emerald-300 flex items-center space-x-2">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span>Masuk Sebagai: <strong>{currentUser.name} ({currentUser.role})</strong></span>
-              </div>
-            )}
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-            
-            {/* Station 1: Pos Timbangan & Kasir */}
-            <div className="p-6 rounded-2xl bg-slate-900/70 border border-slate-800 hover:border-emerald-500/50 transition flex flex-col justify-between space-y-6 shadow-xl">
-              <div className="space-y-3">
-                <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
-                  <Scale className="w-6 h-6" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-white text-lg">Pos Jembatan Timbang &amp; Kasir</h3>
-                  <span className="text-xs font-mono text-emerald-400 font-semibold block mt-0.5">Admin 1 Console</span>
-                </div>
-                <p className="text-xs text-slate-400 leading-relaxed">
-                  Penimbangan truk gabah/beras (Bruto, Tara, Netto), cetak tiket timbang, penerbitan surat jalan DO, dan kasir pelunasan toko.
-                </p>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => handleOpenWorkstation('ADMIN1', 'SCREEN_16')}
-                className="w-full py-3 bg-[#0f3e2e] hover:bg-[#15533e] text-emerald-200 font-bold text-xs rounded-xl border border-emerald-600/40 transition flex items-center justify-center space-x-2"
-              >
-                <span>Buka Pos Timbangan</span>
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            </div>
-
-            {/* Station 2: Lantai Gudang & Karung */}
-            <div className="p-6 rounded-2xl bg-slate-900/70 border border-slate-800 hover:border-amber-500/50 transition flex flex-col justify-between space-y-6 shadow-xl">
-              <div className="space-y-3">
-                <div className="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
-                  <Package className="w-6 h-6" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-white text-lg">Gudang, Beras &amp; Karung</h3>
-                  <span className="text-xs font-mono text-amber-400 font-semibold block mt-0.5">Admin 2 Console</span>
-                </div>
-                <p className="text-xs text-slate-400 leading-relaxed">
-                  Tally tier muatan armada truk, stok opname beras jadi, racikan cor milling, dan pencatatan karung Cap Putri Thailand.
-                </p>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => handleOpenWorkstation('ADMIN2', 'SCREEN_42')}
-                className="w-full py-3 bg-slate-800 hover:bg-slate-700 text-amber-200 font-bold text-xs rounded-xl border border-amber-500/30 transition flex items-center justify-center space-x-2"
-              >
-                <span>Buka Konsol Gudang</span>
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            </div>
-
-            {/* Station 3: Keuangan & Pemilik */}
-            <div className="p-6 rounded-2xl bg-slate-900/70 border border-slate-800 hover:border-sky-500/50 transition flex flex-col justify-between space-y-6 shadow-xl">
-              <div className="space-y-3">
-                <div className="w-12 h-12 rounded-xl bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-sky-400">
-                  <Shield className="w-6 h-6" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-white text-lg">Konsol Pemilik &amp; Keuangan</h3>
-                  <span className="text-xs font-mono text-sky-400 font-semibold block mt-0.5">Owner Console</span>
-                </div>
-                <p className="text-xs text-slate-400 leading-relaxed">
-                  Penetapan harga harian gabah kering giling (GKG), approval transfer bank BCA suplier, verifikasi hutang toko, dan kas pabrik.
-                </p>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => handleOpenWorkstation('OWNER', 'SCREEN_13')}
-                className="w-full py-3 bg-slate-800 hover:bg-slate-700 text-sky-200 font-bold text-xs rounded-xl border border-sky-500/30 transition flex items-center justify-center space-x-2"
-              >
-                <span>Buka Konsol Owner</span>
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            </div>
-
-            {/* Station 4: Pembukuan SAK EMKM */}
-            <div className="p-6 rounded-2xl bg-slate-900/70 border border-slate-800 hover:border-purple-500/50 transition flex flex-col justify-between space-y-6 shadow-xl">
-              <div className="space-y-3">
-                <div className="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400">
-                  <FileSpreadsheet className="w-6 h-6" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-white text-lg">Akuntansi &amp; Pajak SAK EMKM</h3>
-                  <span className="text-xs font-mono text-purple-400 font-semibold block mt-0.5">Super Admin Console</span>
-                </div>
-                <p className="text-xs text-slate-400 leading-relaxed">
-                  Jurnal umum berpasangan otomatis, neraca saldo, neraca keuangan seimbang Aktiva = Pasiva Rp 0, dan buku log audit aktivitas.
-                </p>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => handleOpenWorkstation('SUPER_ADMIN', 'SCREEN_SUPER_ADMIN_ACCOUNTING')}
-                className="w-full py-3 bg-slate-800 hover:bg-slate-700 text-purple-200 font-bold text-xs rounded-xl border border-purple-500/30 transition flex items-center justify-center space-x-2"
-              >
-                <span>Buka Konsol Akuntansi</span>
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            </div>
-
-          </div>
-        </div>
-      </section>
-
-      {/* =========================================================================
-          7. FOOTER: PLANT CONTACT & REGIONAL HEADQUARTERS
-          ========================================================================= */}
-      <footer className="relative py-14 px-6 sm:px-10 lg:px-14 bg-[#050d08] border-t border-slate-800 text-slate-400 text-xs">
+      <footer id="contact" className="relative py-14 px-6 sm:px-10 lg:px-14 bg-[#050d08] border-t border-slate-800 text-slate-400 text-xs">
         <BatikGajahOlingPattern opacity={0.03} />
 
         <div className="relative z-10 max-w-[1560px] mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
@@ -974,22 +816,6 @@ export const PortalScreen: React.FC = () => {
             )}
           </div>
         </div>
-      )}
-
-      {/* Internal Staff Password Authentication Modal */}
-      {loginTargetRole && (
-        <LoginModal
-          targetRole={loginTargetRole}
-          onClose={() => setLoginTargetRole(null)}
-          onSuccess={(roleToSet) => {
-            setLoginTargetRole(null);
-            setRole(roleToSet);
-            if (roleToSet === 'OWNER') setActiveScreen('SCREEN_13');
-            if (roleToSet === 'ADMIN1') setActiveScreen('SCREEN_16');
-            if (roleToSet === 'ADMIN2') setActiveScreen('SCREEN_42');
-            if (roleToSet === 'SUPER_ADMIN') setActiveScreen('SCREEN_SUPER_ADMIN_ACCOUNTING');
-          }}
-        />
       )}
 
     </div>

@@ -185,11 +185,12 @@ export const LoginModal: React.FC<LoginModalProps> = ({ targetRole: initialRole,
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="flex items-center justify-between bg-emerald-50 p-3 rounded-xl border border-emerald-200">
               <div className="flex items-center space-x-2">
+                {selectedRole === 'SUPER_ADMIN' && <ShieldCheck className="w-5 h-5 text-amber-500" />}
                 {selectedRole === 'OWNER' && <Shield className="w-5 h-5 text-[#f59e0b]" />}
                 {selectedRole === 'ADMIN1' && <Scale className="w-5 h-5 text-[#10b981]" />}
                 {selectedRole === 'ADMIN2' && <Smartphone className="w-5 h-5 text-amber-600" />}
                 <span className="font-extrabold text-xs text-[#0f3e2e]">
-                  Peran Terpilih: {selectedRole === 'OWNER' ? 'Owner (Pemilik)' : selectedRole === 'ADMIN1' ? 'Admin 1 (Kantor)' : 'Admin 2 (HP Field)'}
+                  Peran Terpilih: {selectedRole === 'SUPER_ADMIN' ? 'Super Admin (Akses Penuh)' : selectedRole === 'OWNER' ? 'Owner (Pemilik)' : selectedRole === 'ADMIN1' ? 'Admin 1 (Kantor)' : 'Admin 2 (HP Field)'}
                 </span>
               </div>
               <button
@@ -236,6 +237,15 @@ export const LoginModal: React.FC<LoginModalProps> = ({ targetRole: initialRole,
             <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 text-[11px] space-y-1 text-slate-600">
               <span className="font-bold text-slate-700 block">Kredensial Pengujian:</span>
               <div className="flex flex-wrap gap-1.5 pt-1">
+                {selectedRole === 'SUPER_ADMIN' && (
+                  <button
+                    type="button"
+                    onClick={() => { setUsername('superadmin'); setPassword('super123'); }}
+                    className="px-2 py-1 bg-purple-100 hover:bg-purple-200 text-purple-900 font-bold rounded"
+                  >
+                    Auto-Fill (superadmin / super123)
+                  </button>
+                )}
                 {selectedRole === 'OWNER' && (
                   <button
                     type="button"
