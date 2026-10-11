@@ -320,50 +320,28 @@ export const RiceVariantSettingsModal: React.FC<RiceVariantSettingsModalProps> =
             />
           </div>
 
-          {/* Pengaturan Tokopedia & Shopee */}
-          <div className="bg-[#f4f0e6] p-3 sm:p-4 rounded-[12px] border border-[#1b4332]/10 space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <ShoppingBag className="w-4 h-4 text-[#2d6a4f]" />
-                <span className="text-xs font-bold text-[#142217]">
-                  Tersedia di Tokopedia &amp; Shopee
-                </span>
+          {/* Keterangan Tersedia di Shopee dan Tokopedia */}
+          <div className="bg-[#f4f0e6] p-3 sm:p-4 rounded-[12px] border border-[#1b4332]/10 flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <ShoppingBag className="w-4 h-4 text-[#2d6a4f]" />
+              <div>
+                <div className="text-xs font-bold text-[#142217]">
+                  Tersedia di Shopee dan Tokopedia
+                </div>
+                <div className="text-[11px] text-[#142217]/70 font-normal">
+                  Tampilkan tulisan "Tersedia di Shopee dan Tokopedia" pada kartu varian beras
+                </div>
               </div>
-              <label className="flex items-center space-x-2 text-xs font-bold text-[#1b4332] cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={current.availableOnMarketplace}
-                  onChange={(e) => updateCurrent('availableOnMarketplace', e.target.checked)}
-                  className="rounded border-[#1b4332]/30 text-[#1b4332] focus:ring-[#1b4332]"
-                />
-                <span>Tampilkan Label</span>
-              </label>
             </div>
-
-            {current.availableOnMarketplace && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                <div className="space-y-1">
-                  <label className="text-[11px] font-bold text-[#03ac0e]">Link Tokopedia (Opsional):</label>
-                  <input
-                    type="text"
-                    value={current.tokopediaUrl || ''}
-                    onChange={(e) => updateCurrent('tokopediaUrl', e.target.value)}
-                    placeholder="https://www.tokopedia.com/..."
-                    className="w-full px-3 py-1.5 rounded-lg border border-[#03ac0e]/30 bg-white text-xs text-[#142217] focus:border-[#03ac0e] outline-none"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-[11px] font-bold text-[#ee4d2d]">Link Shopee (Opsional):</label>
-                  <input
-                    type="text"
-                    value={current.shopeeUrl || ''}
-                    onChange={(e) => updateCurrent('shopeeUrl', e.target.value)}
-                    placeholder="https://shopee.co.id/..."
-                    className="w-full px-3 py-1.5 rounded-lg border border-[#ee4d2d]/30 bg-white text-xs text-[#142217] focus:border-[#ee4d2d] outline-none"
-                  />
-                </div>
-              </div>
-            )}
+            <label className="flex items-center space-x-2 text-xs font-bold text-[#1b4332] cursor-pointer shrink-0 ml-3">
+              <input
+                type="checkbox"
+                checked={current.availableOnMarketplace}
+                onChange={(e) => updateCurrent('availableOnMarketplace', e.target.checked)}
+                className="rounded border-[#1b4332]/30 text-[#1b4332] focus:ring-[#1b4332]"
+              />
+              <span>{current.availableOnMarketplace ? 'Aktif' : 'Nonaktif'}</span>
+            </label>
           </div>
 
         </div>

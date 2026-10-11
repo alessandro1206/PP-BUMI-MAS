@@ -378,47 +378,19 @@ export const PortalScreen: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Tersedia di Tokopedia & Shopee Banner */}
+                  {/* Tersedia di Shopee dan Tokopedia */}
                   {v.availableOnMarketplace && (
-                    <div className="bg-[#e8f1eb] text-[#1b4332] border border-[#1b4332]/15 px-2.5 py-1.5 rounded-[8px] flex items-center justify-between text-[11px] font-bold tracking-tight-bella">
-                      <span className="flex items-center space-x-1.5">
-                        <ShoppingBag className="w-3.5 h-3.5 text-[#2d6a4f]" />
-                        <span>Tersedia di Tokopedia &amp; Shopee</span>
-                      </span>
+                    <div className="bg-[#e8f1eb] text-[#1b4332] border border-[#1b4332]/15 px-3 py-2 rounded-[8px] flex items-center space-x-2 text-xs font-bold tracking-tight-bella">
+                      <ShoppingBag className="w-4 h-4 text-[#2d6a4f] shrink-0" />
+                      <span>Tersedia di Shopee dan Tokopedia</span>
                     </div>
                   )}
                 </div>
 
-                <div className="space-y-2.5 pt-2">
+                <div className="space-y-3 pt-2">
                   <div className="text-lg font-bold tracking-tight-bella text-[#1b4332]">
                     {v.price} <span className="text-xs font-normal text-[#142217]/60">{v.unit}</span>
                   </div>
-
-                  {/* Marketplace Buttons */}
-                  {v.availableOnMarketplace && (
-                    <div className="grid grid-cols-2 gap-2">
-                      <a
-                        href={v.tokopediaUrl || `https://www.tokopedia.com/search?st=product&q=${encodeURIComponent(v.name)}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="px-2.5 py-1.5 rounded-full border border-[#03ac0e]/40 bg-[#03ac0e]/10 hover:bg-[#03ac0e]/20 text-[#03ac0e] text-[11px] font-bold text-center flex items-center justify-center space-x-1 transition"
-                        title={`Beli ${v.name} di Tokopedia`}
-                      >
-                        <span>Tokopedia</span>
-                        <ExternalLink className="w-3 h-3" />
-                      </a>
-                      <a
-                        href={v.shopeeUrl || `https://shopee.co.id/search?keyword=${encodeURIComponent(v.name)}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="px-2.5 py-1.5 rounded-full border border-[#ee4d2d]/40 bg-[#ee4d2d]/10 hover:bg-[#ee4d2d]/20 text-[#ee4d2d] text-[11px] font-bold text-center flex items-center justify-center space-x-1 transition"
-                        title={`Beli ${v.name} di Shopee`}
-                      >
-                        <span>Shopee</span>
-                        <ExternalLink className="w-3 h-3" />
-                      </a>
-                    </div>
-                  )}
 
                   <a
                     href="https://www.instagram.com/berasbusur.id?rpxt=MW10dWI3aTFvMjZ2cA=="
