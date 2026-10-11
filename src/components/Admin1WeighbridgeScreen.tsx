@@ -83,8 +83,12 @@ export const Admin1WeighbridgeScreen: React.FC = () => {
   const [selectedPort, setSelectedPort] = useState<string>('COM4');
   const [indicatorProtocol, setIndicatorProtocol] = useState<'universal' | 'yaohua' | 'toledo' | 'cas' | 'gedge'>('universal');
   const [showSettingsModal, setShowSettingsModal] = useState<boolean>(false);
-  const [settingsActiveTab, setSettingsActiveTab] = useState<'config' | 'terminal'>('config');
+  const [settingsActiveTab, setSettingsActiveTab] = useState<'config' | 'cctv' | 'terminal'>('config');
   const [cameraIp, setCameraIp] = useState<string>('192.168.1.108');
+  const [cameraUser, setCameraUser] = useState<string>('admin');
+  const [cameraPass, setCameraPass] = useState<string>('admin123');
+  const [dahuaTestResult, setDahuaTestResult] = useState<any | null>(null);
+  const [isTestingDahua, setIsTestingDahua] = useState<boolean>(false);
   const [cameraSnapshotPreview, setCameraSnapshotPreview] = useState<string | null>(null);
   const [rawStreamLogs, setRawStreamLogs] = useState<string[]>([
     `[${new Date().toLocaleTimeString('id-ID')}] Terminal diagnostik siap. Menunggu stream data RS232...`
@@ -454,51 +458,91 @@ export const Admin1WeighbridgeScreen: React.FC = () => {
     }
   };
 
-  // CCTV OCR Scanner (Dahua Digest Snapshot via Electron or Local Python OCR)
+  // Test Ping & Snapshot ke Dahua 2MP
+  const handleTestDahua = async () => {
+    setIsTestingDahua(true);
+    setDahuaTestResult(null);
+    try {
+      // Sync kredensial ke server Python lokal
+      await fetch('http://localhost:5000/set-camera', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ip: cameraIp, user: cameraUser, pass: cameraPass })
+      }).catch(() => {});
+
+      const res = await fetch(`http://localhost:5000/dahua-test?ip=${cameraIp}`);
+      const data = await res.json();
+      setDahuaTestResult(data);
+      if (data.success) {
+        if (data.preview_thumbnail) {
+          setCameraSnapshotPreview(data.preview_thumbnail);
+        }
+        addLog(`Kamera Dahua 2MP ${cameraIp} Terhubung (${data.latency_ms} ms, ${data.resolution})`, 'success');
+      } else {
+        addLog(`Tes Dahua: ${data.message || data.error}`, 'warn');
+      }
+    } catch (e: any) {
+      setDahuaTestResult({
+        success: false,
+        message: 'Server Python lokal offline (localhost:5000). Jalankan "jalankan_server_cctv.bat".'
+      });
+      addLog('Server CCTV lokal offline di localhost:5000', 'warn');
+    } finally {
+      setIsTestingDahua(false);
+    }
+  };
+
+  // CCTV OCR Scanner (Dahua 2MP Snapshot via Python EasyOCR or Electron)
   const handleScanNopolCctv = async () => {
     setIsScanningCctv(true);
     setCctvError(null);
     const electron = (window as any).electron || (window as any).electronAPI;
 
-    // 1. Ambil snapshot langsung dari IP Camera Dahua via Electron (RiceFlow Engine)
+    let capturedSnapshot = cameraSnapshotPreview;
+    // 1. Ambil snapshot langsung dari IP Camera Dahua via Electron (jika di Electron)
     if (electron?.getSnapshot) {
       try {
-        addLog(`Mengambil snapshot CCTV dari ${cameraIp}...`, 'info');
+        addLog(`Mengambil snapshot CCTV Dahua dari ${cameraIp}...`, 'info');
         const snap = await electron.getSnapshot(cameraIp);
         if (snap && snap.startsWith('data:image')) {
+          capturedSnapshot = snap;
           setCameraSnapshotPreview(snap);
           addLog('Snapshot CCTV Dahua berhasil diambil via Electron.', 'success');
         }
       } catch (e: any) {
-        addLog(`Kamera snapshot: ${e.message}`, 'warn');
+        addLog(`Kamera snapshot Electron: ${e.message}`, 'warn');
       }
     }
 
-    // 2. Scan OCR Plat (Local Python OCR server jika tersedia)
+    // 2. Scan OCR Plat lewat microservice Python (EasyOCR & OpenCV Preprocessing)
     try {
       const response = await fetch('http://localhost:5000/scan-nopol', {
-        method: 'GET',
-        headers: { 'Accept': 'application/json' }
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({
+          ip: cameraIp,
+          image_base64: capturedSnapshot || undefined
+        })
       });
+
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const data = await response.json();
+
       if (data.nopol) {
         const detected = data.nopol.toUpperCase().trim();
         setNopol(detected);
         handleLookupPlate(detected);
-        addLog(`CCTV OCR Berhasil Mendeteksi Plat: ${detected}`, 'success');
+        addLog(`CCTV Dahua ANPR Berhasil Mendeteksi Plat: ${detected}`, 'success');
         return;
       } else {
-        const err = data.message || 'Teks plat tidak terdeteksi dari CCTV.';
+        const err = data.message || 'Teks plat nomor tidak terdeteksi jelas dari CCTV.';
         setCctvError(err);
         addLog(`Gagal Scan CCTV: ${err}`, 'warn');
       }
     } catch (err: any) {
-      if (!cameraSnapshotPreview) {
-        const msg = 'CCTV Server offline (localhost:5000). Snapshot kamera langsung tersedia via Electron.';
-        setCctvError(msg);
-        addLog(msg, 'warn');
-      }
+      const msg = 'Server CCTV lokal offline (localhost:5000). Jalankan "jalankan_server_cctv.bat" di komputer pos timbangan.';
+      setCctvError(msg);
+      addLog(msg, 'warn');
     } finally {
       setIsScanningCctv(false);
     }
@@ -1543,6 +1587,18 @@ export const Admin1WeighbridgeScreen: React.FC = () => {
               </button>
               <button
                 type="button"
+                onClick={() => setSettingsActiveTab('cctv')}
+                className={`py-2 px-4 text-xs font-bold border-b-2 flex items-center space-x-2 ${
+                  settingsActiveTab === 'cctv'
+                    ? 'border-amber-600 text-amber-600'
+                    : 'border-transparent text-slate-400 hover:text-slate-600'
+                }`}
+              >
+                <Camera className="w-4 h-4" />
+                <span>Kamera CCTV Dahua 2MP</span>
+              </button>
+              <button
+                type="button"
                 onClick={() => setSettingsActiveTab('terminal')}
                 className={`py-2 px-4 text-xs font-bold border-b-2 flex items-center space-x-2 ${
                   settingsActiveTab === 'terminal'
@@ -1709,6 +1765,89 @@ export const Admin1WeighbridgeScreen: React.FC = () => {
                     {comPortConnected ? 'Putuskan Koneksi' : 'Hubungkan Sekarang'}
                   </button>
                 </div>
+              </div>
+            )}
+
+            {/* Tab CCTV: Konfigurasi Kamera Dahua 2MP */}
+            {settingsActiveTab === 'cctv' && (
+              <div className="space-y-4 text-xs">
+                <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-amber-900 space-y-1">
+                  <div className="font-bold flex items-center space-x-1.5">
+                    <Camera className="w-4 h-4 text-amber-700" />
+                    <span>Integrasi IP Camera Dahua 2MP (ANPR Pos Timbangan)</span>
+                  </div>
+                  <p className="text-[11px] text-amber-800 leading-relaxed font-normal">
+                    Menggunakan koneksi HTTP Digest Snapshot resmi Dahua untuk mengambil foto 1080p jernih, lalu diproses oleh OpenCV dan EasyOCR untuk membaca plat nomor truk secara otomatis.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div>
+                    <label className="block text-slate-700 font-bold mb-1">IP Address Kamera Dahua:</label>
+                    <input
+                      type="text"
+                      value={cameraIp}
+                      onChange={(e) => setCameraIp(e.target.value)}
+                      placeholder="192.168.1.108"
+                      className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 font-mono font-bold text-slate-800 outline-none focus:border-amber-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-700 font-bold mb-1">Username Dahua:</label>
+                    <input
+                      type="text"
+                      value={cameraUser}
+                      onChange={(e) => setCameraUser(e.target.value)}
+                      placeholder="admin"
+                      className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 font-mono font-bold text-slate-800 outline-none focus:border-amber-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-700 font-bold mb-1">Password Dahua:</label>
+                    <input
+                      type="password"
+                      value={cameraPass}
+                      onChange={(e) => setCameraPass(e.target.value)}
+                      placeholder="admin123"
+                      className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 font-mono font-bold text-slate-800 outline-none focus:border-amber-500"
+                    />
+                  </div>
+                </div>
+
+                {/* Test Action & Feedback */}
+                <div className="flex items-center justify-between p-3 rounded-xl bg-slate-100 border border-slate-200">
+                  <div className="flex items-center space-x-2">
+                    <span className={`w-2.5 h-2.5 rounded-full ${dahuaTestResult?.success ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'}`} />
+                    <span className="font-bold text-slate-700">
+                      {dahuaTestResult ? dahuaTestResult.message : 'Siap menguji koneksi kamera Dahua.'}
+                    </span>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={handleTestDahua}
+                    disabled={isTestingDahua}
+                    className="px-4 py-1.5 rounded-xl font-bold bg-amber-500 hover:bg-amber-400 text-slate-950 transition shadow"
+                  >
+                    {isTestingDahua ? 'Menghubungkan...' : 'Tes Ping & Snapshot'}
+                  </button>
+                </div>
+
+                {/* Snapshot Preview if available */}
+                {cameraSnapshotPreview && (
+                  <div className="space-y-1">
+                    <span className="text-slate-500 font-bold">Hasil Tangkapan Snapshot Dahua 2MP:</span>
+                    <div className="rounded-xl overflow-hidden border border-slate-300 bg-black max-h-48 flex items-center justify-center">
+                      <img
+                        src={cameraSnapshotPreview}
+                        alt="Preview Snapshot Dahua"
+                        className="max-h-48 w-full object-contain"
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 

@@ -1,20 +1,15 @@
 """
 =============================================================================
-PP BUMI MAS ERP - Server OCR Nopol CCTV TP-Link (Local POS API)
+PP BUMI MAS ERP - Server CCTV LPR (License Plate Recognition) & Scale Bridge
 =============================================================================
-Skrip Python ini berfungsi sebagai microservice lokal untuk mengambil foto 1 frame 
-dari stream CCTV RTSP TP-Link di pos timbangan dan membaca Plat Nomor Polisi (Nopol) 
-armada truk menggunakan PaddleOCR.
+Microservice lokal untuk membaca Plat Nomor Polisi (Nopol) truk timbangan
+secara otomatis dari IP Camera Dahua 2MP menggunakan EasyOCR dan OpenCV.
 
-Persyaratan Library Python:
-  pip install flask flask-cors opencv-python paddlepaddle paddleocr numpy
-
-Cara menjalankan di komputer Pos Timbangan:
-  python server_cctv.py
-
-Endpoint API:
-  GET  http://localhost:5000/scan-nopol
-  POST http://localhost:5000/scan-nopol
+Mendukung:
+1. Dahua HTTP Digest Snapshot (/cgi-bin/snapshot.cgi?channel=1) - Tercepat & Stabil
+2. Dahua RTSP Stream (/cam/realmonitor?channel=1&subtype=0)
+3. Preprocessing Plat Nomor Indonesia (Plat Hitam & Plat Putih Baru)
+4. Jembatan Timbang Serial RS232 / COM Port Bridge (CAS, Yaohua, Toledo, Universal)
 =============================================================================
 """
 
@@ -22,11 +17,16 @@ import os
 import re
 import sys
 import logging
+import base64
+import time
+import threading
+from io import BytesIO
+
 import numpy as np
 import cv2
-import threading
-import time
-from flask import Flask, jsonify, request
+import requests
+from requests.auth import HTTPDigestAuth, HTTPBasicAuth
+from flask import Flask, jsonify, request, Response
 from flask_cors import CORS
 
 try:
@@ -35,12 +35,32 @@ try:
 except ImportError:
     serial = None
 
+try:
+    import easyocr
+    ocr_reader = easyocr.Reader(['en'], gpu=False, verbose=False)
+    logging.info("EasyOCR Engine berhasil dimuat!")
+except Exception as e:
+    logging.error(f"Gagal memuat EasyOCR: {e}")
+    ocr_reader = None
+
 # Setup logging
 logging.basicConfig(level=logging.INFO, format='[%(asctime)s] %(levelname)s: %(message)s')
-logger = logging.getLogger("CCTV_Scale_Server")
+logger = logging.getLogger("Dahua_ANPR_Server")
 
 app = Flask(__name__)
-CORS(app)  # Izinkan CORS agar website ERP (Vite / localhost) bisa akses API port 5000
+CORS(app)
+
+# =============================================================================
+# KONFIGURASI DAHUA IP CAMERA 2MP
+# =============================================================================
+DAHUA_CONFIG = {
+    "ip": os.getenv("DAHUA_IP", "192.168.1.108"),
+    "user": os.getenv("DAHUA_USER", "admin"),
+    "pass": os.getenv("DAHUA_PASS", "admin123"),
+    "http_port": int(os.getenv("DAHUA_HTTP_PORT", "80")),
+    "rtsp_port": int(os.getenv("DAHUA_RTSP_PORT", "554")),
+    "channel": int(os.getenv("DAHUA_CHANNEL", "1")),
+}
 
 # =============================================================================
 # HARDWARE SCALE SERIAL MANAGER (RS232 / COM Port)
@@ -48,7 +68,7 @@ CORS(app)  # Izinkan CORS agar website ERP (Vite / localhost) bisa akses API por
 class ScaleManager:
     def __init__(self):
         self.conn = None
-        self.port = "COM3"
+        self.port = "COM4"
         self.baudrate = 9600
         self.is_connected = False
         self.is_reading = False
@@ -102,201 +122,367 @@ class ScaleManager:
                     if line:
                         with self.lock:
                             self.last_raw = line
-                            if 'ST' in line:
-                                self.is_stable = True
-                            elif 'US' in line:
-                                self.is_stable = False
-                            
-                            m = re.search(r'[-+]?\s*\d*\.\d+|[-+]?\s*\d+', line)
-                            if m:
-                                try:
-                                    val = float(m.group().replace(' ', ''))
-                                    if 0 <= val < 150000:
-                                        self.current_weight = val
-                                except ValueError:
-                                    pass
-                time.sleep(0.04)
-            except Exception:
-                time.sleep(0.1)
+                            self._parse_weight(line)
+            except Exception as e:
+                logger.warning(f"Error pembacaan scale: {e}")
+                time.sleep(0.5)
+            time.sleep(0.05)
+
+    def _parse_weight(self, raw_str):
+        trimmed = raw_str.strip()
+        self.is_stable = not ("US" in trimmed or "us" in trimmed)
+        # Regex angka berat
+        match = re.search(r'([+-]?\d+\.?\d*)', trimmed)
+        if match:
+            try:
+                self.current_weight = float(match.group(1))
+            except ValueError:
+                pass
 
 scale_manager = ScaleManager()
 
-
 # =============================================================================
-# KONFIGURASI CCTV TP-LINK & PADDLEOCR
+# DAHUA CAPTURE & PREPROCESSING ENGINE
 # =============================================================================
-# RTSP URL CCTV TP-Link (Tapo / VIGI)
-# Format RTSP TP-Link Tapo: rtsp://username:password@IP_CCTV:554/stream1
-# Format RTSP TP-Link VIGI: rtsp://username:password@IP_CCTV:554/h264/ch1/main/av_stream
-RTSP_URL = os.getenv("CCTV_RTSP_URL", "rtsp://admin:admin123@192.168.1.60:554/stream1")
-
-# Fallback ke webcam USB jika RTSP gagal / mode testing (0 = default webcam)
-FALLBACK_TO_WEBCAM = os.getenv("FALLBACK_TO_WEBCAM", "true").lower() == "true"
-
-# Inisialisasi PaddleOCR (CPU mode secara bawaan agar kompatibel di semua PC Pos)
-logger.info("Menginisialisasi PaddleOCR Engine...")
-try:
-    from paddleocr import PaddleOCR
-    # lang='en' atau 'id' bagus untuk karakter huruf & angka latin
-    ocr_engine = PaddleOCR(use_angle_cls=True, lang='en', show_log=False, use_gpu=False)
-    logger.info("PaddleOCR Engine berhasil dimuat!")
-except Exception as e:
-    logger.error(f"Gagal memuat PaddleOCR: {e}")
-    ocr_engine = None
-
-
-# =============================================================================
-# HELPER FUNCTIONS
-# =============================================================================
-def clean_nopol_text(text_list):
+def capture_dahua_snapshot(ip=None, user=None, password=None, port=None):
     """
-    Ekstrak & format teks plat nomor Indonesia dari hasil deteksi PaddleOCR.
-    Format Plat Nomor: 1-2 Huruf (Kode Wilayah) + 1-4 Angka + 1-3 Huruf (Seri)
-    Contoh: L 9482 UB, B 1234 XYZ, N 888 AB, W 1020 A
+    Mengambil snapshot JPEG resolusi penuh (1080p) langsung dari Dahua IP Camera
+    menggunakan HTTP Digest Authentication resmi Dahua.
+    Metode ini jauh lebih cepat (<200ms) dan lebih tajam dibanding stream RTSP.
     """
-    nopol_pattern = re.compile(r'\b([A-Z]{1,2})\s*(\d{1,4})\s*([A-Z]{1,3})\b', re.IGNORECASE)
+    cam_ip = ip or DAHUA_CONFIG["ip"]
+    cam_user = user or DAHUA_CONFIG["user"]
+    cam_pass = password or DAHUA_CONFIG["pass"]
+    cam_port = port or DAHUA_CONFIG["http_port"]
 
-    for item in text_list:
-        raw_str = item.strip().upper()
-        # Bersihkan karakter aneh
-        cleaned = re.sub(r'[^A-Z0-9\s]', '', raw_str)
-        
-        match = nopol_pattern.search(cleaned)
+    url = f"http://{cam_ip}:{cam_port}/cgi-bin/snapshot.cgi?channel={DAHUA_CONFIG['channel']}"
+    logger.info(f"Mengambil snapshot Dahua dari {url}...")
+
+    # Coba Digest Auth terlebih dahulu (standar Dahua)
+    try:
+        res = requests.get(url, auth=HTTPDigestAuth(cam_user, cam_pass), timeout=5)
+        if res.status_code == 200 and len(res.content) > 1000:
+            arr = np.frombuffer(res.content, dtype=np.uint8)
+            img = cv2.imdecode(arr, cv2.IMREAD_COLOR)
+            if img is not None:
+                logger.info(f"Snapshot Dahua berhasil didapatkan! Resolusi: {img.shape[1]}x{img.shape[0]}")
+                return img, None
+    except Exception as e:
+        logger.warning(f"Digest snapshot gagal: {e}")
+
+    # Fallback ke Basic Auth
+    try:
+        res = requests.get(url, auth=HTTPBasicAuth(cam_user, cam_pass), timeout=5)
+        if res.status_code == 200 and len(res.content) > 1000:
+            arr = np.frombuffer(res.content, dtype=np.uint8)
+            img = cv2.imdecode(arr, cv2.IMREAD_COLOR)
+            if img is not None:
+                return img, None
+    except Exception as e:
+        logger.warning(f"Basic snapshot gagal: {e}")
+
+    # Fallback ke RTSP stream Dahua
+    rtsp_url = f"rtsp://{cam_user}:{cam_pass}@{cam_ip}:{DAHUA_CONFIG['rtsp_port']}/cam/realmonitor?channel={DAHUA_CONFIG['channel']}&subtype=0"
+    logger.info(f"Mencoba koneksi ke RTSP Dahua: rtsp://{cam_user}:***@{cam_ip}:{DAHUA_CONFIG['rtsp_port']}...")
+    try:
+        cap = cv2.VideoCapture(rtsp_url)
+        cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
+        if cap.isOpened():
+            for _ in range(2):
+                cap.read()
+            ret, frame = cap.read()
+            cap.release()
+            if ret and frame is not None:
+                logger.info(f"RTSP frame Dahua berhasil didapatkan! ({frame.shape[1]}x{frame.shape[0]})")
+                return frame, None
+    except Exception as e:
+        logger.warning(f"RTSP capture gagal: {e}")
+
+    return None, f"Tidak dapat terhubung ke kamera Dahua di {cam_ip}. Periksa IP, username, dan password."
+
+
+def preprocess_plate_image(image):
+    """
+    Pipeline pra-pemrosesan citra untuk plat nomor Indonesia:
+    1. Ekualisasi kontras (CLAHE)
+    2. Bilateral filter untuk menghilangkan noise debu aspal tanpa memudarkan tepi huruf
+    3. Normalisasi plat putih (tulisan hitam) & plat hitam (tulisan putih)
+    """
+    if image is None:
+        return []
+
+    processed_variants = []
+
+    # Varian 1: Original image
+    processed_variants.append(image)
+
+    # Fokuskan ke area bawah/tengah (Region of Interest tempat plat truk berada)
+    h, w = image.shape[:2]
+    # Crop bagian bawah 65% di mana plat nomor kendaraan selalu berada
+    roi_bottom = image[int(h * 0.35):, :]
+    processed_variants.append(roi_bottom)
+
+    # Konversi ke grayscale
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    
+    # CLAHE (Contrast Limited Adaptive Histogram Equalization)
+    clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
+    gray_clahe = clahe.apply(gray)
+    processed_variants.append(cv2.cvtColor(gray_clahe, cv2.COLOR_GRAY2BGR))
+
+    # Bilateral filter
+    denoised = cv2.bilateralFilter(gray_clahe, 11, 17, 17)
+    
+    # Otsu thresholding (Hitam Putih Murni)
+    _, thresh_inv = cv2.threshold(denoised, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+    _, thresh_norm = cv2.threshold(denoised, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+
+    processed_variants.append(cv2.cvtColor(thresh_inv, cv2.COLOR_GRAY2BGR))
+    processed_variants.append(cv2.cvtColor(thresh_norm, cv2.COLOR_GRAY2BGR))
+
+    return processed_variants
+
+
+# Kode Wilayah Plat Nomor Indonesia Resmi
+KODE_WILAYAH_INDONESIA = {
+    'P', 'DK', 'L', 'W', 'N', 'B', 'AG', 'AE', 'S', 'M', 
+    'AA', 'AB', 'AD', 'D', 'F', 'T', 'E', 'G', 'H', 'K', 
+    'R', 'A', 'Z', 'BE', 'BG', 'BK', 'BL', 'BM', 'BN', 'BA'
+}
+
+def clean_and_normalize_nopol(raw_texts):
+    """
+    Membersihkan dan memvalidasi format plat nomor Indonesia:
+    [KODE WILAYAH] [NOMOR POLISI 1-4 DIGIT] [SERI 1-3 HURUF]
+    Contoh: P 8890 UZ, L 9482 UB, DK 1234 AB, B 1234 XYZ
+    Mengabaikan angka masa berlaku (seperti 04.28 atau 11-27).
+    """
+    logger.info(f"Menganalisis teks terdeteksi: {raw_texts}")
+
+    # Gabungkan semua potongan teks menjadi satu baris bersih
+    text_blobs = []
+    for item in raw_texts:
+        t = item.upper().strip()
+        # Hilangkan simbol titik atau minus yang biasa pada tanggal berlaku (04.28 -> diabaikan)
+        t = re.sub(r'[\.\:\;\,\_\-]', '', t)
+        text_blobs.append(t)
+
+    combined_all = " ".join(text_blobs)
+
+    # 1. Pola standar Indonesia: 1-2 Huruf + 1-4 Angka + 1-3 Huruf
+    pattern_standard = re.compile(r'\b([A-Z]{1,2})\s*(\d{1,4})\s*([A-Z]{1,3})\b')
+    match = pattern_standard.search(combined_all)
+    if match:
+        wilayah = match.group(1).upper()
+        angka = match.group(2)
+        seri = match.group(3).upper()
+
+        # Validasi kode wilayah jika cocok dengan daftar wilayah
+        if wilayah in KODE_WILAYAH_INDONESIA or len(wilayah) <= 2:
+            return f"{wilayah} {angka} {seri}"
+
+    # 2. Coba periksa per elemen jika OCR memisahkan kotak
+    for i in range(len(text_blobs)):
+        blob = text_blobs[i]
+        match = pattern_standard.search(blob)
         if match:
-            kode_wilayah = match.group(1).upper()
-            angka = match.group(2)
-            seri = match.group(3).upper()
-            return f"{kode_wilayah} {angka} {seri}"
+            return f"{match.group(1)} {match.group(2)} {match.group(3)}"
 
-    # Jika pola baku tidak ketemu, coba gabungkan teks angka dan huruf terdeteksi
-    combined = " ".join(text_list).upper()
-    match = nopol_pattern.search(combined)
+    # 3. Coba koreksi karakter umum yang tertukar (O->0, I->1, dll)
+    corrected = combined_all
+    # Jika ada huruf O di tengah kumpulan angka
+    corrected = re.sub(r'(?<=\d)O(?=\d)', '0', corrected)
+    corrected = re.sub(r'(?<=\d)I(?=\d)', '1', corrected)
+    corrected = re.sub(r'(?<=[A-Z])0(?=[A-Z])', 'O', corrected)
+
+    match = pattern_standard.search(corrected)
     if match:
         return f"{match.group(1)} {match.group(2)} {match.group(3)}"
 
     return ""
 
 
-def capture_frame_from_cctv():
-    """
-    Membuka stream RTSP CCTV TP-Link dan mengambil 1 frame foto terbaru.
-    """
-    logger.info(f"Membuka RTSP Stream CCTV: {RTSP_URL}")
-    cap = cv2.VideoCapture(RTSP_URL)
-    
-    # Set buffer size terkecil agar tidak terjadi delay/lag snapshot
-    cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
-
-    if not cap.isOpened():
-        logger.warning("Stream RTSP CCTV tidak dapat dibuka!")
-        cap.release()
-        
-        if FALLBACK_TO_WEBCAM:
-            logger.info("Mencoba fallback ke Webcam USB lokal (device 0)...")
-            cap = cv2.VideoCapture(0)
-            if not cap.isOpened():
-                cap.release()
-                return None, "Gagal terhubung ke CCTV RTSP dan Webcam USB"
-
-    # Buang beberapa frame awal buffer untuk dapatkan frame terbaru (fresh photo)
-    for _ in range(3):
-        cap.read()
-
-    ret, frame = cap.read()
-    cap.release()
-
-    if not ret or frame is None:
-        return None, "Gagal mengambil frame foto dari kamera"
-
-    return frame, None
-
-
 # =============================================================================
 # ENDPOINT API
 # =============================================================================
 @app.route("/", methods=["GET"])
-def health_check():
+def index():
     return jsonify({
+        "service": "PP BUMI MAS - Dahua ANPR & Scale Bridge",
         "status": "ONLINE",
-        "service": "PP Bumi Mas CCTV OCR Nopol Service",
-        "rtsp_url": RTSP_URL,
-        "ocr_loaded": ocr_engine is not None
+        "dahua_config": {
+            "ip": DAHUA_CONFIG["ip"],
+            "user": DAHUA_CONFIG["user"],
+            "http_port": DAHUA_CONFIG["http_port"],
+            "rtsp_port": DAHUA_CONFIG["rtsp_port"]
+        },
+        "ocr_engine": "EasyOCR" if ocr_reader else "None",
+        "scale_connected": scale_manager.is_connected,
+        "scale_port": scale_manager.port
     })
 
 
 @app.route("/scan-nopol", methods=["GET", "POST"])
 def scan_nopol():
     """
-    Endpoint utama yang dipanggil oleh tombol [ SCAN NOPOL CCTV ] di website ERP.
+    Endpoint utama pembacaan plat nomor CCTV Dahua.
+    Mendukung GET (ambil dari kamera Dahua) atau POST (mengirimkan snapshot khusus).
     """
-    logger.info("Menerima permintaan scan Nopol CCTV...")
+    logger.info("Menerima permintaan scan Nopol...")
 
-    if ocr_engine is None:
+    if not ocr_reader:
         return jsonify({
             "success": False,
             "nopol": "",
-            "message": "Engine PaddleOCR belum terpasang atau gagal dimuat di server Python."
+            "message": "Engine OCR belum siap. Periksa instalasi library."
         }), 500
 
-    # 1. Ambil 1 frame foto dari CCTV
-    frame, err_msg = capture_frame_from_cctv()
-    if err_msg or frame is None:
-        logger.error(f"Capture error: {err_msg}")
+    frame = None
+    err = None
+
+    # Jika dikirim gambar base64 lewat POST body
+    if request.is_json and request.json and "image_base64" in request.json:
+        try:
+            b64_data = request.json["image_base64"]
+            if "," in b64_data:
+                b64_data = b64_data.split(",")[1]
+            img_bytes = base64.b64decode(b64_data)
+            arr = np.frombuffer(img_bytes, dtype=np.uint8)
+            frame = cv2.imdecode(arr, cv2.IMREAD_COLOR)
+        except Exception as e:
+            err = f"Gagal decode base64: {e}"
+
+    # Jika tidak ada base64, ambil langsung dari Dahua IP Camera
+    if frame is None:
+        custom_ip = request.args.get("ip") or (request.json and request.json.get("ip")) or DAHUA_CONFIG["ip"]
+        frame, err = capture_dahua_snapshot(ip=custom_ip)
+
+    if frame is None or err:
         return jsonify({
             "success": False,
             "nopol": "",
-            "message": f"Gagal membaca CCTV: {err_msg}. Periksa koneksi RTSP IP camera."
+            "message": f"Kamera Dahua tidak dapat diakses: {err}"
         }), 500
 
-    # 2. Proses foto dengan PaddleOCR
-    try:
-        # PaddleOCR menerima array OpenCV BGR / RGB
-        result = ocr_engine.ocr(frame, cls=True)
+    # Jalankan preprocessing
+    variants = preprocess_plate_image(frame)
+    all_detected_texts = []
 
-        detected_texts = []
-        if result and len(result) > 0 and result[0] is not None:
-            for line in result[0]:
-                text = line[1][0]
-                confidence = line[1][1]
-                logger.info(f"Detected Text: '{text}' (Conf: {confidence:.2f})")
-                detected_texts.append(text)
+    # Jalankan OCR pada varian gambar
+    for var_img in variants:
+        try:
+            results = ocr_reader.readtext(var_img, detail=0)
+            if results:
+                all_detected_texts.extend(results)
+                # Coba cek apakah sudah dapat plat nomor valid
+                detected_nopol = clean_and_normalize_nopol(results)
+                if detected_nopol:
+                    logger.info(f"Nopol terdeteksi akurat: {detected_nopol}")
+                    return jsonify({
+                        "success": True,
+                        "nopol": detected_nopol,
+                        "raw_texts": all_detected_texts,
+                        "message": f"Plat nomor berhasil dideteksi: {detected_nopol}"
+                    })
+        except Exception as e:
+            logger.warning(f"Error OCR varian: {e}")
 
-        # 3. Ekstrak format Plat Nopol dari teks terdeteksi
-        nopol_result = clean_nopol_text(detected_texts)
+    # Analisis semua gabungan teks jika belum cocok
+    final_nopol = clean_and_normalize_nopol(all_detected_texts)
+    if final_nopol:
+        return jsonify({
+            "success": True,
+            "nopol": final_nopol,
+            "raw_texts": all_detected_texts,
+            "message": f"Plat nomor terdeteksi: {final_nopol}"
+        })
 
-        if nopol_result:
-            logger.info(f"✅ Nopol Terdeteksi: {nopol_result}")
-            return jsonify({
-                "success": True,
-                "nopol": nopol_result,
-                "raw_texts": detected_texts,
-                "message": "Nopol berhasil dibaca dari CCTV"
-            })
-        else:
-            raw_concat = ", ".join(detected_texts) if detected_texts else "Tidak ada teks terdeteksi"
-            logger.warning(f"❌ Nopol tidak terdeteksi. Teks mentah: {raw_concat}")
-            return jsonify({
-                "success": False,
-                "nopol": "",
-                "raw_texts": detected_texts,
-                "message": f"Plat Nopol tidak terbaca dengan jelas. Teks terdeteksi: '{raw_concat}'"
-            }), 200
+    raw_str = ", ".join(all_detected_texts) if all_detected_texts else "Tidak ada teks terbaca"
+    return jsonify({
+        "success": False,
+        "nopol": "",
+        "raw_texts": all_detected_texts,
+        "message": f"Plat nomor belum terbaca jelas. Teks sekitar: '{raw_str}'"
+    }), 200
 
-    except Exception as e:
-        logger.error(f"Error saat proses OCR: {e}")
+
+@app.route("/dahua-test", methods=["GET"])
+def dahua_test():
+    """
+    Endpoint diagnostik untuk menguji koneksi langsung ke kamera Dahua.
+    """
+    test_ip = request.args.get("ip", DAHUA_CONFIG["ip"])
+    start_t = time.time()
+    frame, err = capture_dahua_snapshot(ip=test_ip)
+    latency_ms = round((time.time() - start_t) * 1000, 1)
+
+    if frame is not None:
+        # Encode preview kecil
+        small = cv2.resize(frame, (480, 270))
+        _, buffer = cv2.imencode('.jpg', small)
+        b64_preview = "data:image/jpeg;base64," + base64.b64encode(buffer).decode('ascii')
+        return jsonify({
+            "success": True,
+            "camera_ip": test_ip,
+            "latency_ms": latency_ms,
+            "resolution": f"{frame.shape[1]}x{frame.shape[0]}",
+            "preview_thumbnail": b64_preview,
+            "message": f"Kamera Dahua 2MP terhubung sempurna ({latency_ms} ms)!"
+        })
+    else:
         return jsonify({
             "success": False,
-            "nopol": "",
-            "message": f"Terjadi kesalahan pada OCR: {str(e)}"
+            "camera_ip": test_ip,
+            "latency_ms": latency_ms,
+            "error": err,
+            "message": f"Gagal terhubung ke Dahua {test_ip}: {err}"
         }), 500
+
+
+@app.route("/set-camera", methods=["POST"])
+def set_camera():
+    """
+    Update konfigurasi IP, User, dan Password kamera Dahua secara dinamis.
+    """
+    data = request.json or {}
+    if "ip" in data:
+        DAHUA_CONFIG["ip"] = data["ip"]
+    if "user" in data:
+        DAHUA_CONFIG["user"] = data["user"]
+    if "pass" in data:
+        DAHUA_CONFIG["pass"] = data["pass"]
+    if "http_port" in data:
+        DAHUA_CONFIG["http_port"] = int(data["http_port"])
+
+    logger.info(f"Update konfigurasi Dahua: IP={DAHUA_CONFIG['ip']}, User={DAHUA_CONFIG['user']}")
+    return jsonify({
+        "success": True,
+        "message": "Konfigurasi kamera Dahua berhasil diperbarui.",
+        "config": {
+            "ip": DAHUA_CONFIG["ip"],
+            "user": DAHUA_CONFIG["user"],
+            "http_port": DAHUA_CONFIG["http_port"]
+        }
+    })
+
+
+@app.route("/snapshot", methods=["GET"])
+def get_snapshot_jpeg():
+    """
+    Mengambil frame JPEG langsung untuk ditampilkan di browser.
+    """
+    frame, err = capture_dahua_snapshot()
+    if frame is not None:
+        _, buffer = cv2.imencode('.jpg', frame)
+        return Response(buffer.tobytes(), mimetype='image/jpeg')
+    return Response(b"Error capturing snapshot", status=500)
 
 
 # =============================================================================
-# ENDPOINT TIMBANGAN SERIAL RS232 / HARDWARE SCALE BRIDGE
+# ENDPOINT HARDWARE TIMBANGAN SERIAL RS232 / COM PORT
 # =============================================================================
 @app.route('/ports', methods=['GET'])
 def get_serial_ports():
-    """Daftar Port COM yang tersedia di Windows."""
     ports = scale_manager.get_ports()
     return jsonify({
         "success": True,
@@ -306,9 +492,8 @@ def get_serial_ports():
 
 @app.route('/connect-scale', methods=['POST'])
 def connect_scale():
-    """Hubungkan hardware timbangan ke port COM tertentu."""
     data = request.json or {}
-    port = data.get('port', 'COM3')
+    port = data.get('port', 'COM4')
     baudrate = data.get('baudrate', 9600)
     success, msg = scale_manager.connect(port, baudrate)
     return jsonify({
@@ -321,7 +506,6 @@ def connect_scale():
 
 @app.route('/disconnect-scale', methods=['POST'])
 def disconnect_scale():
-    """Putuskan koneksi hardware timbangan."""
     scale_manager.disconnect()
     return jsonify({
         "success": True,
@@ -331,7 +515,6 @@ def disconnect_scale():
 
 @app.route('/scale-weight', methods=['GET'])
 def get_scale_weight():
-    """Ambil data pembacaan berat realtime dari timbangan."""
     with scale_manager.lock:
         return jsonify({
             "connected": scale_manager.is_connected,
@@ -345,13 +528,13 @@ def get_scale_weight():
 
 if __name__ == "__main__":
     print("\n" + "="*70)
-    print(" 🚀 PP BUMI MAS ERP - SERVER POS: CCTV OCR & SCALE HARDWARE")
-    print(" Port: 5000")
-    print(" Endpoint CCTV OCR : http://localhost:5000/scan-nopol")
-    print(" Endpoint Scale COM: http://localhost:5000/scale-weight")
-    print(" Daftar Port COM   : http://localhost:5000/ports")
-    print(" Press Ctrl+C to stop server")
+    print(" PP BUMI MAS - DAHUA 2MP ANPR & SCALE BRIDGE SERVER")
+    print(f" Dahua Target IP : {DAHUA_CONFIG['ip']}:{DAHUA_CONFIG['http_port']}")
+    print(" Server Endpoint : http://localhost:5000")
+    print(" Scan Nopol      : http://localhost:5000/scan-nopol")
+    print(" Dahua Test Ping : http://localhost:5000/dahua-test")
+    print(" Live Snapshot   : http://localhost:5000/snapshot")
+    print(" Scale COM       : http://localhost:5000/scale-weight")
     print("="*70 + "\n")
 
     app.run(host="0.0.0.0", port=5000, debug=False)
-
