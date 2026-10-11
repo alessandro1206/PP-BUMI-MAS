@@ -37,7 +37,7 @@ export const Header: React.FC = () => {
     return (
       <>
         <div className="pt-4 px-4 sm:px-6 max-w-[1200px] mx-auto w-full sticky top-0 z-50">
-          <header className="bg-[#ffffff] rounded-[12px] border border-[#000000]/10 h-16 sm:h-20 px-4 sm:px-6 flex items-center justify-between transition-all">
+          <header className="bg-[#ffffff] rounded-[12px] border border-[#1b4332]/15 h-16 sm:h-20 px-4 sm:px-6 flex items-center justify-between transition-all">
             {/* Brand Mark */}
             <div 
               className="flex items-center space-x-3 cursor-pointer group"
@@ -49,29 +49,29 @@ export const Header: React.FC = () => {
                 }
               }}
             >
-              <div className="w-9 h-9 rounded-full bg-[#f04923] flex items-center justify-center text-white font-bold text-xs tracking-tight-bella">
+              <div className="w-9 h-9 rounded-full bg-[#1b4332] flex items-center justify-center text-[#f4f0e6] font-bold text-xs tracking-tight-bella">
                 BM
               </div>
               <div>
                 <div className="flex items-center space-x-2">
-                  <span className="text-base sm:text-lg font-bold tracking-tight-bella text-[#000000]">
+                  <span className="text-base sm:text-lg font-bold tracking-tight-bella text-[#142217]">
                     PP BUMI MAS
                   </span>
-                  <span className="text-[10px] font-bold uppercase bg-[#ebeadf] text-[#000000] px-2 py-0.5 rounded-full border border-[#000000]/15 tracking-tight-bella">
+                  <span className="text-[10px] font-bold uppercase bg-[#e8f1eb] text-[#1b4332] px-2 py-0.5 rounded-full border border-[#1b4332]/20 tracking-tight-bella">
                     BERAS BUSUR
                   </span>
                 </div>
-                <p className="text-[11px] text-[#000000]/70 font-normal tracking-tight-bella">Pabrik &amp; Reprocessing Beras Banyuwangi</p>
+                <p className="text-[11px] text-[#142217]/70 font-normal tracking-tight-bella">Pabrik &amp; Reprocessing Beras Banyuwangi</p>
               </div>
             </div>
 
             {/* Navigation Category Links */}
-            <nav className="hidden lg:flex items-center space-x-6 text-sm font-normal text-[#000000] tracking-tight-bella">
-              <a href="#koleksi-beras" className="hover:text-[#f04923] transition">Koleksi Beras</a>
-              <a href="#tentang-busur" className="hover:text-[#f04923] transition">Tentang Kami</a>
-              <a href="#kilang-proses" className="hover:text-[#f04923] transition">Kilang &amp; Presisi</a>
-              <a href="#inspirasi-dapur" className="hover:text-[#f04923] transition">Inspirasi Dapur</a>
-              <a href="#pesan-grosir" className="hover:text-[#f04923] transition">Penawaran B2B</a>
+            <nav className="hidden lg:flex items-center space-x-6 text-sm font-normal text-[#142217] tracking-tight-bella">
+              <a href="#koleksi-beras" className="hover:text-[#1b4332] transition">Koleksi Beras</a>
+              <a href="#tentang-busur" className="hover:text-[#1b4332] transition">Tentang Kami</a>
+              <a href="#kilang-proses" className="hover:text-[#1b4332] transition">Kilang &amp; Presisi</a>
+              <a href="#inspirasi-dapur" className="hover:text-[#1b4332] transition">Inspirasi Dapur</a>
+              <a href="#pesan-grosir" className="hover:text-[#1b4332] transition">Penawaran B2B</a>
             </nav>
 
             {/* Right Action Controls */}
@@ -80,10 +80,10 @@ export const Header: React.FC = () => {
                 href="https://www.instagram.com/berasbusur.id?rpxt=MW10dWI3aTFvMjZ2cA=="
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hidden sm:inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-full border border-[#000000]/15 hover:border-[#f04923] text-xs font-bold tracking-tight-bella text-[#000000] transition bg-[#ebeadf]/50 hover:bg-[#ebeadf]"
+                className="hidden sm:inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-full border border-[#1b4332]/20 hover:border-[#1b4332] text-xs font-bold tracking-tight-bella text-[#142217] transition bg-[#e8f1eb]/70 hover:bg-[#e8f1eb]"
                 title="Instagram Resmi @berasbusur.id"
               >
-                <Instagram className="w-3.5 h-3.5 text-[#f04923]" />
+                <Instagram className="w-3.5 h-3.5 text-[#2d6a4f]" />
                 <span>@berasbusur.id</span>
               </a>
 
@@ -91,7 +91,7 @@ export const Header: React.FC = () => {
                 <>
                   <button
                     onClick={() => setActiveScreen('SCREEN_WORKSTATIONS')}
-                    className="px-4 py-2 rounded-full text-xs font-bold tracking-tight-bella bg-[#000000] text-white hover:bg-[#272735] transition flex items-center space-x-1.5"
+                    className="px-4 py-2 rounded-full text-xs font-bold tracking-tight-bella bg-[#1b4332] text-white hover:bg-[#245741] transition flex items-center space-x-1.5"
                   >
                     <Building2 className="w-3.5 h-3.5" />
                     <span>Stasiun Kerja</span>
@@ -108,15 +108,15 @@ export const Header: React.FC = () => {
                 <>
                   <button
                     onClick={() => setShowLoginModal(true)}
-                    className="px-4 py-2 rounded-full border border-[#000000] text-[#000000] hover:bg-[#ebeadf] text-xs font-bold tracking-tight-bella transition flex items-center space-x-1.5"
+                    className="px-4 py-2 rounded-full border border-[#1b4332]/40 text-[#142217] hover:bg-[#e8f1eb] text-xs font-bold tracking-tight-bella transition flex items-center space-x-1.5"
                   >
-                    <Shield className="w-3.5 h-3.5 text-[#000000]" />
+                    <Shield className="w-3.5 h-3.5 text-[#1b4332]" />
                     <span>Login Staf Pabrik</span>
                   </button>
 
                   <a
                     href="#pesan-grosir"
-                    className="bella-btn-coral text-xs py-2 px-4 sm:px-5 font-bold tracking-tight-bella inline-flex items-center space-x-1"
+                    className="bella-btn-green text-xs py-2 px-4 sm:px-5 font-bold tracking-tight-bella inline-flex items-center space-x-1"
                   >
                     <span>Minta Penawaran</span>
                   </a>

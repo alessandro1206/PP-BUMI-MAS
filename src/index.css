@@ -4,12 +4,15 @@
 
 @layer base {
   :root {
-    /* bella Tokens - Sunlit kitchen counter at golden hour */
-    --color-warm-canvas: #ebeadf;
+    /* Connected Shades of Green and Cream Palette */
+    --color-warm-canvas: #f4f0e6;
     --color-pristine-surface: #ffffff;
-    --color-sand-beige: #d5cec0;
-    --color-ink-black: #000000;
-    --color-coral-pulse: #f04923;
+    --color-sand-beige: #dfd9cb;
+    --color-ink-black: #142217;
+    --color-forest-green: #1b4332;
+    --color-leaf-green: #2d6a4f;
+    --color-sage-cream: #e8f1eb;
+    --color-coral-pulse: #1b4332;
 
     /* Mercury Tokens - Alpine banking at blue hour */
     --color-onyx-canvas: #171721;
@@ -129,23 +132,38 @@
   background-color: #f5f4ec;
 }
 
-.bella-btn-coral {
-  background-color: #f04923;
+.bella-btn-coral, .bella-btn-green {
+  background-color: #1b4332;
   color: #ffffff;
-  border: 1px solid #f04923;
+  border: 1px solid #1b4332;
   border-radius: 999px;
   padding: 12px 24px;
   font-weight: 700;
   letter-spacing: -0.05em;
   transition: all 0.2s ease;
 }
-.bella-btn-coral:hover {
-  background-color: #dc3e19;
+.bella-btn-coral:hover, .bella-btn-green:hover {
+  background-color: #245741;
+  border-color: #245741;
 }
 
-.bella-badge-coral {
-  background-color: #f04923;
+.bella-badge-coral, .bella-badge-green {
+  background-color: #1b4332;
   color: #ffffff;
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: -0.05em;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+}
+
+.bella-badge-sage {
+  background-color: #e8f1eb;
+  color: #1b4332;
+  border: 1px solid rgba(27, 67, 50, 0.2);
   border-radius: 999px;
   padding: 6px 14px;
   font-size: 12px;
@@ -158,7 +176,8 @@
 
 .bella-badge-white {
   background-color: #ffffff;
-  color: #000000;
+  color: #142217;
+  border: 1px solid rgba(20, 34, 23, 0.12);
   border-radius: 999px;
   padding: 6px 14px;
   font-size: 12px;

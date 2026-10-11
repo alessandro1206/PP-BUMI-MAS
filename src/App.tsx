@@ -100,7 +100,7 @@ const MainContent: React.FC = () => {
   };
 
   return (
-    <div className={`min-h-screen flex flex-col ${activeScreen === 'SCREEN_5' ? 'bg-[#ebeadf] text-[#000000] selection:bg-[#f04923] selection:text-white' : 'bg-[#171721] text-[#ededf3] selection:bg-[#5266eb] selection:text-white'}`}>
+    <div className={`min-h-screen flex flex-col ${activeScreen === 'SCREEN_5' ? 'bg-[#f4f0e6] text-[#142217] selection:bg-[#1b4332] selection:text-white' : 'bg-[#171721] text-[#ededf3] selection:bg-[#5266eb] selection:text-white'}`}>
       {/* Sleek Enterprise Top Application Header */}
       <Header />
 
