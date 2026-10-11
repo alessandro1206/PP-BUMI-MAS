@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { Shield, Scale, Smartphone, Building2, UserCheck, LogOut, FileText, BarChart3, Users, Package, Wallet, Receipt, Layers, Key, BookOpen, Instagram } from 'lucide-react';
+import { Shield, Scale, Smartphone, Building2, UserCheck, LogOut, FileText, BarChart3, Users, Package, Wallet, Receipt, Layers, Key, BookOpen, Instagram, Menu, X } from 'lucide-react';
 import { LoginModal } from './LoginModal';
 import { AuditLogModal } from './AuditLogModal';
 import { InitialBalanceSetupModal } from './InitialBalanceSetupModal';
@@ -12,6 +12,7 @@ export const Header: React.FC = () => {
   const [showLoginModal, setShowLoginModal] = useState<boolean>(false);
   const [showAuditModal, setShowAuditModal] = useState<boolean>(false);
   const [showInitialSetupModal, setShowInitialSetupModal] = useState<boolean>(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
 
   const pendingCount = weighbridgeInList.filter(w => w.transfer_status === 'PENDING_PRICE').length;
 
@@ -36,11 +37,11 @@ export const Header: React.FC = () => {
   if (activeScreen === 'SCREEN_5') {
     return (
       <>
-        <div className="pt-4 px-4 sm:px-6 max-w-[1200px] mx-auto w-full sticky top-0 z-50">
-          <header className="bg-[#ffffff] rounded-[12px] border border-[#1b4332]/15 h-16 sm:h-20 px-4 sm:px-6 flex items-center justify-between transition-all">
-            {/* Brand Mark */}
+        <div className="pt-3 sm:pt-4 px-3 sm:px-6 max-w-[1200px] mx-auto w-full sticky top-0 z-50">
+          <header className="bg-[#ffffff] rounded-[12px] border border-[#1b4332]/15 h-16 sm:h-20 px-3 sm:px-5 lg:px-6 flex items-center justify-between transition-all">
+            {/* Brand Mark (Left) */}
             <div 
-              className="flex items-center space-x-3 cursor-pointer group"
+              className="flex items-center space-x-2.5 sm:space-x-3 cursor-pointer group shrink-0"
               onClick={() => {
                 if (currentUser) {
                   setActiveScreen('SCREEN_WORKSTATIONS');
@@ -49,24 +50,26 @@ export const Header: React.FC = () => {
                 }
               }}
             >
-              <div className="w-9 h-9 rounded-full bg-[#1b4332] flex items-center justify-center text-[#f4f0e6] font-bold text-xs tracking-tight-bella">
+              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#1b4332] flex items-center justify-center text-[#f4f0e6] font-bold text-xs tracking-tight-bella shrink-0">
                 BM
               </div>
-              <div>
-                <div className="flex items-center space-x-2">
-                  <span className="text-base sm:text-lg font-bold tracking-tight-bella text-[#142217]">
+              <div className="shrink-0">
+                <div className="flex items-center space-x-1.5 sm:space-x-2">
+                  <span className="text-sm sm:text-base lg:text-lg font-bold tracking-tight-bella text-[#142217] whitespace-nowrap">
                     PP BUMI MAS
                   </span>
-                  <span className="text-[10px] font-bold uppercase bg-[#e8f1eb] text-[#1b4332] px-2 py-0.5 rounded-full border border-[#1b4332]/20 tracking-tight-bella">
+                  <span className="text-[9px] sm:text-[10px] font-bold uppercase bg-[#e8f1eb] text-[#1b4332] px-1.5 sm:px-2 py-0.5 rounded-full border border-[#1b4332]/20 tracking-tight-bella whitespace-nowrap shrink-0">
                     BERAS BUSUR
                   </span>
                 </div>
-                <p className="text-[11px] text-[#142217]/70 font-normal tracking-tight-bella">Pabrik &amp; Reprocessing Beras Banyuwangi</p>
+                <p className="hidden md:block text-[10px] sm:text-[11px] text-[#142217]/70 font-normal tracking-tight-bella whitespace-nowrap">
+                  Pabrik &amp; Reprocessing Beras Banyuwangi
+                </p>
               </div>
             </div>
 
-            {/* Navigation Category Links */}
-            <nav className="hidden lg:flex items-center space-x-6 text-sm font-normal text-[#142217] tracking-tight-bella">
+            {/* Navigation Category Links (Desktop XL only to prevent collision) */}
+            <nav className="hidden xl:flex items-center space-x-6 text-sm font-normal text-[#142217] tracking-tight-bella whitespace-nowrap">
               <a href="#koleksi-beras" className="hover:text-[#1b4332] transition">Koleksi Beras</a>
               <a href="#tentang-busur" className="hover:text-[#1b4332] transition">Tentang Kami</a>
               <a href="#kilang-proses" className="hover:text-[#1b4332] transition">Kilang &amp; Presisi</a>
@@ -75,12 +78,12 @@ export const Header: React.FC = () => {
             </nav>
 
             {/* Right Action Controls */}
-            <div className="flex items-center space-x-2 sm:space-x-3">
+            <div className="flex items-center space-x-2 sm:space-x-3 shrink-0">
               <a
                 href="https://www.instagram.com/berasbusur.id?rpxt=MW10dWI3aTFvMjZ2cA=="
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hidden sm:inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-full border border-[#1b4332]/20 hover:border-[#1b4332] text-xs font-bold tracking-tight-bella text-[#142217] transition bg-[#e8f1eb]/70 hover:bg-[#e8f1eb]"
+                className="hidden xl:inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-full border border-[#1b4332]/20 hover:border-[#1b4332] text-xs font-bold tracking-tight-bella text-[#142217] transition bg-[#e8f1eb]/70 hover:bg-[#e8f1eb] whitespace-nowrap"
                 title="Instagram Resmi @berasbusur.id"
               >
                 <Instagram className="w-3.5 h-3.5 text-[#2d6a4f]" />
@@ -91,15 +94,15 @@ export const Header: React.FC = () => {
                 <>
                   <button
                     onClick={() => setActiveScreen('SCREEN_WORKSTATIONS')}
-                    className="px-4 py-2 rounded-full text-xs font-bold tracking-tight-bella bg-[#1b4332] text-white hover:bg-[#245741] transition flex items-center space-x-1.5"
+                    className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs font-bold tracking-tight-bella bg-[#1b4332] text-white hover:bg-[#245741] transition flex items-center space-x-1.5 whitespace-nowrap"
                   >
                     <Building2 className="w-3.5 h-3.5" />
-                    <span>Stasiun Kerja</span>
+                    <span className="hidden sm:inline">Stasiun Kerja</span>
                   </button>
                   <button
                     onClick={logout}
                     title={`Logout (${currentUser.name})`}
-                    className="p-2 rounded-full border border-rose-500/30 text-rose-600 hover:bg-rose-50 transition"
+                    className="p-1.5 sm:p-2 rounded-full border border-rose-500/30 text-rose-600 hover:bg-rose-50 transition"
                   >
                     <LogOut className="w-3.5 h-3.5" />
                   </button>
@@ -108,22 +111,99 @@ export const Header: React.FC = () => {
                 <>
                   <button
                     onClick={() => setShowLoginModal(true)}
-                    className="px-4 py-2 rounded-full border border-[#1b4332]/40 text-[#142217] hover:bg-[#e8f1eb] text-xs font-bold tracking-tight-bella transition flex items-center space-x-1.5"
+                    className="hidden md:inline-flex px-3 sm:px-4 py-1.5 sm:py-2 rounded-full border border-[#1b4332]/40 text-[#142217] hover:bg-[#e8f1eb] text-xs font-bold tracking-tight-bella transition items-center space-x-1.5 whitespace-nowrap"
                   >
                     <Shield className="w-3.5 h-3.5 text-[#1b4332]" />
-                    <span>Login Staf Pabrik</span>
+                    <span>Login Staf</span>
                   </button>
 
                   <a
                     href="#pesan-grosir"
-                    className="bella-btn-green text-xs py-2 px-4 sm:px-5 font-bold tracking-tight-bella inline-flex items-center space-x-1"
+                    className="bella-btn-green text-xs py-2 px-3 sm:px-5 font-bold tracking-tight-bella inline-flex items-center space-x-1 whitespace-nowrap"
                   >
                     <span>Minta Penawaran</span>
                   </a>
+
+                  {/* Hamburger Menu Toggle (Below XL) */}
+                  <button
+                    onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                    className="xl:hidden p-2 rounded-full border border-[#1b4332]/25 text-[#142217] hover:bg-[#e8f1eb] transition flex items-center justify-center shrink-0"
+                    aria-label="Buka Menu Navigasi"
+                  >
+                    {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+                  </button>
                 </>
               )}
             </div>
           </header>
+
+          {/* Collapsible Mobile / Tablet Navigation Card */}
+          {mobileMenuOpen && (
+            <div className="xl:hidden mt-2 bg-[#ffffff] rounded-[12px] border border-[#1b4332]/15 p-4 space-y-3">
+              <nav className="flex flex-col space-y-1 text-sm font-bold text-[#142217] tracking-tight-bella">
+                <a 
+                  href="#koleksi-beras" 
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="px-3 py-2 rounded-lg hover:bg-[#e8f1eb] transition"
+                >
+                  Koleksi Beras
+                </a>
+                <a 
+                  href="#tentang-busur" 
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="px-3 py-2 rounded-lg hover:bg-[#e8f1eb] transition"
+                >
+                  Tentang Kami
+                </a>
+                <a 
+                  href="#kilang-proses" 
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="px-3 py-2 rounded-lg hover:bg-[#e8f1eb] transition"
+                >
+                  Kilang &amp; Presisi
+                </a>
+                <a 
+                  href="#inspirasi-dapur" 
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="px-3 py-2 rounded-lg hover:bg-[#e8f1eb] transition"
+                >
+                  Inspirasi Dapur
+                </a>
+                <a 
+                  href="#pesan-grosir" 
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="px-3 py-2 rounded-lg hover:bg-[#e8f1eb] transition"
+                >
+                  Penawaran B2B
+                </a>
+              </nav>
+
+              <div className="pt-2 border-t border-[#1b4332]/10 flex flex-col space-y-2">
+                <a
+                  href="https://www.instagram.com/berasbusur.id?rpxt=MW10dWI3aTFvMjZ2cA=="
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3 py-2 rounded-lg border border-[#1b4332]/20 text-xs font-bold text-[#142217] flex items-center space-x-2 bg-[#e8f1eb]/60"
+                >
+                  <Instagram className="w-4 h-4 text-[#2d6a4f]" />
+                  <span>Instagram @berasbusur.id</span>
+                </a>
+
+                {!currentUser && (
+                  <button
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      setShowLoginModal(true);
+                    }}
+                    className="w-full px-3 py-2 rounded-lg border border-[#1b4332]/40 text-xs font-bold text-[#142217] flex items-center justify-center space-x-2 hover:bg-[#e8f1eb]"
+                  >
+                    <Shield className="w-4 h-4 text-[#1b4332]" />
+                    <span>Login Staf Pabrik</span>
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
         {showLoginModal && (

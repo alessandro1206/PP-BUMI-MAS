@@ -96,7 +96,7 @@ export const PortalScreen: React.FC = () => {
 
             {/* Bottom Hero Typography & CTAs */}
             <div className="relative z-10 space-y-4 max-w-xl text-white">
-              <h1 className="text-3xl sm:text-5xl font-bold tracking-tight-bella leading-[1.1] text-white">
+              <h1 className="text-2xl sm:text-4xl lg:text-5xl font-bold tracking-tight-bella leading-[1.1] text-white">
                 Beras Alami Banyuwangi. Pulen, Bersih, Tanpa Pengawet.
               </h1>
               
@@ -474,7 +474,7 @@ export const PortalScreen: React.FC = () => {
               </div>
             </div>
 
-            <div className="lg:col-span-7 grid grid-cols-2 gap-4">
+            <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="bg-[#ffffff] rounded-[12px] p-3 border border-[#1b4332]/10 space-y-2">
                 <img 
                   src="https://images.unsplash.com/photo-1516684732162-798a0062be99?auto=format&fit=crop&w=400&q=80" 
