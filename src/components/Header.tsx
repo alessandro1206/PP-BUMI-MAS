@@ -66,7 +66,7 @@ export const Header: React.FC = () => {
                     BANYUWANGI
                   </span>
                 </div>
-                <p className="text-[11px] text-[#c3c3cc] font-normal">Alpine Banking Craft • Premium Rice Mill</p>
+                <p className="text-[11px] text-[#c3c3cc] font-normal">Pabrik &amp; Reprocessing Beras Modern</p>
               </div>
             </div>
 

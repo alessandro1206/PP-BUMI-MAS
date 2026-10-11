@@ -83,11 +83,11 @@ export const PortalScreen: React.FC = () => {
           1. FULL-BLEED HERO SECTION (100vw × ~100vh)
           ========================================================================= */}
       <section className="relative min-h-[92vh] sm:min-h-screen flex flex-col justify-between overflow-hidden bg-[#171721]">
-        {/* Full-bleed photographic background with blue-hour alpine / volcanic sawah mist */}
+        {/* Full-bleed photographic background with volcanic Kawah Ijen crater */}
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-1000 scale-105"
           style={{
-            backgroundImage: `url('https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=2400&q=85')`,
+            backgroundImage: `url('/images/kawah-ijen.jpg')`,
           }}
         >
           {/* Mercury dark overlay base ensuring perfect text contrast */}
@@ -100,12 +100,6 @@ export const PortalScreen: React.FC = () => {
         <div className="relative z-10 max-w-[1200px] w-full mx-auto px-4 sm:px-6 pt-24 sm:pt-32 pb-16 flex-1 flex flex-col justify-center items-center text-center">
           
           <div className="max-w-[760px] space-y-6">
-            
-            {/* Category / Location Marker */}
-            <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-[#1e1e2a]/80 border border-[#70707d]/30 text-xs text-[#c3c3cc]">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#5266eb]"></span>
-              <span className="font-mono uppercase tracking-[0.12em] text-[11px]">PP BUMI MAS • BANYUWANGI, JAWA TIMUR</span>
-            </div>
 
             {/* Display Headline in intermediate weight 480 */}
             <h1 className="text-4xl sm:text-6xl lg:text-[65px] font-normal leading-[1.1] tracking-[-0.015em] text-[#ededf3]">
