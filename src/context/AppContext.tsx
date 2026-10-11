@@ -273,8 +273,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       { id: 'cust-2', name: 'BUMI SUBUR SURABAYA', brand_aka: 'BCAMP', contact_person: 'Ko Jimmy', phone: '0811324567', address: 'Surabaya', expedition_destination: 'Ekspedisi Caravan', credit_limit: 500000000, payment_term: 'TEMPO_14_HARI', status: 'AKTIF' }
     ]);
     setProducts([
-      { id: 'prod-1', code: 'BRS-5X10', name: 'Beras Premium Cap Putri @(5x10) KG', unit: 'SAK', weight_per_unit: 50, empty_bag_stock: 500, finished_goods_stock_kg: 10000, base_price_per_kg: 14200, packaging_config: '@(5x10)', inner_qty: 5, inner_weight_kg: 10 },
-      { id: 'prod-2', code: 'BRS-5X5', name: 'Beras Premium Cap Putri @(5x5) KG', unit: 'SAK', weight_per_unit: 25, empty_bag_stock: 800, finished_goods_stock_kg: 7500, base_price_per_kg: 14300, packaging_config: '@(5x5)', inner_qty: 5, inner_weight_kg: 5 }
+      { id: 'prod-1', code: 'BRS-PUTRI', name: 'Beras Premium Cap Putri Thailand @(5x10) KG', unit: 'SAK', weight_per_unit: 50, empty_bag_stock: 500, finished_goods_stock_kg: 10000, base_price_per_kg: 14800, packaging_config: '@(5x10)', inner_qty: 5, inner_weight_kg: 10 },
+      { id: 'prod-2', code: 'BRS-PANDAN', name: 'Beras Punel Pulau Pandan @25 KG', unit: 'SAK', weight_per_unit: 25, empty_bag_stock: 600, finished_goods_stock_kg: 8500, base_price_per_kg: 14900, packaging_config: '@(1x25)', inner_qty: 1, inner_weight_kg: 25 },
+      { id: 'prod-3', code: 'BRS-SRIARUM', name: 'Beras Premium Sri Arum @25 KG', unit: 'SAK', weight_per_unit: 25, empty_bag_stock: 700, finished_goods_stock_kg: 6000, base_price_per_kg: 14500, packaging_config: '@(1x25)', inner_qty: 1, inner_weight_kg: 25 },
+      { id: 'prod-4', code: 'BRS-BETET', name: 'Beras Super Kepala Cap Betet @25 KG', unit: 'SAK', weight_per_unit: 25, empty_bag_stock: 800, finished_goods_stock_kg: 9000, base_price_per_kg: 13900, packaging_config: '@(1x25)', inner_qty: 1, inner_weight_kg: 25 }
     ]);
     setStapelPiles([
       { id: 'stapel-1', name: 'Stapel 1 - Gudang Utama', quality_grade: 'Standar Pabrik', stock_kg: 25000, current_stock_kg: 25000, created_at: new Date().toISOString() },

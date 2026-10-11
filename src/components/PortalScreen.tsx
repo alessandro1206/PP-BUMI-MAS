@@ -22,7 +22,7 @@ export const PortalScreen: React.FC = () => {
   const { setRole, setActiveScreen, currentUser } = useApp();
   const [quoteModalOpen, setQuoteModalOpen] = useState(false);
   const [quoteSubmitted, setQuoteSubmitted] = useState(false);
-  const [selectedGrainPreset, setSelectedGrainPreset] = useState<string>('Cap Putri Thailand (Premium 5kg/10kg)');
+  const [selectedGrainPreset, setSelectedGrainPreset] = useState<string>('Cap Putri Thailand (Premium 5kg/10kg/25kg)');
   
   // Quote form state
   const [clientName, setClientName] = useState('');
@@ -283,7 +283,7 @@ export const PortalScreen: React.FC = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             
             {/* Card 1: Cap Putri Thailand */}
             <div className="bella-card flex flex-col justify-between space-y-5 border border-[#1b4332]/10 hover:border-[#1b4332]/40 transition">
@@ -293,7 +293,7 @@ export const PortalScreen: React.FC = () => {
                   <span className="text-[11px] font-bold tracking-tight-bella text-[#1b4332]/80">Super Premium</span>
                 </div>
 
-                <div className="h-44 rounded-[8px] overflow-hidden bg-[#f4f0e6]">
+                <div className="h-48 rounded-[8px] overflow-hidden bg-[#f4f0e6]">
                   <img 
                     src="https://images.unsplash.com/photo-1516684732162-798a0062be99?auto=format&fit=crop&w=600&q=80" 
                     alt="Cap Putri Thailand" 
@@ -304,7 +304,7 @@ export const PortalScreen: React.FC = () => {
                 <div>
                   <h3 className="text-base font-bold tracking-tight-bella text-[#142217]">Cap Putri Thailand</h3>
                   <p className="text-xs font-normal tracking-tight-bella text-[#142217]/70 mt-1">
-                    Beras kristal putih bening, sosoh 95%, broken maks 5%. Nasi lembut pulen favorit keluarga.
+                    Beras kristal putih bening, sosoh 95%, broken maks 5%. Nasi lembut pulen istimewa favorit keluarga.
                   </p>
                 </div>
 
@@ -336,44 +336,44 @@ export const PortalScreen: React.FC = () => {
               </div>
             </div>
 
-            {/* Card 2: Cap Betet */}
+            {/* Card 2: Pulau Pandan (Real Product Packaging) */}
             <div className="bella-card flex flex-col justify-between space-y-5 border border-[#1b4332]/10 hover:border-[#1b4332]/40 transition">
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="bella-badge-sage text-[10px]">Pilihan Resto</span>
-                  <span className="text-[11px] font-bold tracking-tight-bella text-[#1b4332]/80">Super Kepala</span>
+                  <span className="bella-badge-sage text-[10px]">Mutu Pilihan</span>
+                  <span className="text-[11px] font-bold tracking-tight-bella text-[#1b4332]/80">Beras Punel</span>
                 </div>
 
-                <div className="h-44 rounded-[8px] overflow-hidden bg-[#f4f0e6]">
+                <div className="h-48 rounded-[8px] overflow-hidden bg-[#e8f1eb]/50 flex items-center justify-center p-1">
                   <img 
-                    src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80" 
-                    alt="Cap Betet Super Kepala" 
-                    className="w-full h-full object-cover hover:scale-105 transition duration-500"
+                    src="/images/pulau-pandan.jpg" 
+                    alt="Beras Punel Pulau Pandan" 
+                    className="w-full h-full object-contain hover:scale-105 transition duration-500 rounded-[6px]"
                   />
                 </div>
 
                 <div>
-                  <h3 className="text-base font-bold tracking-tight-bella text-[#142217]">Cap Betet Super Kepala</h3>
+                  <h3 className="text-base font-bold tracking-tight-bella text-[#142217]">Pulau Pandan</h3>
                   <p className="text-xs font-normal tracking-tight-bella text-[#142217]/70 mt-1">
-                    Beras kepala pilihan rumah makan dan katering. Tekstur pulen padat dan tidak mudah basi.
+                    Beras punel mutu pilihan dengan kemurnian bulir padi. Wangi pandan alami untuk sajian istimewa.
                   </p>
                 </div>
 
                 <div className="space-y-1 text-xs font-normal tracking-tight-bella border-t border-[#1b4332]/10 pt-2 text-[#142217]/80">
                   <div className="flex justify-between">
                     <span>Kemasan:</span>
-                    <strong className="text-[#142217]">10kg, 25kg, 50kg</strong>
+                    <strong className="text-[#142217]">5kg, 10kg, 25kg</strong>
                   </div>
                   <div className="flex justify-between">
-                    <span>Derajat Sosoh:</span>
-                    <strong className="text-[#142217]">90% Standar Kepala</strong>
+                    <span>Karakteristik:</span>
+                    <strong className="text-[#142217]">Punel &amp; Pandan Alami</strong>
                   </div>
                 </div>
               </div>
 
               <div className="space-y-3 pt-2">
                 <div className="text-lg font-bold tracking-tight-bella text-[#1b4332]">
-                  Rp 13.900 <span className="text-xs font-normal text-[#142217]/60">/ kg</span>
+                  Rp 14.900 <span className="text-xs font-normal text-[#142217]/60">/ kg</span>
                 </div>
 
                 <a
@@ -387,44 +387,95 @@ export const PortalScreen: React.FC = () => {
               </div>
             </div>
 
-            {/* Card 3: Cap Pandan Wangi */}
+            {/* Card 3: Sri Arum */}
             <div className="bella-card flex flex-col justify-between space-y-5 border border-[#1b4332]/10 hover:border-[#1b4332]/40 transition">
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="bella-badge-sage text-[10px]">Wangi Alami</span>
-                  <span className="text-[11px] font-bold tracking-tight-bella text-[#1b4332]/80">Aromatic</span>
+                  <span className="bella-badge-white text-[10px] text-[#1b4332]">Wangi Alami</span>
+                  <span className="text-[11px] font-bold tracking-tight-bella text-[#1b4332]/80">Premium Punel</span>
                 </div>
 
-                <div className="h-44 rounded-[8px] overflow-hidden bg-[#f4f0e6]">
+                <div className="h-48 rounded-[8px] overflow-hidden bg-[#f4f0e6]">
                   <img 
-                    src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=600&q=80" 
-                    alt="Cap Pandan Wangi" 
+                    src="https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=600&q=80" 
+                    alt="Beras Premium Sri Arum" 
                     className="w-full h-full object-cover hover:scale-105 transition duration-500"
                   />
                 </div>
 
                 <div>
-                  <h3 className="text-base font-bold tracking-tight-bella text-[#142217]">Cap Pandan Wangi</h3>
+                  <h3 className="text-base font-bold tracking-tight-bella text-[#142217]">Sri Arum</h3>
                   <p className="text-xs font-normal tracking-tight-bella text-[#142217]/70 mt-1">
-                    Wangi pandan murni khas tanah vulkanik tanpa esens sintetis. Nasi harum menggugah selera.
+                    Beras wangi alami dari kesuburan tanah Banyuwangi. Tekstur pulen, putih bersih, dan nikmat disajikan hangat.
                   </p>
                 </div>
 
                 <div className="space-y-1 text-xs font-normal tracking-tight-bella border-t border-[#1b4332]/10 pt-2 text-[#142217]/80">
                   <div className="flex justify-between">
                     <span>Kemasan:</span>
-                    <strong className="text-[#142217]">5kg, 25kg</strong>
+                    <strong className="text-[#142217]">5kg, 10kg, 25kg, 50kg</strong>
                   </div>
                   <div className="flex justify-between">
-                    <span>Karakteristik:</span>
-                    <strong className="text-[#142217]">Pandan Alami Murni</strong>
+                    <span>Derajat Sosoh:</span>
+                    <strong className="text-[#142217]">95% Harum &amp; Bersih</strong>
                   </div>
                 </div>
               </div>
 
               <div className="space-y-3 pt-2">
                 <div className="text-lg font-bold tracking-tight-bella text-[#1b4332]">
-                  Rp 15.500 <span className="text-xs font-normal text-[#142217]/60">/ kg</span>
+                  Rp 14.500 <span className="text-xs font-normal text-[#142217]/60">/ kg</span>
+                </div>
+
+                <a
+                  href="https://www.instagram.com/berasbusur.id?rpxt=MW10dWI3aTFvMjZ2cA=="
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full bella-btn-pill py-2.5 text-xs text-center block hover:bg-[#e8f1eb]"
+                >
+                  Pesan via Instagram
+                </a>
+              </div>
+            </div>
+
+            {/* Card 4: Cap Betet Super Kepala */}
+            <div className="bella-card flex flex-col justify-between space-y-5 border border-[#1b4332]/10 hover:border-[#1b4332]/40 transition">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="bella-badge-sage text-[10px]">Pilihan Resto</span>
+                  <span className="text-[11px] font-bold tracking-tight-bella text-[#1b4332]/80">Super Kepala</span>
+                </div>
+
+                <div className="h-48 rounded-[8px] overflow-hidden bg-[#f4f0e6]">
+                  <img 
+                    src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80" 
+                    alt="Cap Betet Super Kepala" 
+                    className="w-full h-full object-cover hover:scale-105 transition duration-500"
+                  />
+                </div>
+
+                <div>
+                  <h3 className="text-base font-bold tracking-tight-bella text-[#142217]">Cap Betet Super Kepala</h3>
+                  <p className="text-xs font-normal tracking-tight-bella text-[#142217]/70 mt-1">
+                    Beras kepala pilihan rumah makan dan katering. Tekstur butir utuh padat pulen dan tidak mudah basi.
+                  </p>
+                </div>
+
+                <div className="space-y-1 text-xs font-normal tracking-tight-bella border-t border-[#1b4332]/10 pt-2 text-[#142217]/80">
+                  <div className="flex justify-between">
+                    <span>Kemasan:</span>
+                    <strong className="text-[#142217]">10kg, 20kg, 25kg, 50kg</strong>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Derajat Sosoh:</span>
+                    <strong className="text-[#142217]">90% Standar Kepala</strong>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-3 pt-2">
+                <div className="text-lg font-bold tracking-tight-bella text-[#1b4332]">
+                  Rp 13.900 <span className="text-xs font-normal text-[#142217]/60">/ kg</span>
                 </div>
 
                 <a
@@ -646,9 +697,10 @@ export const PortalScreen: React.FC = () => {
                     onChange={(e) => setSelectedGrainPreset(e.target.value)}
                     className="w-full px-4 py-2.5 rounded-full border border-[#1b4332]/20 bg-[#f4f0e6] text-xs font-normal text-[#142217] outline-none focus:border-[#1b4332]"
                   >
-                    <option value="Cap Putri Thailand (Premium 5kg/10kg)">Cap Putri Thailand (Premium 5kg/10kg)</option>
-                    <option value="Cap Betet (Super Kepala 10kg/25kg)">Cap Betet (Super Kepala 10kg/25kg)</option>
-                    <option value="Cap Pandan Wangi (Aromatic 5kg/25kg)">Cap Pandan Wangi (Aromatic 5kg/25kg)</option>
+                    <option value="Cap Putri Thailand (Premium 5kg/10kg/25kg)">Cap Putri Thailand (Premium 5kg/10kg/25kg)</option>
+                    <option value="Pulau Pandan (Beras Punel Mutu Pilihan)">Pulau Pandan (Beras Punel Mutu Pilihan)</option>
+                    <option value="Sri Arum (Beras Wangi & Pulen)">Sri Arum (Beras Wangi & Pulen)</option>
+                    <option value="Cap Betet Super Kepala (10kg/20kg/25kg)">Cap Betet Super Kepala (10kg/20kg/25kg)</option>
                   </select>
                 </div>
 
