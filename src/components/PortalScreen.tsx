@@ -283,7 +283,7 @@ export const PortalScreen: React.FC = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             
             {/* Card 1: Cap Putri Thailand */}
             <div className="bella-card flex flex-col justify-between space-y-5 border border-[#000000]/10 hover:border-[#f04923]/40 transition">
@@ -435,56 +435,6 @@ export const PortalScreen: React.FC = () => {
                 >
                   Pesan via Instagram
                 </a>
-              </div>
-            </div>
-
-            {/* Card 4: Beras Busur Katering & Grosir */}
-            <div className="bella-card flex flex-col justify-between space-y-5 border border-[#000000]/10 hover:border-[#f04923]/40 transition">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="bella-badge-coral text-[10px]">Partai Besar</span>
-                  <span className="text-[11px] font-bold tracking-tight-bella text-[#000000]/60">Curah Sak 50kg</span>
-                </div>
-
-                <div className="h-44 rounded-[8px] overflow-hidden bg-[#ebeadf]">
-                  <img 
-                    src="https://images.unsplash.com/photo-1536304993881-ff6e9eefa2a6?auto=format&fit=crop&w=600&q=80" 
-                    alt="Beras Katering Karung 50kg" 
-                    className="w-full h-full object-cover hover:scale-105 transition duration-500"
-                  />
-                </div>
-
-                <div>
-                  <h3 className="text-base font-bold tracking-tight-bella text-[#000000]">Beras Busur Katering &amp; Curah</h3>
-                  <p className="text-xs font-normal tracking-tight-bella text-[#000000]/70 mt-1">
-                    Pasokan partai besar langsung dari lantai kilang untuk rumah makan, pabrik katering, dan toko sembako.
-                  </p>
-                </div>
-
-                <div className="space-y-1 text-xs font-normal tracking-tight-bella border-t border-[#000000]/10 pt-2 text-[#000000]/80">
-                  <div className="flex justify-between">
-                    <span>Kemasan:</span>
-                    <strong className="text-[#000000]">Karung 50kg Jahit</strong>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Minimum Order:</span>
-                    <strong className="text-[#000000]">1 Ton / Armada Truk</strong>
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-3 pt-2">
-                <div className="text-lg font-bold tracking-tight-bella text-[#000000]">
-                  Rp 13.200 <span className="text-xs font-normal text-[#000000]/60">/ kg</span>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => handleOpenQuote('Beras Katering & Grosir Sak 50kg')}
-                  className="w-full bella-btn-coral py-2.5 text-xs text-center block"
-                >
-                  Minta Penawaran Grosir
-                </button>
               </div>
             </div>
 
@@ -699,7 +649,6 @@ export const PortalScreen: React.FC = () => {
                     <option value="Cap Putri Thailand (Premium 5kg/10kg)">Cap Putri Thailand (Premium 5kg/10kg)</option>
                     <option value="Cap Betet (Super Kepala 10kg/25kg)">Cap Betet (Super Kepala 10kg/25kg)</option>
                     <option value="Cap Pandan Wangi (Aromatic 5kg/25kg)">Cap Pandan Wangi (Aromatic 5kg/25kg)</option>
-                    <option value="Beras Katering & Grosir Sak 50kg">Beras Katering &amp; Grosir Sak 50kg</option>
                   </select>
                 </div>
 
