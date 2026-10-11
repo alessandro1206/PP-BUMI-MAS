@@ -15,14 +15,55 @@ import {
   Clock,
   Phone,
   Mail,
-  Scale
+  Scale,
+  SlidersHorizontal,
+  ShoppingBag
 } from 'lucide-react';
+import { 
+  RiceVariantSettingsModal, 
+  DEFAULT_RICE_VARIANTS, 
+  RiceVariant 
+} from './RiceVariantSettingsModal';
 
 export const PortalScreen: React.FC = () => {
   const { setRole, setActiveScreen, currentUser } = useApp();
   const [quoteModalOpen, setQuoteModalOpen] = useState(false);
   const [quoteSubmitted, setQuoteSubmitted] = useState(false);
+  const [showVariantSettings, setShowVariantSettings] = useState(false);
   const [selectedGrainPreset, setSelectedGrainPreset] = useState<string>('Cap Putri Thailand (Premium 5kg/10kg/25kg)');
+
+  // Rice variants state loaded from localStorage with default fallbacks
+  const [variants, setVariants] = useState<RiceVariant[]>(() => {
+    try {
+      const saved = localStorage.getItem('beras_busur_variants_settings');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (err) {
+      console.error('Failed to load variants from localStorage', err);
+    }
+    return DEFAULT_RICE_VARIANTS;
+  });
+
+  const handleSaveVariants = (updated: RiceVariant[]) => {
+    setVariants(updated);
+    try {
+      localStorage.setItem('beras_busur_variants_settings', JSON.stringify(updated));
+    } catch (err) {
+      console.error('Failed to save variants', err);
+    }
+    setShowVariantSettings(false);
+  };
+
+  const handleResetVariants = () => {
+    setVariants(DEFAULT_RICE_VARIANTS);
+    try {
+      localStorage.removeItem('beras_busur_variants_settings');
+    } catch (err) {
+      console.error('Failed to reset variants', err);
+    }
+  };
   
   // Quote form state
   const [clientName, setClientName] = useState('');
@@ -267,228 +308,129 @@ export const PortalScreen: React.FC = () => {
         </section>
 
         {/* =========================================================================
-            4. PRODUCT GRID SECTION (3-Column on Desktop, 24px gaps)
+            4. PRODUCT GRID SECTION (Koleksi Beras Unggulan & Pengaturan Varian)
             ========================================================================= */}
         <section id="koleksi-beras" className="space-y-8">
           
-          <div className="text-center max-w-2xl mx-auto space-y-2">
-            <span className="bella-badge-sage text-[11px]">
-              Katalog Produk Resmi
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-bold tracking-tight-bella text-[#142217]">
-              Koleksi Beras Unggulan
-            </h2>
-            <p className="text-xs sm:text-sm font-normal tracking-tight-bella text-[#142217]/80">
-              Diproduksi khusus untuk memenuhi standar dapur rumah tangga, hotel, katering, serta distributor grosir dengan jaminan kualitas konsisten.
-            </p>
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div className="space-y-2 max-w-2xl">
+              <span className="bella-badge-sage text-[11px]">
+                Katalog Produk Resmi
+              </span>
+              <h2 className="text-3xl sm:text-4xl font-bold tracking-tight-bella text-[#142217]">
+                Koleksi Beras Unggulan
+              </h2>
+              <p className="text-xs sm:text-sm font-normal tracking-tight-bella text-[#142217]/80">
+                Diproduksi langsung di kilang modern PP Bumi Mas Banyuwangi dengan standar beras pulen alami, higienis, dan tanpa bahan pengawet.
+              </p>
+            </div>
+
+            <button
+              onClick={() => setShowVariantSettings(true)}
+              className="inline-flex items-center space-x-2 px-4 py-2 rounded-full border border-[#1b4332]/25 bg-[#ffffff] hover:bg-[#e8f1eb] text-xs font-bold text-[#142217] transition shadow-sm shrink-0 self-start md:self-auto"
+              title="Atur teks nama, gambar, ukuran kemasan, dan harga varian beras"
+            >
+              <SlidersHorizontal className="w-3.5 h-3.5 text-[#1b4332]" />
+              <span>Pengaturan Varian Beras</span>
+            </button>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            
-            {/* Card 1: Cap Putri Thailand */}
-            <div className="bella-card flex flex-col justify-between space-y-5 border border-[#1b4332]/10 hover:border-[#1b4332]/40 transition">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="bella-badge-green text-[10px]">Bestseller</span>
-                  <span className="text-[11px] font-bold tracking-tight-bella text-[#1b4332]/80">Super Premium</span>
-                </div>
-
-                <div className="h-48 rounded-[8px] overflow-hidden bg-[#f4f0e6]">
-                  <img 
-                    src="https://images.unsplash.com/photo-1516684732162-798a0062be99?auto=format&fit=crop&w=600&q=80" 
-                    alt="Cap Putri Thailand" 
-                    className="w-full h-full object-cover hover:scale-105 transition duration-500"
-                  />
-                </div>
-
-                <div>
-                  <h3 className="text-base font-bold tracking-tight-bella text-[#142217]">Cap Putri Thailand</h3>
-                  <p className="text-xs font-normal tracking-tight-bella text-[#142217]/70 mt-1">
-                    Beras kristal putih bening, sosoh 95%, broken maks 5%. Nasi lembut pulen istimewa favorit keluarga.
-                  </p>
-                </div>
-
-                <div className="space-y-1 text-xs font-normal tracking-tight-bella border-t border-[#1b4332]/10 pt-2 text-[#142217]/80">
-                  <div className="flex justify-between">
-                    <span>Kemasan:</span>
-                    <strong className="text-[#142217]">5kg, 10kg, 25kg, 50kg</strong>
+            {variants.map((v) => (
+              <div 
+                key={v.id}
+                className="bella-card flex flex-col justify-between space-y-5 border border-[#1b4332]/10 hover:border-[#1b4332]/40 transition group"
+              >
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="bella-badge-green text-[10px]">{v.categoryBadge || 'Unggulan'}</span>
+                    <span className="text-[11px] font-bold tracking-tight-bella text-[#1b4332]/80">{v.subBadge}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span>Derajat Sosoh:</span>
-                    <strong className="text-[#142217]">95% Bening Kristal</strong>
+
+                  <div className="h-48 rounded-[8px] overflow-hidden bg-[#f4f0e6] flex items-center justify-center p-1">
+                    <img 
+                      src={v.image} 
+                      alt={v.name} 
+                      className={`w-full h-full hover:scale-105 transition duration-500 rounded-[6px] ${
+                        v.image.includes('pulau-pandan') ? 'object-contain' : 'object-cover'
+                      }`}
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=600&q=80';
+                      }}
+                    />
                   </div>
+
+                  <div>
+                    <h3 className="text-base font-bold tracking-tight-bella text-[#142217]">{v.name}</h3>
+                    <p className="text-xs font-normal tracking-tight-bella text-[#142217]/70 mt-1 line-clamp-3">
+                      {v.description}
+                    </p>
+                  </div>
+
+                  <div className="space-y-1 text-xs font-normal tracking-tight-bella border-t border-[#1b4332]/10 pt-2 text-[#142217]/80">
+                    <div className="flex justify-between">
+                      <span>Kemasan:</span>
+                      <strong className="text-[#142217]">{v.sizes}</strong>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Karakteristik:</span>
+                      <strong className="text-[#142217]">{v.millingGrade}</strong>
+                    </div>
+                  </div>
+
+                  {/* Tersedia di Tokopedia & Shopee Banner */}
+                  {v.availableOnMarketplace && (
+                    <div className="bg-[#e8f1eb] text-[#1b4332] border border-[#1b4332]/15 px-2.5 py-1.5 rounded-[8px] flex items-center justify-between text-[11px] font-bold tracking-tight-bella">
+                      <span className="flex items-center space-x-1.5">
+                        <ShoppingBag className="w-3.5 h-3.5 text-[#2d6a4f]" />
+                        <span>Tersedia di Tokopedia &amp; Shopee</span>
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-2.5 pt-2">
+                  <div className="text-lg font-bold tracking-tight-bella text-[#1b4332]">
+                    {v.price} <span className="text-xs font-normal text-[#142217]/60">{v.unit}</span>
+                  </div>
+
+                  {/* Marketplace Buttons */}
+                  {v.availableOnMarketplace && (
+                    <div className="grid grid-cols-2 gap-2">
+                      <a
+                        href={v.tokopediaUrl || `https://www.tokopedia.com/search?st=product&q=${encodeURIComponent(v.name)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-2.5 py-1.5 rounded-full border border-[#03ac0e]/40 bg-[#03ac0e]/10 hover:bg-[#03ac0e]/20 text-[#03ac0e] text-[11px] font-bold text-center flex items-center justify-center space-x-1 transition"
+                        title={`Beli ${v.name} di Tokopedia`}
+                      >
+                        <span>Tokopedia</span>
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
+                      <a
+                        href={v.shopeeUrl || `https://shopee.co.id/search?keyword=${encodeURIComponent(v.name)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-2.5 py-1.5 rounded-full border border-[#ee4d2d]/40 bg-[#ee4d2d]/10 hover:bg-[#ee4d2d]/20 text-[#ee4d2d] text-[11px] font-bold text-center flex items-center justify-center space-x-1 transition"
+                        title={`Beli ${v.name} di Shopee`}
+                      >
+                        <span>Shopee</span>
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
+                    </div>
+                  )}
+
+                  <a
+                    href="https://www.instagram.com/berasbusur.id?rpxt=MW10dWI3aTFvMjZ2cA=="
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full bella-btn-pill py-2.5 text-xs text-center block hover:bg-[#e8f1eb]"
+                  >
+                    Pesan via Instagram
+                  </a>
                 </div>
               </div>
-
-              <div className="space-y-3 pt-2">
-                <div className="text-lg font-bold tracking-tight-bella text-[#1b4332]">
-                  Rp 14.800 <span className="text-xs font-normal text-[#142217]/60">/ kg</span>
-                </div>
-
-                <a
-                  href="https://www.instagram.com/berasbusur.id?rpxt=MW10dWI3aTFvMjZ2cA=="
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full bella-btn-pill py-2.5 text-xs text-center block hover:bg-[#e8f1eb]"
-                >
-                  Pesan via Instagram
-                </a>
-              </div>
-            </div>
-
-            {/* Card 2: Pulau Pandan (Real Product Packaging) */}
-            <div className="bella-card flex flex-col justify-between space-y-5 border border-[#1b4332]/10 hover:border-[#1b4332]/40 transition">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="bella-badge-sage text-[10px]">Mutu Pilihan</span>
-                  <span className="text-[11px] font-bold tracking-tight-bella text-[#1b4332]/80">Beras Punel</span>
-                </div>
-
-                <div className="h-48 rounded-[8px] overflow-hidden bg-[#e8f1eb]/50 flex items-center justify-center p-1">
-                  <img 
-                    src="/images/pulau-pandan.jpg" 
-                    alt="Beras Punel Pulau Pandan" 
-                    className="w-full h-full object-contain hover:scale-105 transition duration-500 rounded-[6px]"
-                  />
-                </div>
-
-                <div>
-                  <h3 className="text-base font-bold tracking-tight-bella text-[#142217]">Pulau Pandan</h3>
-                  <p className="text-xs font-normal tracking-tight-bella text-[#142217]/70 mt-1">
-                    Beras punel mutu pilihan dengan kemurnian bulir padi. Wangi pandan alami untuk sajian istimewa.
-                  </p>
-                </div>
-
-                <div className="space-y-1 text-xs font-normal tracking-tight-bella border-t border-[#1b4332]/10 pt-2 text-[#142217]/80">
-                  <div className="flex justify-between">
-                    <span>Kemasan:</span>
-                    <strong className="text-[#142217]">5kg, 10kg, 25kg</strong>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Karakteristik:</span>
-                    <strong className="text-[#142217]">Punel &amp; Pandan Alami</strong>
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-3 pt-2">
-                <div className="text-lg font-bold tracking-tight-bella text-[#1b4332]">
-                  Rp 14.900 <span className="text-xs font-normal text-[#142217]/60">/ kg</span>
-                </div>
-
-                <a
-                  href="https://www.instagram.com/berasbusur.id?rpxt=MW10dWI3aTFvMjZ2cA=="
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full bella-btn-pill py-2.5 text-xs text-center block hover:bg-[#e8f1eb]"
-                >
-                  Pesan via Instagram
-                </a>
-              </div>
-            </div>
-
-            {/* Card 3: Sri Arum */}
-            <div className="bella-card flex flex-col justify-between space-y-5 border border-[#1b4332]/10 hover:border-[#1b4332]/40 transition">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="bella-badge-white text-[10px] text-[#1b4332]">Wangi Alami</span>
-                  <span className="text-[11px] font-bold tracking-tight-bella text-[#1b4332]/80">Premium Punel</span>
-                </div>
-
-                <div className="h-48 rounded-[8px] overflow-hidden bg-[#f4f0e6]">
-                  <img 
-                    src="https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=600&q=80" 
-                    alt="Beras Premium Sri Arum" 
-                    className="w-full h-full object-cover hover:scale-105 transition duration-500"
-                  />
-                </div>
-
-                <div>
-                  <h3 className="text-base font-bold tracking-tight-bella text-[#142217]">Sri Arum</h3>
-                  <p className="text-xs font-normal tracking-tight-bella text-[#142217]/70 mt-1">
-                    Beras wangi alami dari kesuburan tanah Banyuwangi. Tekstur pulen, putih bersih, dan nikmat disajikan hangat.
-                  </p>
-                </div>
-
-                <div className="space-y-1 text-xs font-normal tracking-tight-bella border-t border-[#1b4332]/10 pt-2 text-[#142217]/80">
-                  <div className="flex justify-between">
-                    <span>Kemasan:</span>
-                    <strong className="text-[#142217]">5kg, 10kg, 25kg, 50kg</strong>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Derajat Sosoh:</span>
-                    <strong className="text-[#142217]">95% Harum &amp; Bersih</strong>
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-3 pt-2">
-                <div className="text-lg font-bold tracking-tight-bella text-[#1b4332]">
-                  Rp 14.500 <span className="text-xs font-normal text-[#142217]/60">/ kg</span>
-                </div>
-
-                <a
-                  href="https://www.instagram.com/berasbusur.id?rpxt=MW10dWI3aTFvMjZ2cA=="
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full bella-btn-pill py-2.5 text-xs text-center block hover:bg-[#e8f1eb]"
-                >
-                  Pesan via Instagram
-                </a>
-              </div>
-            </div>
-
-            {/* Card 4: Cap Betet Super Kepala */}
-            <div className="bella-card flex flex-col justify-between space-y-5 border border-[#1b4332]/10 hover:border-[#1b4332]/40 transition">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="bella-badge-sage text-[10px]">Pilihan Resto</span>
-                  <span className="text-[11px] font-bold tracking-tight-bella text-[#1b4332]/80">Super Kepala</span>
-                </div>
-
-                <div className="h-48 rounded-[8px] overflow-hidden bg-[#f4f0e6]">
-                  <img 
-                    src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80" 
-                    alt="Cap Betet Super Kepala" 
-                    className="w-full h-full object-cover hover:scale-105 transition duration-500"
-                  />
-                </div>
-
-                <div>
-                  <h3 className="text-base font-bold tracking-tight-bella text-[#142217]">Cap Betet Super Kepala</h3>
-                  <p className="text-xs font-normal tracking-tight-bella text-[#142217]/70 mt-1">
-                    Beras kepala pilihan rumah makan dan katering. Tekstur butir utuh padat pulen dan tidak mudah basi.
-                  </p>
-                </div>
-
-                <div className="space-y-1 text-xs font-normal tracking-tight-bella border-t border-[#1b4332]/10 pt-2 text-[#142217]/80">
-                  <div className="flex justify-between">
-                    <span>Kemasan:</span>
-                    <strong className="text-[#142217]">10kg, 20kg, 25kg, 50kg</strong>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Derajat Sosoh:</span>
-                    <strong className="text-[#142217]">90% Standar Kepala</strong>
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-3 pt-2">
-                <div className="text-lg font-bold tracking-tight-bella text-[#1b4332]">
-                  Rp 13.900 <span className="text-xs font-normal text-[#142217]/60">/ kg</span>
-                </div>
-
-                <a
-                  href="https://www.instagram.com/berasbusur.id?rpxt=MW10dWI3aTFvMjZ2cA=="
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full bella-btn-pill py-2.5 text-xs text-center block hover:bg-[#e8f1eb]"
-                >
-                  Pesan via Instagram
-                </a>
-              </div>
-            </div>
-
+            ))}
           </div>
 
         </section>
@@ -897,6 +839,15 @@ export const PortalScreen: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Rice Variant Settings Modal */}
+      <RiceVariantSettingsModal
+        isOpen={showVariantSettings}
+        onClose={() => setShowVariantSettings(false)}
+        variants={variants}
+        onSave={handleSaveVariants}
+        onReset={handleResetVariants}
+      />
 
     </div>
   );
