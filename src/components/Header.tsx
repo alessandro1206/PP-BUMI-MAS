@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { Shield, Scale, Smartphone, Building2, UserCheck, LogOut, FileText, BarChart3, Users, Package, Wallet, Receipt, Layers, Key, BookOpen } from 'lucide-react';
+import { Shield, Scale, Smartphone, Building2, UserCheck, LogOut, FileText, BarChart3, Users, Package, Wallet, Receipt, Layers, Key, BookOpen, Instagram } from 'lucide-react';
 import { LoginModal } from './LoginModal';
 import { AuditLogModal } from './AuditLogModal';
 import { InitialBalanceSetupModal } from './InitialBalanceSetupModal';
@@ -32,6 +32,114 @@ export const Header: React.FC = () => {
       setShowLoginModal(true);
     }
   };
+
+  if (activeScreen === 'SCREEN_5') {
+    return (
+      <>
+        <div className="pt-4 px-4 sm:px-6 max-w-[1200px] mx-auto w-full sticky top-0 z-50">
+          <header className="bg-[#ffffff] rounded-[12px] border border-[#000000]/10 h-16 sm:h-20 px-4 sm:px-6 flex items-center justify-between transition-all">
+            {/* Brand Mark */}
+            <div 
+              className="flex items-center space-x-3 cursor-pointer group"
+              onClick={() => {
+                if (currentUser) {
+                  setActiveScreen('SCREEN_WORKSTATIONS');
+                } else {
+                  setActiveScreen('SCREEN_5');
+                }
+              }}
+            >
+              <div className="w-9 h-9 rounded-full bg-[#f04923] flex items-center justify-center text-white font-bold text-xs tracking-tight-bella">
+                BM
+              </div>
+              <div>
+                <div className="flex items-center space-x-2">
+                  <span className="text-base sm:text-lg font-bold tracking-tight-bella text-[#000000]">
+                    PP BUMI MAS
+                  </span>
+                  <span className="text-[10px] font-bold uppercase bg-[#ebeadf] text-[#000000] px-2 py-0.5 rounded-full border border-[#000000]/15 tracking-tight-bella">
+                    BERAS BUSUR
+                  </span>
+                </div>
+                <p className="text-[11px] text-[#000000]/70 font-normal tracking-tight-bella">Pabrik &amp; Reprocessing Beras Banyuwangi</p>
+              </div>
+            </div>
+
+            {/* Navigation Category Links */}
+            <nav className="hidden lg:flex items-center space-x-6 text-sm font-normal text-[#000000] tracking-tight-bella">
+              <a href="#koleksi-beras" className="hover:text-[#f04923] transition">Koleksi Beras</a>
+              <a href="#tentang-busur" className="hover:text-[#f04923] transition">Tentang Kami</a>
+              <a href="#kilang-proses" className="hover:text-[#f04923] transition">Kilang &amp; Presisi</a>
+              <a href="#inspirasi-dapur" className="hover:text-[#f04923] transition">Inspirasi Dapur</a>
+              <a href="#pesan-grosir" className="hover:text-[#f04923] transition">Penawaran B2B</a>
+            </nav>
+
+            {/* Right Action Controls */}
+            <div className="flex items-center space-x-2 sm:space-x-3">
+              <a
+                href="https://www.instagram.com/berasbusur.id?rpxt=MW10dWI3aTFvMjZ2cA=="
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hidden sm:inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-full border border-[#000000]/15 hover:border-[#f04923] text-xs font-bold tracking-tight-bella text-[#000000] transition bg-[#ebeadf]/50 hover:bg-[#ebeadf]"
+                title="Instagram Resmi @berasbusur.id"
+              >
+                <Instagram className="w-3.5 h-3.5 text-[#f04923]" />
+                <span>@berasbusur.id</span>
+              </a>
+
+              {currentUser ? (
+                <>
+                  <button
+                    onClick={() => setActiveScreen('SCREEN_WORKSTATIONS')}
+                    className="px-4 py-2 rounded-full text-xs font-bold tracking-tight-bella bg-[#000000] text-white hover:bg-[#272735] transition flex items-center space-x-1.5"
+                  >
+                    <Building2 className="w-3.5 h-3.5" />
+                    <span>Stasiun Kerja</span>
+                  </button>
+                  <button
+                    onClick={logout}
+                    title={`Logout (${currentUser.name})`}
+                    className="p-2 rounded-full border border-rose-500/30 text-rose-600 hover:bg-rose-50 transition"
+                  >
+                    <LogOut className="w-3.5 h-3.5" />
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    onClick={() => setShowLoginModal(true)}
+                    className="px-4 py-2 rounded-full border border-[#000000] text-[#000000] hover:bg-[#ebeadf] text-xs font-bold tracking-tight-bella transition flex items-center space-x-1.5"
+                  >
+                    <Shield className="w-3.5 h-3.5 text-[#000000]" />
+                    <span>Login Staf Pabrik</span>
+                  </button>
+
+                  <a
+                    href="#pesan-grosir"
+                    className="bella-btn-coral text-xs py-2 px-4 sm:px-5 font-bold tracking-tight-bella inline-flex items-center space-x-1"
+                  >
+                    <span>Minta Penawaran</span>
+                  </a>
+                </>
+              )}
+            </div>
+          </header>
+        </div>
+
+        {showLoginModal && (
+          <LoginModal
+            targetRole={null}
+            onClose={() => setShowLoginModal(false)}
+            onSuccess={(roleToSet) => {
+              setShowLoginModal(false);
+              setRole(roleToSet);
+              setActiveScreen('SCREEN_WORKSTATIONS');
+            }}
+          />
+        )}
+      </>
+    );
+  }
 
   return (
     <>
@@ -118,7 +226,7 @@ export const Header: React.FC = () => {
                 </button>
               </div>
             ) : role === 'PORTAL' && !currentUser ? (
-              /* Mercury Centered Navigation Pill Links */
+              /* Centered Navigation Pill Links */
               <nav className="hidden lg:flex items-center space-x-1 text-sm font-normal text-[#ededf3]">
                 <a href="#our-grains" className="px-4 py-2 rounded-full hover:bg-[#272735] transition text-[#ededf3]">Our Grains</a>
                 <a href="#factory-process" className="px-4 py-2 rounded-full hover:bg-[#272735] transition text-[#ededf3]">Factory &amp; Process</a>
@@ -134,7 +242,7 @@ export const Header: React.FC = () => {
               </div>
             )}
 
-            {/* Right Side: Primary Cobalt Action & Ghost Controls */}
+            {/* Right Side: Primary Actions & User Controls */}
             <div className="flex items-center space-x-3">
               {currentUser ? (
                 <>
@@ -171,15 +279,15 @@ export const Header: React.FC = () => {
                   </button>
 
                   <a
-                    href="#quote"
+                    href="#pesan-grosir"
                     className="mercury-btn-cobalt text-xs px-5 py-2 font-normal flex items-center space-x-1.5"
                   >
-                    <span>Request a Quote</span>
+                    <span>Minta Penawaran</span>
                   </a>
                 </>
               )}
 
-              {currentUser ? (
+              {currentUser && (
                 <>
                   {currentUser.role === 'SUPER_ADMIN' && (
                     <button
@@ -250,14 +358,6 @@ export const Header: React.FC = () => {
                     <LogOut className="w-3.5 h-3.5" />
                   </button>
                 </>
-              ) : (
-                <button
-                  onClick={() => setShowLoginModal(true)}
-                  className="px-3 py-1.5 bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 font-semibold rounded-lg text-xs transition flex items-center space-x-1.5 border border-amber-500/30"
-                >
-                  <Shield className="w-3.5 h-3.5 text-amber-400" />
-                  <span>Login Staff</span>
-                </button>
               )}
             </div>
           </div>

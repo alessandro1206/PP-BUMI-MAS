@@ -7,6 +7,13 @@ export default {
   theme: {
     extend: {
       colors: {
+        bella: {
+          canvas: '#ebeadf',
+          surface: '#ffffff',
+          beige: '#d5cec0',
+          black: '#000000',
+          coral: '#f04923',
+        },
         mercury: {
           onyx: '#171721',
           graphite: '#1e1e2a',
@@ -29,14 +36,17 @@ export default {
           card: '#1e1e2a'
         }
       },
+      letterSpacing: {
+        'tight-bella': '-0.05em',
+      },
       fontFamily: {
         sans: ['Inter', '"Plus Jakarta Sans"', 'sans-serif'],
         display: ['Inter', '"Plus Jakarta Sans"', 'sans-serif'],
       },
       borderRadius: {
         'card': '12px',
-        'pill': '32px',
-        'pill-lg': '40px',
+        'pill': '999px',
+        'pill-lg': '999px',
       }
     },
   },

@@ -4,7 +4,14 @@
 
 @layer base {
   :root {
-    /* Mercury Tokens — Alpine banking at blue hour */
+    /* bella Tokens - Sunlit kitchen counter at golden hour */
+    --color-warm-canvas: #ebeadf;
+    --color-pristine-surface: #ffffff;
+    --color-sand-beige: #d5cec0;
+    --color-ink-black: #000000;
+    --color-coral-pulse: #f04923;
+
+    /* Mercury Tokens - Alpine banking at blue hour */
     --color-onyx-canvas: #171721;
     --color-graphite-card: #1e1e2a;
     --color-obsidian-button: #272735;
@@ -99,6 +106,67 @@
 }
 .mercury-btn-obsidian:hover {
   background-color: #323244;
+}
+
+/* bella Component Classes (Zero Drop Shadows, 12px Surfaces, 999px Pills, -0.05em Tracking) */
+.bella-card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.bella-btn-pill {
+  background-color: #ffffff;
+  color: #000000;
+  border: 1px solid #000000;
+  border-radius: 999px;
+  padding: 12px 24px;
+  font-weight: 700;
+  letter-spacing: -0.05em;
+  transition: all 0.2s ease;
+}
+.bella-btn-pill:hover {
+  background-color: #f5f4ec;
+}
+
+.bella-btn-coral {
+  background-color: #f04923;
+  color: #ffffff;
+  border: 1px solid #f04923;
+  border-radius: 999px;
+  padding: 12px 24px;
+  font-weight: 700;
+  letter-spacing: -0.05em;
+  transition: all 0.2s ease;
+}
+.bella-btn-coral:hover {
+  background-color: #dc3e19;
+}
+
+.bella-badge-coral {
+  background-color: #f04923;
+  color: #ffffff;
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: -0.05em;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+}
+
+.bella-badge-white {
+  background-color: #ffffff;
+  color: #000000;
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: -0.05em;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
 }
 
 .font-arcadia-display {
