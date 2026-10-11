@@ -108,7 +108,7 @@ export const SuperAdminAccountingScreen: React.FC = () => {
     // 3. Jurnal Penjualan dari Surat Jalan (Delivery Order)
     ...deliveryOrders.map((d) => ({
       id: `jrn-do-${d.id}`,
-      date: d.order_date.substring(0, 10),
+      date: (d.order_date || d.delivery_date || d.created_at || '').substring(0, 10),
       ref_no: d.do_number,
       description: `Penjualan Beras Surat Jalan ${d.do_number} (${d.customer_name})`,
       source_module: 'PENJUALAN_DO' as const,

@@ -30,8 +30,10 @@ import { SuperAdminAccountingScreen } from './components/SuperAdminAccountingScr
 
 import { Activity, Radio, Cpu, ShieldCheck } from 'lucide-react';
 
+import { ErrorBoundary } from './components/ErrorBoundary';
+
 const MainContent: React.FC = () => {
-  const { activeScreen, role, currentUser } = useApp();
+  const { activeScreen, setActiveScreen, role, currentUser } = useApp();
 
   const renderScreen = () => {
     switch (activeScreen) {
@@ -104,7 +106,9 @@ const MainContent: React.FC = () => {
 
       {/* Main Dynamic Workspace Area */}
       <main className={`flex-1 w-full ${activeScreen === 'SCREEN_5' ? 'p-0' : 'max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-6'}`}>
-        {renderScreen()}
+        <ErrorBoundary key={activeScreen} onReset={() => setActiveScreen('SCREEN_5')}>
+          {renderScreen()}
+        </ErrorBoundary>
       </main>
 
       {/* Professional Industrial Status Bar (Internal ERP screens only) */}

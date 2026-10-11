@@ -28,7 +28,7 @@ export interface JournalEntry {
   ref_no: string;
   description: string;
   items: JournalItem[];
-  source_module: 'TIMBANGAN_PEMBELIAN' | 'PRODUKSI_COR' | 'PENJUALAN_DO' | 'PENGELUARAN_BIAYA' | 'PELUNASAN_PIUTANG' | 'TRANSFER_HUTANG' | 'MANUAL_JURNAL';
+  source_module: 'TIMBANGAN_PEMBELIAN' | 'PRODUKSI_COR' | 'PENJUALAN_DO' | 'PENGELUARAN_BIAYA' | 'PELUNASAN_PIUTANG' | 'TRANSFER_HUTANG' | 'MANUAL_JURNAL' | 'PEMBAYARAN_HUTANG' | 'KAS_KECIL';
 }
 
 export interface InitialPayableItem {
@@ -151,7 +151,7 @@ export interface ExpenseTransaction {
   logged_by: string;
 }
 
-export type TransferStatus = 'PENDING_PRICE' | 'SCHEDULED_H1' | 'PAID_H_DAY';
+export type TransferStatus = 'PENDING_PRICE' | 'SCHEDULED_H1' | 'PAID_H_DAY' | 'PENDING_TRANSFER' | 'CONFIRMED';
 
 export interface StapelAllocationItem {
   stapel_id?: string;
@@ -178,9 +178,9 @@ export interface WeighbridgeIn {
   allocations: StapelAllocationItem[]; // Multi-Stapel / Direct Cor
   price_per_kg: number | null;
   total_payment: number | null;
-  transfer_plan_date: string | null;
+  transfer_plan_date?: string | null;
   transfer_status: TransferStatus;
-  transfer_proof_file: string | null;
+  transfer_proof_file?: string | null;
   status?: 'MASUK' | 'SELESAI';
 }
 
@@ -251,7 +251,7 @@ export interface TruckLoadTier {
   destination: string;
 }
 
-export type InvoicePaymentStatus = 'UNPAID' | 'TEMPO' | 'CICILAN' | 'PAID';
+export type InvoicePaymentStatus = 'UNPAID' | 'TEMPO' | 'CICILAN' | 'PAID' | 'BELUM_BAYAR' | 'LUNAS';
 
 export interface InvoicePaymentLog {
   id: string;
@@ -275,6 +275,7 @@ export interface SalesDeliveryOrder {
   id: string;
   do_number: string;
   invoice_number: string | null;
+  customer_id?: string;
   customer_name: string;
   brand_aka?: string; // Merek / AKA, contoh: "DM"
   expedition_info?: string; // e.g. "EXP. CARAVAN (P.MATHIAS), GD.DIPO CARAVAN..."
@@ -282,6 +283,7 @@ export interface SalesDeliveryOrder {
   customer_phone?: string; // e.g. "081 833 4998"
   origin_city?: string; // e.g. "Banyuwangi" or "Wonosobo"
   delivery_date?: string; // Tanggal Pengiriman / Kalender Rencana Kerja
+  order_date?: string;
   notes?: string;
   items: SalesDeliveryOrderItem[];
   product_name: string; // Summary string e.g. "Pandan (1k, 5k, 10k), Cap Putri Thailand..."
@@ -292,7 +294,7 @@ export interface SalesDeliveryOrder {
   remaining_balance?: number; // Sisa piutang yang belum lunas
   payment_logs?: InvoicePaymentLog[]; // History cicilan pembayaran
   payment_status: InvoicePaymentStatus;
-  status?: 'RENCANA_JADWAL' | 'DI_MUAT_TRUK' | 'TERKIRIM';
+  status?: 'RENCANA_JADWAL' | 'DI_MUAT_TRUK' | 'TERKIRIM' | 'SHIPPED';
   parent_po_id?: string; // ID PO Induk jika 1 PO di-split ke beberapa truk
   truck_capacity_ton?: number; // e.g. 12, 13, 25
   created_at: string;
@@ -308,8 +310,11 @@ export interface PettyCashTransaction {
   amount: number;
   source_destination: string;
   recipient_payer: string;
+  recipient_or_source?: string;
   description: string;
   quick_tag: QuickTag;
+  category?: string;
+  logged_by?: string;
 }
 
 export interface StapelPile {
@@ -317,4 +322,6 @@ export interface StapelPile {
   name: string;
   stock_kg: number;
   quality_grade: string;
+  current_stock_kg?: number;
+  created_at?: string;
 }

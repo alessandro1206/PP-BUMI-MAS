@@ -277,8 +277,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       { id: 'prod-2', code: 'BRS-5X5', name: 'Beras Premium Cap Putri @(5x5) KG', unit: 'SAK', weight_per_unit: 25, empty_bag_stock: 800, finished_goods_stock_kg: 7500, base_price_per_kg: 14300, packaging_config: '@(5x5)', inner_qty: 5, inner_weight_kg: 5 }
     ]);
     setStapelPiles([
-      { id: 'stapel-1', name: 'Stapel 1 - Gudang Utama', quality_grade: 'Standar Pabrik', current_stock_kg: 25000, created_at: new Date().toISOString() },
-      { id: 'stapel-2', name: 'Stapel 2 - Area Reprocessing', quality_grade: 'Super Fine', current_stock_kg: 18000, created_at: new Date().toISOString() }
+      { id: 'stapel-1', name: 'Stapel 1 - Gudang Utama', quality_grade: 'Standar Pabrik', stock_kg: 25000, current_stock_kg: 25000, created_at: new Date().toISOString() },
+      { id: 'stapel-2', name: 'Stapel 2 - Area Reprocessing', quality_grade: 'Super Fine', stock_kg: 18000, current_stock_kg: 18000, created_at: new Date().toISOString() }
     ]);
     setSakItems([
       { id: 'sak-1', name: 'Karung Sak 50kg Outer Polos', sak_type: 'OUTER', unit: 'PCS', stock_current: 1200 },
@@ -294,10 +294,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         id: `pc-init-${Date.now()}`,
         transaction_time: new Date().toISOString().replace('T', ' ').substring(0, 16),
         type: 'KAS_MASUK',
-        category: 'TARIK_BCA',
         amount: kasAmount,
+        source_destination: 'Bank BCA Utama',
+        recipient_payer: 'Owner',
         recipient_or_source: 'Setoran Saldo Awal Brankas',
         description: 'Setoran Saldo Awal Kas Brankas Kantor',
+        quick_tag: 'TARIK_BCA',
+        category: 'TARIK_BCA',
         logged_by: currentUser?.username || 'owner'
       }
     ]);
@@ -313,10 +316,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           id: `pc-init-${Date.now()}`,
           transaction_time: new Date().toISOString().replace('T', ' ').substring(0, 16),
           type: 'KAS_MASUK',
-          category: 'TARIK_BCA',
           amount: setupData.kas_balance,
+          source_destination: 'Bank BCA Utama',
+          recipient_payer: 'Owner',
           recipient_or_source: 'Setoran Saldo Awal Brankas',
           description: 'Setoran Saldo Awal Kas Brankas Kantor',
+          quick_tag: 'TARIK_BCA',
+          category: 'TARIK_BCA',
           logged_by: currentUser?.username || 'owner'
         }
       ]);
@@ -394,6 +400,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         customer_name: existingCust.name,
         brand_aka: r.brand_aka || existingCust.brand_aka || 'BUMI SUBUR',
         items: [],
+        product_name: 'Beras Premium (Saldo Awal)',
+        total_kg: 0,
+        selling_price_per_kg: 0,
         total_invoice_amount: r.amount,
         payment_status: 'BELUM_BAYAR',
         status: 'SHIPPED',
@@ -409,7 +418,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     // 4. Initial Stock Beras & Sak
     if (setupData.stapel_stock_kg > 0) {
       setStapelPiles([
-        { id: 'stapel-init-1', name: 'Stapel 1 (Gudang Utama - Saldo Awal)', quality_grade: 'Standar Pabrik', current_stock_kg: setupData.stapel_stock_kg, created_at: new Date().toISOString() }
+        { id: 'stapel-init-1', name: 'Stapel 1 (Gudang Utama - Saldo Awal)', quality_grade: 'Standar Pabrik', stock_kg: setupData.stapel_stock_kg, current_stock_kg: setupData.stapel_stock_kg, created_at: new Date().toISOString() }
       ]);
     }
     if (setupData.sak_stock_pcs > 0) {

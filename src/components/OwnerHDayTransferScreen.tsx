@@ -174,7 +174,7 @@ export const OwnerHDayTransferScreen: React.FC = () => {
                     </div>
                     {pt.transfer_proof_file && (
                       <button
-                        onClick={() => setViewingProof(pt.transfer_proof_file)}
+                        onClick={() => setViewingProof(pt.transfer_proof_file || null)}
                         className="text-[11px] text-[#10b981] font-bold hover:underline flex items-center space-x-1 pt-1"
                       >
                         <Eye className="w-3.5 h-3.5" />

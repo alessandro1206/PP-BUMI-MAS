@@ -1,4 +1,4 @@
-﻿import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { ArrowLeft, Smartphone, Truck, Package, CheckCircle2, ClipboardList, AlertTriangle } from 'lucide-react';
 
@@ -35,7 +35,7 @@ export const Admin2CorPlanScreen: React.FC = () => {
         totalKg += kg;
       });
     });
-    return { ...g, total: totalKg };
+    return { A: g.A || 0, B: g.B || 0, C: g.C || 0, total: totalKg };
   }, [todayDOs, products]);
 
   // Kebutuhan sak auto-calculated

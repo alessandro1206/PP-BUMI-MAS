@@ -91,6 +91,47 @@ export const Admin1WeighbridgeScreen: React.FC = () => {
   ]);
   const [localBridgeInterval, setLocalBridgeInterval] = useState<any | null>(null);
 
+  // CCTV Scanning State
+  const [isScanningCctv, setIsScanningCctv] = useState<boolean>(false);
+  const [cctvError, setCctvError] = useState<string | null>(null);
+
+  // Form State
+  const [nopol, setNopol] = useState<string>('');
+  const [customerName, setCustomerName] = useState<string>('');
+  const [goods, setGoods] = useState<string>('Beras Medium');
+  const [sacks, setSacks] = useState<string>('');
+  const [supplierId, setSupplierId] = useState<string>(suppliers[0]?.id || '');
+  const [selectedTruckForTare, setSelectedTruckForTare] = useState<any | null>(null);
+
+  // Optional warehouse stapel allocation
+  const [showStapelAlloc, setShowStapelAlloc] = useState<boolean>(false);
+  const [allocations, setAllocations] = useState<StapelAllocationItem[]>([
+    { stapel_id: stapelPiles[0]?.id, stapel_name: stapelPiles[0]?.name || 'Stapel 1', is_direct_cor: false, allocated_kg: 0 }
+  ]);
+
+  // Customer Panel State (Search & Add)
+  const [custFilter, setCustFilter] = useState<string>('');
+  const [newCustInput, setNewCustInput] = useState<string>('');
+
+  // Queue Panel State (Search)
+  const [plateFilter, setPlateFilter] = useState<string>('');
+
+  // Ticket History Modal & Print Slip State
+  const [showHistoryModal, setShowHistoryModal] = useState<boolean>(false);
+  const [historySearch, setHistorySearch] = useState<string>('');
+  const [printTicket, setPrintTicket] = useState<any | null>(null);
+  const [isReprint, setIsReprint] = useState<boolean>(false);
+
+  // Activity Log Messages
+  const [activityLogs, setActivityLogs] = useState<Array<{ time: string; msg: string; type: 'info' | 'success' | 'warn' }>>([
+    { time: new Date().toLocaleTimeString('id-ID'), msg: 'Sistem Timbangan Digital PT. BUMI MAS siap.', type: 'info' }
+  ]);
+
+  const addLog = (msg: string, type: 'info' | 'success' | 'warn' = 'info') => {
+    const time = new Date().toLocaleTimeString('id-ID');
+    setActivityLogs(prev => [{ time, msg, type }, ...prev.slice(0, 30)]);
+  };
+
   // Auto-scan COM ports and initialize Electron SerialPort listener on mount
   useEffect(() => {
     const electron = (window as any).electron || (window as any).electronAPI;
@@ -549,9 +590,12 @@ export const Admin1WeighbridgeScreen: React.FC = () => {
 
     addCustomer({
       name,
+      contact_person: name,
       credit_limit: 100000000,
-      payment_terms_days: 14,
-      phone: ''
+      payment_term: 'TEMPO_14_HARI',
+      phone: '',
+      address: 'Banyuwangi',
+      status: 'AKTIF'
     });
     setNewCustInput('');
     setCustomerName(name);
@@ -598,9 +642,12 @@ export const Admin1WeighbridgeScreen: React.FC = () => {
     if (custVal && !customers.some(c => c.name.toLowerCase() === custVal.toLowerCase())) {
       addCustomer({
         name: custVal,
+        contact_person: custVal,
         credit_limit: 50000000,
-        payment_terms_days: 14,
-        phone: ''
+        payment_term: 'TEMPO_14_HARI',
+        phone: '',
+        address: 'Banyuwangi',
+        status: 'AKTIF'
       });
     }
 
