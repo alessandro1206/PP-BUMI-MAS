@@ -26,6 +26,65 @@ import {
   RiceVariant 
 } from './RiceVariantSettingsModal';
 
+// Logo Resmi Kementerian Pertanian (Padi dan Kapas)
+export const KementanLogo: React.FC<{ className?: string }> = ({ className = "w-5 h-5" }) => (
+  <svg 
+    viewBox="0 0 100 100" 
+    fill="none" 
+    xmlns="http://www.w3.org/2000/svg" 
+    className={className}
+    role="img"
+    aria-label="Logo Kementerian Pertanian RI (Padi dan Kapas)"
+  >
+    {/* Lingkaran Luar Hijau Kementan & Lis Emas */}
+    <circle cx="50" cy="50" r="48" fill="#1b4332" stroke="#d4af37" strokeWidth="2.5" />
+    <circle cx="50" cy="50" r="44" fill="#0f291e" stroke="#fbbf24" strokeWidth="1" strokeDasharray="2.5 2" />
+
+    {/* Tangkai Padi Kiri (Kuning Keemasan) */}
+    <path d="M 50,82 C 38,76 28,64 27,48 C 26,35 34,24 45,18" stroke="#f59e0b" strokeWidth="2.2" strokeLinecap="round" fill="none" />
+    {/* Butir-Butir Bulir Padi Kiri */}
+    <ellipse cx="44" cy="20" rx="3.2" ry="5.5" transform="rotate(-30 44 20)" fill="#fbbf24" stroke="#b45309" strokeWidth="0.8" />
+    <ellipse cx="38" cy="26" rx="3.2" ry="5.8" transform="rotate(-42 38 26)" fill="#fbbf24" stroke="#b45309" strokeWidth="0.8" />
+    <ellipse cx="32" cy="33" rx="3.2" ry="6" transform="rotate(-54 32 33)" fill="#fbbf24" stroke="#b45309" strokeWidth="0.8" />
+    <ellipse cx="28" cy="42" rx="3.2" ry="6" transform="rotate(-68 28 42)" fill="#fbbf24" stroke="#b45309" strokeWidth="0.8" />
+    <ellipse cx="27" cy="51" rx="3.2" ry="6" transform="rotate(-82 27 51)" fill="#fbbf24" stroke="#b45309" strokeWidth="0.8" />
+    <ellipse cx="29" cy="60" rx="3.2" ry="5.8" transform="rotate(-98 29 60)" fill="#fbbf24" stroke="#b45309" strokeWidth="0.8" />
+    <ellipse cx="34" cy="69" rx="3.2" ry="5.5" transform="rotate(-114 34 69)" fill="#fbbf24" stroke="#b45309" strokeWidth="0.8" />
+    <ellipse cx="42" cy="76" rx="3.2" ry="5" transform="rotate(-130 42 76)" fill="#fbbf24" stroke="#b45309" strokeWidth="0.8" />
+
+    {/* Tangkai Kapas Kanan (Hijau & Bunga Kapas Putih) */}
+    <path d="M 50,82 C 62,76 72,64 73,48 C 74,35 66,24 55,18" stroke="#16a34a" strokeWidth="2.2" strokeLinecap="round" fill="none" />
+    {/* Kuntum Bunga Kapas Kanan */}
+    <circle cx="56" cy="20" r="4.2" fill="#ffffff" stroke="#15803d" strokeWidth="1" />
+    <path d="M 52.5,22 Q 56,25.5 59.5,22" fill="#15803d" />
+    <circle cx="63" cy="27" r="4.6" fill="#ffffff" stroke="#15803d" strokeWidth="1" />
+    <path d="M 59.5,29.5 Q 63,33.5 66.5,29.5" fill="#15803d" />
+    <circle cx="70" cy="37" r="5" fill="#ffffff" stroke="#15803d" strokeWidth="1" />
+    <path d="M 66,40.5 Q 70,44.5 74,40.5" fill="#15803d" />
+    <circle cx="72" cy="49" r="5" fill="#ffffff" stroke="#15803d" strokeWidth="1" />
+    <path d="M 68,52.5 Q 72,56.5 76,52.5" fill="#15803d" />
+    <circle cx="69" cy="61" r="4.8" fill="#ffffff" stroke="#15803d" strokeWidth="1" />
+    <path d="M 65,64 Q 69,67.5 73,64" fill="#15803d" />
+    <circle cx="60" cy="71" r="4.4" fill="#ffffff" stroke="#15803d" strokeWidth="1" />
+    <path d="M 56.5,73.5 Q 60,77 63.5,73.5" fill="#15803d" />
+
+    {/* Pita Pengikat Merah Emas di Bawah */}
+    <path d="M 41,80 Q 50,86 59,80 Q 50,84 41,80 Z" fill="#dc2626" stroke="#fbbf24" strokeWidth="0.8" />
+    <circle cx="50" cy="82" r="2.8" fill="#fbbf24" stroke="#d97706" strokeWidth="0.5" />
+    <path d="M 43,83 L 38,89 L 44,87 Z" fill="#dc2626" />
+    <path d="M 57,83 L 62,89 L 56,87 Z" fill="#dc2626" />
+
+    {/* Bintang Emas di Puncak Logo */}
+    <polygon points="50,20 51.8,24.8 56.8,24.8 52.8,27.8 54.4,32.4 50,29.5 45.6,32.4 47.2,27.8 43.2,24.8 48.2,24.8" fill="#fbbf24" stroke="#b45309" strokeWidth="0.5" />
+
+    {/* Lambang Daun Tunas Pertanian Hijau Emas di Bagian Tengah */}
+    <path d="M 50,33 C 44,42 42,54 50,68 C 58,54 56,42 50,33 Z" fill="#22c55e" stroke="#fbbf24" strokeWidth="1" />
+    <path d="M 50,37 L 50,66" stroke="#fbbf24" strokeWidth="1" />
+    <path d="M 45,49 Q 50,46 55,49" stroke="#fbbf24" strokeWidth="0.9" fill="none" />
+    <path d="M 44,56 Q 50,53 56,56" stroke="#fbbf24" strokeWidth="0.9" fill="none" />
+  </svg>
+);
+
 export const PortalScreen: React.FC = () => {
   const { setRole, setActiveScreen, currentUser, setShowLoginModal } = useApp();
   const [quoteModalOpen, setQuoteModalOpen] = useState(false);
@@ -250,9 +309,9 @@ export const PortalScreen: React.FC = () => {
             </div>
 
             <div className="space-y-1">
-              <div className="text-lg sm:text-xl font-bold tracking-tight-bella text-[#1b4332]">Maks 14%</div>
-              <div className="text-xs font-bold tracking-tight-bella text-[#142217]">Kadar Air SNI</div>
-              <div className="text-[11px] font-normal tracking-tight-bella text-[#142217]/70">Tahan simpan &amp; segar</div>
+              <div className="text-sm sm:text-base font-bold tracking-tight-bella text-[#1b4332]">Permentan 22/2025</div>
+              <div className="text-xs font-bold tracking-tight-bella text-[#142217]">Standar Mutu Beras</div>
+              <div className="text-[11px] font-normal tracking-tight-bella text-[#142217]/70">Kadar air maks 14% &amp; SNI</div>
             </div>
 
             <div className="col-span-2 md:col-span-1 space-y-1">
@@ -682,17 +741,18 @@ export const PortalScreen: React.FC = () => {
                   <span>Ikuti Akun Resmi @berasbusur.id</span>
                 </a>
               </div>
-              <div className="pt-2 flex flex-wrap gap-1.5">
-                <span className="text-[10px] font-bold bg-[#e8f1eb] text-[#1b4332] px-2 py-0.5 rounded-full border border-[#1b4332]/20">
-                  Standar Mutu SNI
+              <div className="pt-2.5 flex flex-wrap gap-2 items-center">
+                <div className="inline-flex items-center space-x-1.5 bg-[#e8f1eb] text-[#1b4332] px-2.5 py-1 rounded-full border border-[#1b4332]/25 text-[11px] font-bold shadow-xs">
+                  <KementanLogo className="w-4 h-4 shrink-0" />
+                  <span>Izin Edar Kementan (Padi &amp; Kapas)</span>
+                </div>
+                <span className="text-[11px] font-bold bg-[#e8f1eb] text-[#1b4332] px-2.5 py-1 rounded-full border border-[#1b4332]/25 shadow-xs">
+                  Standar Mutu Permentan No. 22/2025
                 </span>
-                <span className="text-[10px] font-bold bg-[#e8f1eb] text-[#1b4332] px-2 py-0.5 rounded-full border border-[#1b4332]/20">
+                <span className="text-[11px] font-bold bg-[#e8f1eb] text-[#1b4332] px-2.5 py-1 rounded-full border border-[#1b4332]/25 shadow-xs">
                   Sertifikat Halal
                 </span>
-                <span className="text-[10px] font-bold bg-[#e8f1eb] text-[#1b4332] px-2 py-0.5 rounded-full border border-[#1b4332]/20">
-                  Izin Edar Kementan
-                </span>
-                <span className="text-[10px] font-bold bg-[#e8f1eb] text-[#1b4332] px-2 py-0.5 rounded-full border border-[#1b4332]/20">
+                <span className="text-[11px] font-bold bg-[#e8f1eb] text-[#1b4332] px-2.5 py-1 rounded-full border border-[#1b4332]/25 shadow-xs">
                   Merek Terdaftar
                 </span>
               </div>
@@ -745,14 +805,17 @@ export const PortalScreen: React.FC = () => {
             <div>
               &copy; {new Date().getFullYear()} PP BUMI MAS • Beras Busur. Hak Cipta Dilindungi Undang-Undang.
             </div>
-            <div className="flex flex-wrap items-center justify-center sm:justify-end gap-x-3 gap-y-1">
+            <div className="flex flex-wrap items-center justify-center sm:justify-end gap-x-3 gap-y-1.5">
               <span>Banyuwangi, Jawa Timur</span>
               <span>•</span>
-              <span>Standar Mutu SNI</span>
+              <div className="inline-flex items-center space-x-1 font-bold text-[#1b4332]">
+                <KementanLogo className="w-3.5 h-3.5 shrink-0" />
+                <span>Izin Edar Kementan RI</span>
+              </div>
+              <span>•</span>
+              <span>Standar Mutu Permentan No. 22 Tahun 2025</span>
               <span>•</span>
               <span>Sertifikat Halal</span>
-              <span>•</span>
-              <span>Izin Edar Kementan</span>
               <span>•</span>
               <span>Merek Terdaftar</span>
             </div>
