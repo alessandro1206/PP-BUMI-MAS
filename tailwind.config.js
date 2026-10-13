@@ -37,7 +37,7 @@ export default {
         }
       },
       letterSpacing: {
-        'tight-bella': '-0.05em',
+        'tight-bella': '-0.02em',
       },
       fontFamily: {
         sans: ['Inter', '"Plus Jakarta Sans"', 'sans-serif'],

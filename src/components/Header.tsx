@@ -499,7 +499,7 @@ export const Header: React.FC = () => {
       {(role === 'OWNER' || currentUser?.role === 'OWNER') && (
         <div className="bg-slate-900/95 border-b border-slate-800/80 text-xs py-1.5 shadow-inner">
           <div className="max-w-7xl mx-auto px-4 flex flex-wrap items-center justify-between gap-2">
-            <div className="flex items-center space-x-1.5 font-medium overflow-x-auto py-1">
+            <div className="flex items-center space-x-1.5 font-medium overflow-x-auto py-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
               <span className="text-amber-400 font-bold uppercase text-[11px] mr-2 flex items-center space-x-1 shrink-0 font-mono">
                 <Shield className="w-3.5 h-3.5 text-amber-400" />
                 <span>Navigasi Owner:</span>
@@ -593,7 +593,7 @@ export const Header: React.FC = () => {
       {(role === 'ADMIN1' || currentUser?.role === 'ADMIN1') && (
         <div className="bg-slate-900/95 border-b border-slate-800/80 text-xs py-1.5 shadow-inner">
           <div className="max-w-7xl mx-auto px-4 flex flex-wrap items-center justify-between gap-2">
-            <div className="flex items-center space-x-1 font-medium overflow-x-auto py-1">
+            <div className="flex items-center space-x-1 font-medium overflow-x-auto py-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
               <span className="text-emerald-400 font-bold uppercase text-[11px] mr-2 flex items-center space-x-1 shrink-0 font-mono">
                 <Scale className="w-3.5 h-3.5 text-emerald-400" />
                 <span>Tugas Admin 1:</span>

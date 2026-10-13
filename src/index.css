@@ -125,7 +125,7 @@
   border-radius: 999px;
   padding: 12px 24px;
   font-weight: 700;
-  letter-spacing: -0.05em;
+  letter-spacing: -0.02em;
   transition: all 0.2s ease;
 }
 .bella-btn-pill:hover {
@@ -139,7 +139,7 @@
   border-radius: 999px;
   padding: 12px 24px;
   font-weight: 700;
-  letter-spacing: -0.05em;
+  letter-spacing: -0.02em;
   transition: all 0.2s ease;
 }
 .bella-btn-coral:hover, .bella-btn-green:hover {
@@ -154,7 +154,7 @@
   padding: 6px 14px;
   font-size: 12px;
   font-weight: 700;
-  letter-spacing: -0.05em;
+  letter-spacing: -0.02em;
   text-transform: uppercase;
   display: inline-flex;
   align-items: center;
@@ -168,7 +168,7 @@
   padding: 6px 14px;
   font-size: 12px;
   font-weight: 700;
-  letter-spacing: -0.05em;
+  letter-spacing: -0.02em;
   text-transform: uppercase;
   display: inline-flex;
   align-items: center;
@@ -182,7 +182,7 @@
   padding: 6px 14px;
   font-size: 12px;
   font-weight: 700;
-  letter-spacing: -0.05em;
+  letter-spacing: -0.02em;
   text-transform: uppercase;
   display: inline-flex;
   align-items: center;

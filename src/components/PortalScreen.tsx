@@ -290,32 +290,32 @@ export const PortalScreen: React.FC = () => {
         <section className="bg-[#ffffff] rounded-[12px] p-6 sm:p-8 border border-[#1b4332]/10">
           <div className="grid grid-cols-2 md:grid-cols-5 gap-6 text-center">
             
-            <div className="space-y-1">
-              <div className="text-lg sm:text-xl font-bold tracking-tight-bella text-[#1b4332]">0%</div>
+            <div className="space-y-1 md:border-r md:border-[#1b4332]/10 md:pr-4">
+              <div className="text-xl sm:text-2xl font-bold tracking-tight-bella text-[#1b4332]">0%</div>
               <div className="text-xs font-bold tracking-tight-bella text-[#142217]">Tanpa Pemutih</div>
-              <div className="text-[11px] font-normal tracking-tight-bella text-[#142217]/70">Warna putih kristal alami</div>
+              <div className="text-[11px] font-normal tracking-tight-bella text-[#142217]/70">Warna kristal alami</div>
             </div>
 
-            <div className="space-y-1">
-              <div className="text-lg sm:text-xl font-bold tracking-tight-bella text-[#1b4332]">100%</div>
+            <div className="space-y-1 md:border-r md:border-[#1b4332]/10 md:pr-4">
+              <div className="text-xl sm:text-2xl font-bold tracking-tight-bella text-[#1b4332]">100%</div>
               <div className="text-xs font-bold tracking-tight-bella text-[#142217]">Padi Banyuwangi</div>
-              <div className="text-[11px] font-normal tracking-tight-bella text-[#142217]/70">Tanah vulkanik kaki Ijen</div>
+              <div className="text-[11px] font-normal tracking-tight-bella text-[#142217]/70">Tanah vulkanik Ijen</div>
             </div>
 
-            <div className="space-y-1">
-              <div className="text-lg sm:text-xl font-bold tracking-tight-bella text-[#1b4332]">CCD Optik</div>
+            <div className="space-y-1 md:border-r md:border-[#1b4332]/10 md:pr-4">
+              <div className="text-xl sm:text-2xl font-bold tracking-tight-bella text-[#1b4332]">CCD Optik</div>
               <div className="text-xs font-bold tracking-tight-bella text-[#142217]">Optical Color Sorter</div>
               <div className="text-[11px] font-normal tracking-tight-bella text-[#142217]/70">Sortir bulir kuning &amp; rijek</div>
             </div>
 
-            <div className="space-y-1">
-              <div className="text-sm sm:text-base font-bold tracking-tight-bella text-[#1b4332]">Permentan 22/2025</div>
-              <div className="text-xs font-bold tracking-tight-bella text-[#142217]">Standar Mutu Beras</div>
-              <div className="text-[11px] font-normal tracking-tight-bella text-[#142217]/70">Kadar air maks 14% &amp; SNI</div>
+            <div className="space-y-1 md:border-r md:border-[#1b4332]/10 md:pr-4">
+              <div className="text-xl sm:text-2xl font-bold tracking-tight-bella text-[#1b4332]">Maks 14%</div>
+              <div className="text-xs font-bold tracking-tight-bella text-[#142217]">Permentan 22/2025</div>
+              <div className="text-[11px] font-normal tracking-tight-bella text-[#142217]/70">Standar mutu SNI resmi</div>
             </div>
 
             <div className="col-span-2 md:col-span-1 space-y-1">
-              <div className="text-lg sm:text-xl font-bold tracking-tight-bella text-[#1b4332]">Legal Tera</div>
+              <div className="text-xl sm:text-2xl font-bold tracking-tight-bella text-[#1b4332]">Legal Tera</div>
               <div className="text-xs font-bold tracking-tight-bella text-[#142217]">Metrologi Presisi</div>
               <div className="text-[11px] font-normal tracking-tight-bella text-[#142217]/70">Bobot timbangan akurat</div>
             </div>
@@ -741,20 +741,25 @@ export const PortalScreen: React.FC = () => {
                   <span>Ikuti Akun Resmi @berasbusur.id</span>
                 </a>
               </div>
-              <div className="pt-2.5 flex flex-wrap gap-2 items-center">
-                <div className="inline-flex items-center space-x-1.5 bg-[#e8f1eb] text-[#1b4332] px-2.5 py-1 rounded-full border border-[#1b4332]/25 text-[11px] font-bold shadow-xs">
-                  <KementanLogo className="w-4 h-4 shrink-0" />
-                  <span>Izin Edar Kementan (Padi &amp; Kapas)</span>
+              <div className="pt-2 space-y-2">
+                <div className="text-[10px] font-bold uppercase tracking-wider text-[#142217]/60">
+                  Sertifikasi &amp; Legalitas Resmi
                 </div>
-                <span className="text-[11px] font-bold bg-[#e8f1eb] text-[#1b4332] px-2.5 py-1 rounded-full border border-[#1b4332]/25 shadow-xs">
-                  Standar Mutu Permentan No. 22/2025
-                </span>
-                <span className="text-[11px] font-bold bg-[#e8f1eb] text-[#1b4332] px-2.5 py-1 rounded-full border border-[#1b4332]/25 shadow-xs">
-                  Sertifikat Halal
-                </span>
-                <span className="text-[11px] font-bold bg-[#e8f1eb] text-[#1b4332] px-2.5 py-1 rounded-full border border-[#1b4332]/25 shadow-xs">
-                  Merek Terdaftar
-                </span>
+                <div className="flex flex-wrap gap-2 items-center">
+                  <div className="inline-flex items-center space-x-1.5 bg-[#e8f1eb] text-[#1b4332] px-2.5 py-1 rounded-full border border-[#1b4332]/25 text-[11px] font-bold shadow-xs">
+                    <KementanLogo className="w-4 h-4 shrink-0" />
+                    <span>Izin Edar Kementan RI</span>
+                  </div>
+                  <span className="text-[11px] font-bold bg-[#e8f1eb] text-[#1b4332] px-2.5 py-1 rounded-full border border-[#1b4332]/25 shadow-xs">
+                    Permentan No. 22/2025
+                  </span>
+                  <span className="text-[11px] font-bold bg-[#e8f1eb] text-[#1b4332] px-2.5 py-1 rounded-full border border-[#1b4332]/25 shadow-xs">
+                    Sertifikat Halal
+                  </span>
+                  <span className="text-[11px] font-bold bg-[#e8f1eb] text-[#1b4332] px-2.5 py-1 rounded-full border border-[#1b4332]/25 shadow-xs">
+                    Merek Terdaftar
+                  </span>
+                </div>
               </div>
             </div>
 
@@ -805,19 +810,10 @@ export const PortalScreen: React.FC = () => {
             <div>
               &copy; {new Date().getFullYear()} PP BUMI MAS • Beras Busur. Hak Cipta Dilindungi Undang-Undang.
             </div>
-            <div className="flex flex-wrap items-center justify-center sm:justify-end gap-x-3 gap-y-1.5">
-              <span>Banyuwangi, Jawa Timur</span>
+            <div className="flex items-center space-x-2 text-[#142217]/60">
+              <span>Wonosobo, Srono, Banyuwangi</span>
               <span>•</span>
-              <div className="inline-flex items-center space-x-1 font-bold text-[#1b4332]">
-                <KementanLogo className="w-3.5 h-3.5 shrink-0" />
-                <span>Izin Edar Kementan RI</span>
-              </div>
-              <span>•</span>
-              <span>Standar Mutu Permentan No. 22 Tahun 2025</span>
-              <span>•</span>
-              <span>Sertifikat Halal</span>
-              <span>•</span>
-              <span>Merek Terdaftar</span>
+              <span>Jawa Timur, Indonesia</span>
             </div>
           </div>
         </footer>
