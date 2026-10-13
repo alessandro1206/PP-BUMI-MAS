@@ -263,7 +263,7 @@ export const Header: React.FC = () => {
 
   return (
     <>
-      <header className="bg-[#171721]/80 backdrop-blur-xl text-[#ededf3] sticky top-0 z-50 border-b border-[#70707d]/20 transition-all">
+      <header className="bg-[#12121a]/70 backdrop-blur-2xl text-[#ededf3] sticky top-0 z-50 border-b border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.1)] transition-all">
         <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between h-16 sm:h-20">
             {/* Mercury Concentric Ring Logo & Brand Mark */}
@@ -497,7 +497,7 @@ export const Header: React.FC = () => {
 
       {/* OWNER Dedicated Duty Sub-Navigation Menu Bar */}
       {(role === 'OWNER' || currentUser?.role === 'OWNER') && (
-        <div className="bg-slate-900/95 border-b border-slate-800/80 text-xs py-1.5 shadow-inner">
+        <div className="bg-[#12121a]/75 backdrop-blur-xl border-b border-white/10 text-xs py-1.5 shadow-inner">
           <div className="max-w-7xl mx-auto px-4 flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center space-x-1.5 font-medium overflow-x-auto py-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
               <span className="text-amber-400 font-bold uppercase text-[11px] mr-2 flex items-center space-x-1 shrink-0 font-mono">
@@ -591,7 +591,7 @@ export const Header: React.FC = () => {
 
       {/* Admin 1 Dedicated Duty Sub-Navigation Menu Bar */}
       {(role === 'ADMIN1' || currentUser?.role === 'ADMIN1') && (
-        <div className="bg-slate-900/95 border-b border-slate-800/80 text-xs py-1.5 shadow-inner">
+        <div className="bg-[#12121a]/75 backdrop-blur-xl border-b border-white/10 text-xs py-1.5 shadow-inner">
           <div className="max-w-7xl mx-auto px-4 flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center space-x-1 font-medium overflow-x-auto py-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
               <span className="text-emerald-400 font-bold uppercase text-[11px] mr-2 flex items-center space-x-1 shrink-0 font-mono">
