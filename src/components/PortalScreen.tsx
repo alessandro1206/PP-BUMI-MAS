@@ -6,6 +6,7 @@ import {
   Instagram, 
   MessageCircle, 
   ShieldCheck, 
+  Shield,
   Sparkles, 
   Truck, 
   Award, 
@@ -26,7 +27,7 @@ import {
 } from './RiceVariantSettingsModal';
 
 export const PortalScreen: React.FC = () => {
-  const { setRole, setActiveScreen, currentUser } = useApp();
+  const { setRole, setActiveScreen, currentUser, setShowLoginModal } = useApp();
   const [quoteModalOpen, setQuoteModalOpen] = useState(false);
   const [quoteSubmitted, setQuoteSubmitted] = useState(false);
   const [showVariantSettings, setShowVariantSettings] = useState(false);
@@ -150,10 +151,10 @@ export const PortalScreen: React.FC = () => {
                 Dipetik dari tanah vulkanik subur kaki Gunung Ijen dan diproses langsung di kilang modern PP Bumi Mas. Menghadirkan sajian nasi hangat dan harum alami untuk meja makan keluarga Anda.
               </p>
 
-              <div className="pt-2 flex flex-wrap items-center gap-3">
+              <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                 <a
                   href="#koleksi-beras"
-                  className="bella-btn-pill inline-flex items-center space-x-2 text-xs sm:text-sm py-3 px-6 hover:bg-[#e8f1eb]"
+                  className="bella-btn-pill inline-flex items-center justify-center space-x-2 text-xs sm:text-sm py-3 px-6 hover:bg-[#e8f1eb]"
                 >
                   <span>Jelajahi Koleksi Beras</span>
                   <ChevronRight className="w-4 h-4" />
@@ -163,7 +164,7 @@ export const PortalScreen: React.FC = () => {
                   href="https://www.instagram.com/berasbusur.id?rpxt=MW10dWI3aTFvMjZ2cA=="
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bella-btn-green inline-flex items-center space-x-2 text-xs sm:text-sm py-3 px-6"
+                  className="bella-btn-green inline-flex items-center justify-center space-x-2 text-xs sm:text-sm py-3 px-6"
                 >
                   <Instagram className="w-4 h-4" />
                   <span>Instagram @berasbusur.id</span>
@@ -691,6 +692,23 @@ export const PortalScreen: React.FC = () => {
                 <li><a href="#kilang-proses" className="hover:text-[#1b4332]">Kilang &amp; Proses</a></li>
                 <li><a href="#inspirasi-dapur" className="hover:text-[#1b4332]">Inspirasi Dapur</a></li>
                 <li><a href="#pesan-grosir" className="hover:text-[#1b4332]">Penawaran Grosir</a></li>
+                <li className="pt-2 border-t border-[#1b4332]/10">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (currentUser) {
+                        setActiveScreen('SCREEN_WORKSTATIONS');
+                      } else {
+                        setShowLoginModal(true);
+                      }
+                    }}
+                    className="text-[#1b4332] font-bold hover:underline flex items-center space-x-1.5 py-1 text-xs"
+                    title="Akses Konsol Staf Pabrik & ERP"
+                  >
+                    <Shield className="w-3.5 h-3.5 text-[#1b4332]" />
+                    <span>{currentUser ? 'Buka Stasiun Kerja ERP' : 'Login Staf Pabrik'}</span>
+                  </button>
+                </li>
               </ul>
             </div>
 

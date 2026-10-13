@@ -72,8 +72,8 @@ export const LoginModal: React.FC<LoginModalProps> = ({ targetRole: initialRole,
   };
 
   return (
-    <div className="fixed inset-0 bg-[#171721]/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
-      <div className="bg-[#1e1e2a] rounded-[12px] max-w-md w-full p-7 space-y-6 border border-[#70707d]/30 relative text-[#ededf3]">
+    <div className="fixed inset-0 bg-[#171721]/80 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+      <div className="bg-[#1e1e2a] rounded-[12px] max-w-md w-full p-5 sm:p-7 space-y-5 sm:space-y-6 border border-[#70707d]/30 relative text-[#ededf3] my-auto max-h-[92vh] overflow-y-auto">
         {/* Top Header */}
         <div className="flex justify-between items-start border-b border-[#70707d]/20 pb-4">
           <div className="flex items-center space-x-3">

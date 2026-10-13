@@ -80,7 +80,7 @@ export const WorkstationHubScreen: React.FC = () => {
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3 bg-[#272735] p-3.5 rounded-full border border-[#70707d]/30 shrink-0">
+          <div className="flex flex-wrap items-center justify-between sm:justify-start gap-3 bg-[#272735] p-3.5 rounded-2xl sm:rounded-full border border-[#70707d]/30 shrink-0">
             <div className="space-y-0.5 px-2">
               <div className="text-[10px] font-mono text-[#c3c3cc] uppercase tracking-wider">
                 Sesi Terverifikasi

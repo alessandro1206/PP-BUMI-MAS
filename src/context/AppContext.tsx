@@ -43,6 +43,8 @@ interface AppContextType {
   deleteUserAccount: (id: string) => void;
   login: (username: string, pass: string, targetRole: RoleType) => boolean;
   logout: () => void;
+  showLoginModal: boolean;
+  setShowLoginModal: (open: boolean) => void;
 
   // Audit Logs
   auditLogs: AuditLog[];
@@ -205,6 +207,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
     return 'SCREEN_5';
   });
+
+  const [showLoginModal, setShowLoginModal] = useState<boolean>(false);
 
   const [userAccounts, setUserAccounts] = useState<UserAccount[]>(() => {
     const saved = loadStorage<UserAccount[] | null>('bumimas_erp_user_accounts', null);
@@ -1057,6 +1061,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         deleteUserAccount,
         login,
         logout,
+        showLoginModal,
+        setShowLoginModal,
         auditLogs,
         addAuditLog,
         suppliers,
