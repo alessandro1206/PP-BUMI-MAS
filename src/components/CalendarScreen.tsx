@@ -26,9 +26,11 @@ import {
   Share2,
   Link,
   Key,
-  Copy
+  Copy,
+  RefreshCw
 } from 'lucide-react';
 import { CalendarEvent, CalendarEventType, CalendarEventStatus } from '../types';
+import { parseIcalFeed, fetchIcalWithProxies } from '../utils/icalParser';
 
 // Pre-seeded events from Juwita's Google Calendar (juwitasriwulandari@gmail.com)
 const DEFAULT_CALENDAR_EVENTS: CalendarEvent[] = [
@@ -279,14 +281,122 @@ export const CalendarScreen: React.FC = () => {
   const [secretIcalUrl, setSecretIcalUrl] = useState<string>(() => {
     return localStorage.getItem('bumimas_gcal_secret_ical_url') || '';
   });
+  const [isSyncingIcal, setIsSyncingIcal] = useState(false);
+  const [syncError, setSyncError] = useState<string | null>(null);
+  const [syncSuccessMsg, setSyncSuccessMsg] = useState<string | null>(null);
+  const [pastedIcsContent, setPastedIcsContent] = useState('');
 
-  const handleSaveIcalUrl = (urlToSave: string) => {
-    setSecretIcalUrl(urlToSave);
+  const handleSyncFromIcalUrl = async (urlToFetch?: string) => {
+    const targetUrl = (urlToFetch || secretIcalUrl).trim();
+    if (!targetUrl) {
+      alert('Mohon masukkan Secret iCal URL Google Calendar terlebih dahulu!');
+      return;
+    }
+
+    setIsSyncingIcal(true);
+    setSyncError(null);
+    setSyncSuccessMsg(null);
+
     try {
-      localStorage.setItem('bumimas_gcal_secret_ical_url', urlToSave);
-      alert('Alamat Secret iCal URL Google Calendar berhasil disimpan!');
-    } catch (err) {
-      console.error('Failed to save iCal URL', err);
+      setSecretIcalUrl(targetUrl);
+      localStorage.setItem('bumimas_gcal_secret_ical_url', targetUrl);
+
+      const icsText = await fetchIcalWithProxies(targetUrl);
+      const parsedEvents = parseIcalFeed(icsText);
+
+      if (parsedEvents.length === 0) {
+        throw new Error('Tidak ditemukan event jadwal di dalam data kalender tersebut.');
+      }
+
+      const newKeys = new Set(parsedEvents.map(e => `${e.date}_${e.title}`));
+      const nonDuplicatedOld = events.filter(e => !newKeys.has(`${e.date}_${e.title}`));
+      const merged = [...parsedEvents, ...nonDuplicatedOld];
+      saveEvents(merged);
+
+      if (parsedEvents[0]?.date) {
+        const parts = parsedEvents[0].date.split('-');
+        const evYear = parseInt(parts[0], 10);
+        const evMonth = parseInt(parts[1], 10);
+        if (!isNaN(evYear) && !isNaN(evMonth)) {
+          setCurrentDate(new Date(evYear, evMonth - 1, 13));
+        }
+      }
+
+      setSyncSuccessMsg(`Berhasil memuat ${parsedEvents.length} jadwal langsung dari Google Calendar Juwita!`);
+    } catch (err: any) {
+      console.error('Failed to sync iCal feed', err);
+      setSyncError(err?.message || 'Gagal memuat data dari URL Google Calendar.');
+    } finally {
+      setIsSyncingIcal(false);
+    }
+  };
+
+  const handleFileUploadIcs = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const content = event.target?.result as string;
+        if (!content) return;
+        const parsedEvents = parseIcalFeed(content);
+        if (parsedEvents.length === 0) {
+          alert('Tidak ditemukan event di dalam berkas .ics ini.');
+          return;
+        }
+
+        const newKeys = new Set(parsedEvents.map(e => `${e.date}_${e.title}`));
+        const nonDuplicatedOld = events.filter(e => !newKeys.has(`${e.date}_${e.title}`));
+        const merged = [...parsedEvents, ...nonDuplicatedOld];
+        saveEvents(merged);
+
+        if (parsedEvents[0]?.date) {
+          const parts = parsedEvents[0].date.split('-');
+          const evYear = parseInt(parts[0], 10);
+          const evMonth = parseInt(parts[1], 10);
+          if (!isNaN(evYear) && !isNaN(evMonth)) {
+            setCurrentDate(new Date(evYear, evMonth - 1, 13));
+          }
+        }
+
+        alert(`Berhasil mengimpor ${parsedEvents.length} jadwal dari berkas ${file.name}!`);
+        setShowIcalSettingsModal(false);
+      } catch (err: any) {
+        alert(`Gagal membaca berkas: ${err?.message || 'Format tidak valid'}`);
+      }
+    };
+    reader.readAsText(file);
+  };
+
+  const handleParsePastedIcs = () => {
+    if (!pastedIcsContent.trim()) return;
+    try {
+      const parsedEvents = parseIcalFeed(pastedIcsContent);
+      if (parsedEvents.length === 0) {
+        alert('Tidak ditemukan event di dalam teks iCal ini.');
+        return;
+      }
+
+      const newKeys = new Set(parsedEvents.map(e => `${e.date}_${e.title}`));
+      const nonDuplicatedOld = events.filter(e => !newKeys.has(`${e.date}_${e.title}`));
+      const merged = [...parsedEvents, ...nonDuplicatedOld];
+      saveEvents(merged);
+
+      if (parsedEvents[0]?.date) {
+        const parts = parsedEvents[0].date.split('-');
+        const evYear = parseInt(parts[0], 10);
+        const evMonth = parseInt(parts[1], 10);
+        if (!isNaN(evYear) && !isNaN(evMonth)) {
+          setCurrentDate(new Date(evYear, evMonth - 1, 13));
+        }
+      }
+
+      alert(`Berhasil mengimpor ${parsedEvents.length} jadwal dari teks iCal!`);
+      setPastedIcsContent('');
+      setShowIcalSettingsModal(false);
+    } catch (err: any) {
+      alert(`Gagal memproses teks: ${err?.message || 'Format tidak valid'}`);
     }
   };
 
@@ -681,8 +791,20 @@ export const CalendarScreen: React.FC = () => {
               title="Hubungkan Secret iCal URL Google Calendar Juwita"
             >
               <Link className="w-3.5 h-3.5 text-teal-200" />
-              <span>{secretIcalUrl ? 'Tersambung iCal' : 'Hubungkan iCal URL'}</span>
+              <span>{secretIcalUrl ? 'Atur iCal' : 'Hubungkan iCal URL'}</span>
             </button>
+
+            {secretIcalUrl && (
+              <button
+                disabled={isSyncingIcal}
+                onClick={() => handleSyncFromIcalUrl()}
+                className="px-3.5 py-2 bg-[#272735] hover:bg-[#323244] text-teal-300 rounded-full text-xs font-semibold border border-teal-500/40 transition flex items-center space-x-1.5"
+                title="Tarik pembaruan live langsung dari Google Calendar Juwita"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${isSyncingIcal ? 'animate-spin' : ''}`} />
+                <span>{isSyncingIcal ? 'Sinkron...' : 'Sync Live'}</span>
+              </button>
+            )}
 
             <button
               onClick={() => setShowImportModal(true)}
@@ -1450,21 +1572,100 @@ export const CalendarScreen: React.FC = () => {
               </ol>
             </div>
 
-            {/* Input URL */}
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-white block">
-                Paste Secret iCal URL di sini:
+            {/* Status alerts */}
+            {syncSuccessMsg && (
+              <div className="p-3 bg-emerald-950/80 border border-emerald-500/50 rounded-xl text-xs text-emerald-200 flex items-center space-x-2">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                <span>{syncSuccessMsg}</span>
+              </div>
+            )}
+
+            {syncError && (
+              <div className="p-3 bg-amber-950/80 border border-amber-500/50 rounded-xl text-xs text-amber-200 space-y-1">
+                <div className="flex items-center space-x-1.5 font-bold text-amber-300">
+                  <AlertCircle className="w-4 h-4 shrink-0" />
+                  <span>Koneksi Browser Dibatasi (CORS)</span>
+                </div>
+                <p>{syncError}</p>
+                <p className="text-[11px] text-amber-300/80">
+                  Tip: Salin link URL di atas dan buka di tab peramban baru untuk mengunduh file <code>basic.ics</code>, lalu gunakan <strong>Opsi 2 (Upload File)</strong> di bawah.
+                </p>
+              </div>
+            )}
+
+            {/* Opsi 1: URL Live Sync */}
+            <div className="space-y-2 bg-[#272735] p-4 rounded-xl border border-[#70707d]/30">
+              <label className="text-xs font-bold text-white flex items-center justify-between">
+                <span>Opsi 1: Tarik Otomatis via Secret iCal URL</span>
+                <span className="text-[10px] text-teal-400 font-mono">Live Sync</span>
               </label>
-              <input
-                type="url"
-                value={secretIcalUrl}
-                onChange={(e) => setSecretIcalUrl(e.target.value)}
-                placeholder="https://calendar.google.com/calendar/ical/.../basic.ics"
-                className="w-full px-3.5 py-2.5 rounded-xl bg-[#272735] border border-[#70707d]/30 text-white font-mono text-xs focus:border-teal-400 outline-none"
-              />
+              <div className="flex gap-2">
+                <input
+                  type="url"
+                  value={secretIcalUrl}
+                  onChange={(e) => setSecretIcalUrl(e.target.value)}
+                  placeholder="https://calendar.google.com/calendar/ical/.../basic.ics"
+                  className="flex-1 px-3.5 py-2.5 rounded-xl bg-[#1e1e2a] border border-[#70707d]/30 text-white font-mono text-xs focus:border-teal-400 outline-none"
+                />
+                <button
+                  type="button"
+                  disabled={isSyncingIcal || !secretIcalUrl.trim()}
+                  onClick={() => handleSyncFromIcalUrl()}
+                  className="px-4 py-2.5 bg-teal-600 hover:bg-teal-500 disabled:opacity-50 text-white font-bold text-xs rounded-xl shadow transition flex items-center space-x-1.5 shrink-0"
+                >
+                  {isSyncingIcal ? (
+                    <>
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                      <span>Menarik...</span>
+                    </>
+                  ) : (
+                    <>
+                      <RefreshCw className="w-3.5 h-3.5" />
+                      <span>Tarik Data</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* Opsi 2: Upload File basic.ics */}
+            <div className="space-y-2 bg-[#272735] p-4 rounded-xl border border-[#70707d]/30">
+              <label className="text-xs font-bold text-white flex items-center justify-between">
+                <span>Opsi 2: Upload Berkas basic.ics (100% Berhasil)</span>
+                <span className="text-[10px] text-emerald-400 font-mono">Direkomendasikan</span>
+              </label>
               <p className="text-[11px] text-[#c3c3cc]">
-                URL rahasia ini memungkinkan sistem membaca jadwal tanpa harus mengubah kalender Juwita menjadi publik.
+                Buka link iCal Juwita di tab browser baru untuk otomatis mendownload berkas <code>basic.ics</code>, lalu pilih file tersebut di sini:
               </p>
+              <input
+                type="file"
+                accept=".ics,text/calendar"
+                onChange={handleFileUploadIcs}
+                className="w-full text-xs text-[#c3c3cc] file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-emerald-600 file:text-white hover:file:bg-emerald-500 file:cursor-pointer cursor-pointer bg-[#1e1e2a] p-2 rounded-xl border border-[#70707d]/30"
+              />
+            </div>
+
+            {/* Opsi 3: Paste Teks Mentah iCal */}
+            <div className="space-y-2 bg-[#272735] p-4 rounded-xl border border-[#70707d]/30">
+              <label className="text-xs font-bold text-white block">
+                Opsi 3: Atau Paste Langsung Isi Teks .ics
+              </label>
+              <textarea
+                rows={3}
+                value={pastedIcsContent}
+                onChange={(e) => setPastedIcsContent(e.target.value)}
+                placeholder="Paste teks yang diawali dengan BEGIN:VCALENDAR di sini..."
+                className="w-full px-3 py-2 rounded-xl bg-[#1e1e2a] border border-[#70707d]/30 text-white font-mono text-[11px] outline-none focus:border-teal-400"
+              />
+              {pastedIcsContent.trim() && (
+                <button
+                  type="button"
+                  onClick={handleParsePastedIcs}
+                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl transition"
+                >
+                  Impor dari Teks yang Di-paste
+                </button>
+              )}
             </div>
 
             <div className="flex items-center justify-between pt-3 border-t border-[#70707d]/20">
@@ -1485,17 +1686,6 @@ export const CalendarScreen: React.FC = () => {
                   className="px-4 py-2 bg-[#272735] hover:bg-[#323244] text-[#c3c3cc] rounded-xl text-xs font-semibold"
                 >
                   Tutup
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    handleSaveIcalUrl(secretIcalUrl.trim());
-                    setShowIcalSettingsModal(false);
-                  }}
-                  className="px-5 py-2 bg-teal-600 hover:bg-teal-500 text-white font-bold text-xs rounded-xl shadow transition flex items-center space-x-1.5"
-                >
-                  <Check className="w-4 h-4" />
-                  <span>Simpan URL</span>
                 </button>
               </div>
             </div>
