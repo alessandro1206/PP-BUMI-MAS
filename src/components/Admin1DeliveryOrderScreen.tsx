@@ -368,6 +368,16 @@ export const Admin1DeliveryOrderScreen: React.FC = () => {
 
         <div className="flex items-center space-x-2">
           <button
+            type="button"
+            onClick={() => setActiveScreen('SCREEN_CALENDAR')}
+            className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-xl text-xs flex items-center space-x-1.5 shadow transition"
+            title="Buka Kalender Jadwal Kirim & DO Juwita Fullscreen"
+          >
+            <Calendar className="w-4 h-4 text-white" />
+            <span>Kalender Juwita (Full)</span>
+          </button>
+
+          <button
             onClick={() => setShowGCalModal(true)}
             className="px-3.5 py-2 bg-amber-500 hover:bg-amber-600 text-[#0f3e2e] font-extrabold rounded-xl text-xs flex items-center space-x-1.5 shadow"
           >
@@ -911,9 +921,22 @@ export const Admin1DeliveryOrderScreen: React.FC = () => {
                   Akun: juwitasriwulandari@gmail.com
                 </span>
               </div>
-              <button onClick={() => setShowGCalModal(false)} className="p-1 text-slate-400 hover:text-slate-600 rounded-lg">
-                <X className="w-5 h-5" />
-              </button>
+              <div className="flex items-center space-x-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowGCalModal(false);
+                    setActiveScreen('SCREEN_CALENDAR');
+                  }}
+                  className="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg flex items-center space-x-1 shadow transition"
+                >
+                  <ExternalLink className="w-3.5 h-3.5" />
+                  <span>Buka Layar Penuh</span>
+                </button>
+                <button onClick={() => setShowGCalModal(false)} className="p-1 text-slate-400 hover:text-slate-600 rounded-lg">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
             </div>
 
             {/* Event List Selector matching Juwita's Google Calendar */}

@@ -177,6 +177,13 @@ export const WorkstationHubScreen: React.FC = () => {
                 >
                   • Piutang Toko
                 </button>
+                <button
+                  type="button"
+                  onClick={() => handleEnterWorkstation('ADMIN1', 'SCREEN_CALENDAR')}
+                  className="col-span-2 px-2.5 py-1.5 bg-[#272735] hover:bg-[#323244] text-amber-300 rounded-full text-left transition truncate border border-amber-500/30 font-semibold"
+                >
+                  • Kalender Juwita (Jadwal DO)
+                </button>
               </div>
             </div>
           </div>
@@ -444,6 +451,13 @@ export const WorkstationHubScreen: React.FC = () => {
             className="px-3.5 py-1.5 bg-[#272735] hover:bg-[#323244] text-[#ededf3] text-xs font-normal rounded-full border border-[#70707d]/30 transition"
           >
             Laporan Keuangan
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveScreen('SCREEN_CALENDAR')}
+            className="px-3.5 py-1.5 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 text-xs font-bold rounded-full border border-emerald-500/40 transition flex items-center space-x-1.5"
+          >
+            <span>📅 Kalender Juwita</span>
           </button>
         </div>
       </div>

@@ -27,6 +27,7 @@ import { ExpenseBookScreen } from './components/ExpenseBookScreen';
 import { ReportsScreen } from './components/ReportsScreen';
 import { UserManagementScreen } from './components/UserManagementScreen';
 import { SuperAdminAccountingScreen } from './components/SuperAdminAccountingScreen';
+import { CalendarScreen } from './components/CalendarScreen';
 
 import { Activity, Radio, Cpu, ShieldCheck } from 'lucide-react';
 
@@ -93,6 +94,8 @@ const MainContent: React.FC = () => {
         return <UserManagementScreen />;
       case 'SCREEN_SUPER_ADMIN_ACCOUNTING':
         return <SuperAdminAccountingScreen />;
+      case 'SCREEN_CALENDAR':
+        return <CalendarScreen />;
 
       default:
         return <PortalScreen />;

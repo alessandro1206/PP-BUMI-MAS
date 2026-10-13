@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { Shield, Scale, Smartphone, Building2, UserCheck, LogOut, FileText, BarChart3, Users, Package, Wallet, Receipt, Layers, Key, BookOpen, Instagram, Menu, X } from 'lucide-react';
+import { Shield, Scale, Smartphone, Building2, UserCheck, LogOut, FileText, BarChart3, Users, Package, Wallet, Receipt, Layers, Key, BookOpen, Instagram, Menu, X, Calendar } from 'lucide-react';
 import { LoginModal } from './LoginModal';
 import { AuditLogModal } from './AuditLogModal';
 import { InitialBalanceSetupModal } from './InitialBalanceSetupModal';
@@ -304,6 +304,15 @@ export const Header: React.FC = () => {
                   <FileText className="w-3.5 h-3.5 text-[#ededf3]" />
                   <span>Audit</span>
                 </button>
+
+                <button
+                  onClick={() => setActiveScreen('SCREEN_CALENDAR')}
+                  className="px-3 py-1 bg-[#272735] hover:bg-[#323244] text-[#ededf3] rounded-full text-xs flex items-center space-x-1.5 transition"
+                  title="Kalender Jadwal Kirim & DO Juwita"
+                >
+                  <Calendar className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Kalender</span>
+                </button>
               </div>
             ) : role === 'PORTAL' && !currentUser ? (
               /* Centered Navigation Pill Links */
@@ -523,6 +532,16 @@ export const Header: React.FC = () => {
                 <Key className="w-3.5 h-3.5 text-amber-400" />
                 <span>7. Akses User</span>
               </button>
+
+              <button
+                onClick={() => { setRole('OWNER'); setActiveScreen('SCREEN_CALENDAR'); }}
+                className={`px-3 py-1.5 rounded-lg transition flex items-center space-x-1.5 shrink-0 ${
+                  activeScreen === 'SCREEN_CALENDAR' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
+                }`}
+              >
+                <Calendar className="w-3.5 h-3.5 text-amber-400" />
+                <span>8. Kalender Jadwal</span>
+              </button>
             </div>
           </div>
         </div>
@@ -576,6 +595,17 @@ export const Header: React.FC = () => {
               >
                 <Receipt className="w-3.5 h-3.5 text-emerald-400" />
                 <span>4. Kasir Piutang</span>
+              </button>
+
+              <button
+                onClick={() => { setRole('ADMIN1'); setActiveScreen('SCREEN_CALENDAR'); }}
+                className={`px-3 py-1.5 rounded-lg transition flex items-center space-x-1.5 shrink-0 ${
+                  activeScreen === 'SCREEN_CALENDAR' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
+                }`}
+                title="Kalender Jadwal Kirim & DO Juwita"
+              >
+                <Calendar className="w-3.5 h-3.5 text-amber-400" />
+                <span>5. Kalender Juwita</span>
               </button>
 
               <div className="h-4 w-[1px] bg-slate-800 mx-1 shrink-0"></div>

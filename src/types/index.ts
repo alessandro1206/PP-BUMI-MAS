@@ -325,3 +325,26 @@ export interface StapelPile {
   current_stock_kg?: number;
   created_at?: string;
 }
+
+export type CalendarEventType = 'DO_DELIVERY' | 'GABAH_ARRIVAL' | 'TRANSFER_PAYMENT' | 'PRODUCTION_COR' | 'GENERAL_NOTE';
+export type CalendarEventStatus = 'PLANNED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+
+export interface CalendarEvent {
+  id: string;
+  title: string;
+  date: string; // YYYY-MM-DD
+  time?: string; // HH:mm
+  type: CalendarEventType;
+  status: CalendarEventStatus;
+  customer_name?: string;
+  brand_aka?: string;
+  total_kg?: number;
+  nopol?: string;
+  expedition_info?: string;
+  notes?: string;
+  google_calendar_sync?: boolean;
+  google_event_id?: string;
+  account_email?: string;
+  created_at?: string;
+  updated_at?: string;
+}
