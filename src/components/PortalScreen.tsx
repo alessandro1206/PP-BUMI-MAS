@@ -682,6 +682,20 @@ export const PortalScreen: React.FC = () => {
                   <span>Ikuti Akun Resmi @berasbusur.id</span>
                 </a>
               </div>
+              <div className="pt-2 flex flex-wrap gap-1.5">
+                <span className="text-[10px] font-bold bg-[#e8f1eb] text-[#1b4332] px-2 py-0.5 rounded-full border border-[#1b4332]/20">
+                  Standar Mutu SNI
+                </span>
+                <span className="text-[10px] font-bold bg-[#e8f1eb] text-[#1b4332] px-2 py-0.5 rounded-full border border-[#1b4332]/20">
+                  Sertifikat Halal
+                </span>
+                <span className="text-[10px] font-bold bg-[#e8f1eb] text-[#1b4332] px-2 py-0.5 rounded-full border border-[#1b4332]/20">
+                  Izin Edar Kementan
+                </span>
+                <span className="text-[10px] font-bold bg-[#e8f1eb] text-[#1b4332] px-2 py-0.5 rounded-full border border-[#1b4332]/20">
+                  Merek Terdaftar
+                </span>
+              </div>
             </div>
 
             <div className="md:col-span-3 space-y-2 text-xs tracking-tight-bella">
@@ -731,10 +745,16 @@ export const PortalScreen: React.FC = () => {
             <div>
               &copy; {new Date().getFullYear()} PP BUMI MAS • Beras Busur. Hak Cipta Dilindungi Undang-Undang.
             </div>
-            <div className="flex items-center space-x-4">
+            <div className="flex flex-wrap items-center justify-center sm:justify-end gap-x-3 gap-y-1">
               <span>Banyuwangi, Jawa Timur</span>
               <span>•</span>
-              <span>Standard Mutu HACCP &amp; SNI</span>
+              <span>Standar Mutu SNI</span>
+              <span>•</span>
+              <span>Sertifikat Halal</span>
+              <span>•</span>
+              <span>Izin Edar Kementan</span>
+              <span>•</span>
+              <span>Merek Terdaftar</span>
             </div>
           </div>
         </footer>
