@@ -23,7 +23,10 @@ import {
   Layers, 
   ArrowLeft,
   AlertCircle,
-  Share2
+  Share2,
+  Link,
+  Key,
+  Copy
 } from 'lucide-react';
 import { CalendarEvent, CalendarEventType, CalendarEventStatus } from '../types';
 
@@ -270,6 +273,22 @@ export const CalendarScreen: React.FC = () => {
   // Quick import modal state
   const [showImportModal, setShowImportModal] = useState(false);
   const [importText, setImportText] = useState('');
+
+  // Google Calendar Secret iCal URL settings state
+  const [showIcalSettingsModal, setShowIcalSettingsModal] = useState(false);
+  const [secretIcalUrl, setSecretIcalUrl] = useState<string>(() => {
+    return localStorage.getItem('bumimas_gcal_secret_ical_url') || '';
+  });
+
+  const handleSaveIcalUrl = (urlToSave: string) => {
+    setSecretIcalUrl(urlToSave);
+    try {
+      localStorage.setItem('bumimas_gcal_secret_ical_url', urlToSave);
+      alert('Alamat Secret iCal URL Google Calendar berhasil disimpan!');
+    } catch (err) {
+      console.error('Failed to save iCal URL', err);
+    }
+  };
 
   // Month navigation helpers
   const year = currentDate.getFullYear();
@@ -654,6 +673,15 @@ export const CalendarScreen: React.FC = () => {
             >
               <Download className="w-3.5 h-3.5 text-emerald-400" />
               <span>Ekspor .ICS</span>
+            </button>
+
+            <button
+              onClick={() => setShowIcalSettingsModal(true)}
+              className="px-3.5 py-2 bg-gradient-to-r from-teal-700 to-emerald-700 hover:from-teal-600 hover:to-emerald-600 text-white rounded-full text-xs font-bold transition flex items-center space-x-1.5 shadow"
+              title="Hubungkan Secret iCal URL Google Calendar Juwita"
+            >
+              <Link className="w-3.5 h-3.5 text-teal-200" />
+              <span>{secretIcalUrl ? 'Tersambung iCal' : 'Hubungkan iCal URL'}</span>
             </button>
 
             <button
@@ -1369,6 +1397,107 @@ export const CalendarScreen: React.FC = () => {
               >
                 Impor Sekarang
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* =========================================================================
+          MODAL: GOOGLE CALENDAR SECRET ICAL URL SETTINGS
+          ========================================================================= */}
+      {showIcalSettingsModal && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-[#1e1e2a] border border-[#70707d]/30 rounded-2xl max-w-xl w-full p-6 space-y-5 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-[#70707d]/20 pb-3">
+              <div className="space-y-0.5">
+                <h3 className="text-lg font-bold text-white flex items-center space-x-2">
+                  <Link className="w-5 h-5 text-teal-400" />
+                  <span>Pengaturan Secret iCal Google Calendar</span>
+                </h3>
+                <span className="text-[10px] font-mono text-emerald-400">
+                  Akun: juwitasriwulandari@gmail.com
+                </span>
+              </div>
+              <button
+                onClick={() => setShowIcalSettingsModal(false)}
+                className="p-1 rounded text-[#c3c3cc] hover:text-white"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Step by step guide */}
+            <div className="bg-[#272735] border border-teal-500/30 rounded-xl p-4 space-y-2.5">
+              <h4 className="text-xs font-bold text-teal-300 flex items-center space-x-1.5">
+                <Key className="w-4 h-4 text-teal-400" />
+                <span>Cara Mendapatkan Secret iCal URL dari Google Calendar:</span>
+              </h4>
+              <ol className="text-xs text-[#ededf3] space-y-2 list-decimal pl-5">
+                <li>
+                  Buka <strong>calendar.google.com</strong> di komputer/laptop (pastikan login dengan akun <code>juwitasriwulandari@gmail.com</code>).
+                </li>
+                <li>
+                  Di sisi kiri pada bagian <strong>"Kalender saya" (My calendars)</strong>, arahkan mouse ke kalender Juwita dan klik tanda <strong>tiga titik (⋮)</strong>.
+                </li>
+                <li>
+                  Pilih <strong>"Setelan dan berbagi" (Settings and sharing)</strong>.
+                </li>
+                <li>
+                  Gulir ke bawah ke bagian <strong>"Integrasikan kalender" (Integrate calendar)</strong>.
+                </li>
+                <li>
+                  Cari baris <strong>"Alamat rahasia dalam format iCal" (Secret address in iCal format)</strong>, lalu salin URL tersebut.
+                </li>
+              </ol>
+            </div>
+
+            {/* Input URL */}
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-white block">
+                Paste Secret iCal URL di sini:
+              </label>
+              <input
+                type="url"
+                value={secretIcalUrl}
+                onChange={(e) => setSecretIcalUrl(e.target.value)}
+                placeholder="https://calendar.google.com/calendar/ical/.../basic.ics"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-[#272735] border border-[#70707d]/30 text-white font-mono text-xs focus:border-teal-400 outline-none"
+              />
+              <p className="text-[11px] text-[#c3c3cc]">
+                URL rahasia ini memungkinkan sistem membaca jadwal tanpa harus mengubah kalender Juwita menjadi publik.
+              </p>
+            </div>
+
+            <div className="flex items-center justify-between pt-3 border-t border-[#70707d]/20">
+              <a
+                href="https://calendar.google.com/calendar/u/0/r/settings"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-teal-400 hover:text-teal-300 flex items-center space-x-1 font-semibold"
+              >
+                <ExternalLink className="w-3.5 h-3.5" />
+                <span>Buka Setelan Google Calendar</span>
+              </a>
+
+              <div className="flex items-center space-x-2">
+                <button
+                  type="button"
+                  onClick={() => setShowIcalSettingsModal(false)}
+                  className="px-4 py-2 bg-[#272735] hover:bg-[#323244] text-[#c3c3cc] rounded-xl text-xs font-semibold"
+                >
+                  Tutup
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleSaveIcalUrl(secretIcalUrl.trim());
+                    setShowIcalSettingsModal(false);
+                  }}
+                  className="px-5 py-2 bg-teal-600 hover:bg-teal-500 text-white font-bold text-xs rounded-xl shadow transition flex items-center space-x-1.5"
+                >
+                  <Check className="w-4 h-4" />
+                  <span>Simpan URL</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
