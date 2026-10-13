@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import {
   RoleType,
   UserAccount,
@@ -151,30 +151,85 @@ const initialStapels: StapelPile[] = [];
 const initialDeliveryOrders: SalesDeliveryOrder[] = [];
 const initialPettyCash: PettyCashTransaction[] = [];
 
+const loadStorage = <T,>(key: string, fallback: T): T => {
+  if (typeof window === 'undefined' || !window.localStorage) return fallback;
+  try {
+    const raw = window.localStorage.getItem(key);
+    if (raw !== null && raw !== undefined) {
+      try {
+        return JSON.parse(raw);
+      } catch {
+        return raw as unknown as T;
+      }
+    }
+  } catch (err) {
+    console.warn(`Failed to load localStorage key "${key}":`, err);
+  }
+  return fallback;
+};
+
+const saveStorage = (key: string, value: any): void => {
+  if (typeof window === 'undefined' || !window.localStorage) return;
+  try {
+    window.localStorage.setItem(key, JSON.stringify(value));
+  } catch (err) {
+    console.warn(`Failed to save localStorage key "${key}":`, err);
+  }
+};
+
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [role, setRole] = useState<RoleType>('PORTAL');
-  const [activeScreen, setActiveScreen] = useState<string>('SCREEN_5');
+  // User Authentication & Screen Persistence
+  const [currentUser, setCurrentUser] = useState<UserAccount | null>(() => {
+    return loadStorage<UserAccount | null>('bumimas_erp_current_user', null);
+  });
 
-  const [currentUser, setCurrentUser] = useState<UserAccount | null>(null);
-  const [userAccounts, setUserAccounts] = useState<UserAccount[]>(initialUserAccounts);
-  const [auditLogs, setAuditLogs] = useState<AuditLog[]>(initialAuditLogs);
-  const [coaList, setCoaList] = useState<AccountCOA[]>(defaultCOAList);
-  const [journalEntries, setJournalEntries] = useState<JournalEntry[]>([]);
+  const [role, setRole] = useState<RoleType>(() => {
+    const savedRole = loadStorage<RoleType | null>('bumimas_erp_role', null);
+    if (savedRole && savedRole !== 'PORTAL') {
+      return savedRole;
+    }
+    const savedUser = loadStorage<UserAccount | null>('bumimas_erp_current_user', null);
+    if (savedUser && savedUser.role) {
+      return savedUser.role;
+    }
+    return 'PORTAL';
+  });
 
-  const [suppliers, setSuppliers] = useState<Supplier[]>(initialSuppliers);
-  const [customers, setCustomers] = useState<Customer[]>(initialCustomers);
-  const [products, setProducts] = useState<ProductItem[]>(initialProducts);
-  const [expenses, setExpenses] = useState<ExpenseTransaction[]>(initialExpenses);
+  const [activeScreen, setActiveScreen] = useState<string>(() => {
+    const savedUser = loadStorage<UserAccount | null>('bumimas_erp_current_user', null);
+    const savedScreen = loadStorage<string | null>('bumimas_erp_active_screen', null);
+    if (savedUser) {
+      return savedScreen || 'SCREEN_WORKSTATIONS';
+    }
+    return 'SCREEN_5';
+  });
 
-  const [weighbridgeInList, setWeighbridgeInList] = useState<WeighbridgeIn[]>(initialWeighbridge);
-  const [corBatches, setCorBatches] = useState<MillingCorBatch[]>([]);
-  const [packagingLogs, setPackagingLogs] = useState<PackagingStockLog[]>([]);
-  const [byproductOpnames, setByproductOpnames] = useState<ByproductOpname[]>([]);
-  const [truckTiers, setTruckTiers] = useState<TruckLoadTier[]>([]);
-  const [deliveryOrders, setDeliveryOrders] = useState<SalesDeliveryOrder[]>(initialDeliveryOrders);
-  const [pettyCash, setPettyCash] = useState<PettyCashTransaction[]>(initialPettyCash);
+  const [userAccounts, setUserAccounts] = useState<UserAccount[]>(() => {
+    const saved = loadStorage<UserAccount[] | null>('bumimas_erp_user_accounts', null);
+    if (saved && Array.isArray(saved) && saved.length > 0) {
+      return saved;
+    }
+    return initialUserAccounts;
+  });
+
+  const [auditLogs, setAuditLogs] = useState<AuditLog[]>(() => loadStorage('bumimas_erp_audit_logs', initialAuditLogs));
+  const [coaList, setCoaList] = useState<AccountCOA[]>(() => loadStorage('bumimas_erp_coa_list', defaultCOAList));
+  const [journalEntries, setJournalEntries] = useState<JournalEntry[]>(() => loadStorage('bumimas_erp_journal_entries', []));
+
+  const [suppliers, setSuppliers] = useState<Supplier[]>(() => loadStorage('bumimas_erp_suppliers', initialSuppliers));
+  const [customers, setCustomers] = useState<Customer[]>(() => loadStorage('bumimas_erp_customers', initialCustomers));
+  const [products, setProducts] = useState<ProductItem[]>(() => loadStorage('bumimas_erp_products', initialProducts));
+  const [expenses, setExpenses] = useState<ExpenseTransaction[]>(() => loadStorage('bumimas_erp_expenses', initialExpenses));
+
+  const [weighbridgeInList, setWeighbridgeInList] = useState<WeighbridgeIn[]>(() => loadStorage('bumimas_erp_weighbridge', initialWeighbridge));
+  const [corBatches, setCorBatches] = useState<MillingCorBatch[]>(() => loadStorage('bumimas_erp_cor_batches', []));
+  const [packagingLogs, setPackagingLogs] = useState<PackagingStockLog[]>(() => loadStorage('bumimas_erp_packaging_logs', []));
+  const [byproductOpnames, setByproductOpnames] = useState<ByproductOpname[]>(() => loadStorage('bumimas_erp_byproduct_opnames', []));
+  const [truckTiers, setTruckTiers] = useState<TruckLoadTier[]>(() => loadStorage('bumimas_erp_truck_tiers', []));
+  const [deliveryOrders, setDeliveryOrders] = useState<SalesDeliveryOrder[]>(() => loadStorage('bumimas_erp_delivery_orders', initialDeliveryOrders));
+  const [pettyCash, setPettyCash] = useState<PettyCashTransaction[]>(() => loadStorage('bumimas_erp_petty_cash', initialPettyCash));
   const [pettyCashCategories, setPettyCashCategories] = useState<string[]>([
     'UPAH_BURUH',
     'SOLAR',
@@ -183,11 +238,106 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     'OPERASIONAL_KANTOR',
     'LAINNYA'
   ]);
-  const [stapelPiles, setStapelPiles] = useState<StapelPile[]>(initialStapels);
-  const [sakItems, setSakItems] = useState<SakItem[]>(initialSakItems);
-  const [sakTransactions, setSakTransactions] = useState<SakTransaction[]>([]);
+  const [stapelPiles, setStapelPiles] = useState<StapelPile[]>(() => loadStorage('bumimas_erp_stapel_piles', initialStapels));
+  const [sakItems, setSakItems] = useState<SakItem[]>(() => loadStorage('bumimas_erp_sak_items', initialSakItems));
+  const [sakTransactions, setSakTransactions] = useState<SakTransaction[]>(() => loadStorage('bumimas_erp_sak_transactions', []));
 
-  const [bankBalance, setBankBalance] = useState<number>(1450000000);
+  const [bankBalance, setBankBalance] = useState<number>(() => loadStorage('bumimas_erp_bank_balance', 1450000000));
+
+  // Sync state changes to localStorage
+  useEffect(() => {
+    if (currentUser) {
+      saveStorage('bumimas_erp_current_user', currentUser);
+    } else {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        window.localStorage.removeItem('bumimas_erp_current_user');
+      }
+    }
+  }, [currentUser]);
+
+  useEffect(() => {
+    saveStorage('bumimas_erp_role', role);
+  }, [role]);
+
+  useEffect(() => {
+    saveStorage('bumimas_erp_active_screen', activeScreen);
+  }, [activeScreen]);
+
+  useEffect(() => {
+    saveStorage('bumimas_erp_user_accounts', userAccounts);
+  }, [userAccounts]);
+
+  useEffect(() => {
+    saveStorage('bumimas_erp_audit_logs', auditLogs);
+  }, [auditLogs]);
+
+  useEffect(() => {
+    saveStorage('bumimas_erp_coa_list', coaList);
+  }, [coaList]);
+
+  useEffect(() => {
+    saveStorage('bumimas_erp_journal_entries', journalEntries);
+  }, [journalEntries]);
+
+  useEffect(() => {
+    saveStorage('bumimas_erp_suppliers', suppliers);
+  }, [suppliers]);
+
+  useEffect(() => {
+    saveStorage('bumimas_erp_customers', customers);
+  }, [customers]);
+
+  useEffect(() => {
+    saveStorage('bumimas_erp_products', products);
+  }, [products]);
+
+  useEffect(() => {
+    saveStorage('bumimas_erp_expenses', expenses);
+  }, [expenses]);
+
+  useEffect(() => {
+    saveStorage('bumimas_erp_weighbridge', weighbridgeInList);
+  }, [weighbridgeInList]);
+
+  useEffect(() => {
+    saveStorage('bumimas_erp_cor_batches', corBatches);
+  }, [corBatches]);
+
+  useEffect(() => {
+    saveStorage('bumimas_erp_packaging_logs', packagingLogs);
+  }, [packagingLogs]);
+
+  useEffect(() => {
+    saveStorage('bumimas_erp_byproduct_opnames', byproductOpnames);
+  }, [byproductOpnames]);
+
+  useEffect(() => {
+    saveStorage('bumimas_erp_truck_tiers', truckTiers);
+  }, [truckTiers]);
+
+  useEffect(() => {
+    saveStorage('bumimas_erp_delivery_orders', deliveryOrders);
+  }, [deliveryOrders]);
+
+  useEffect(() => {
+    saveStorage('bumimas_erp_petty_cash', pettyCash);
+  }, [pettyCash]);
+
+  useEffect(() => {
+    saveStorage('bumimas_erp_stapel_piles', stapelPiles);
+  }, [stapelPiles]);
+
+  useEffect(() => {
+    saveStorage('bumimas_erp_sak_items', sakItems);
+  }, [sakItems]);
+
+  useEffect(() => {
+    saveStorage('bumimas_erp_sak_transactions', sakTransactions);
+  }, [sakTransactions]);
+
+  useEffect(() => {
+    saveStorage('bumimas_erp_bank_balance', bankBalance);
+  }, [bankBalance]);
 
 
   const cashBalance = pettyCash.reduce((acc, tx) => {
@@ -248,6 +398,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (found) {
       setCurrentUser(found);
       setRole(found.role);
+      saveStorage('bumimas_erp_current_user', found);
+      saveStorage('bumimas_erp_role', found.role);
       addAuditLog(`User Login Berhasil`, `Login sebagai ${found.name} (${found.role})`);
       return true;
     }
@@ -261,6 +413,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setCurrentUser(null);
     setRole('PORTAL');
     setActiveScreen('SCREEN_5');
+    if (typeof window !== 'undefined' && window.localStorage) {
+      window.localStorage.removeItem('bumimas_erp_current_user');
+      window.localStorage.setItem('bumimas_erp_role', JSON.stringify('PORTAL'));
+      window.localStorage.setItem('bumimas_erp_active_screen', JSON.stringify('SCREEN_5'));
+    }
   };
 
   const loadSampleMasterData = () => {
