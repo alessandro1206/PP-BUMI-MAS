@@ -207,22 +207,7 @@ export const PortalScreen: React.FC = () => {
               </div>
             </div>
 
-            <div className="space-y-3 pt-2">
-              <a
-                href={`https://wa.me/62818334998?text=${encodeURIComponent(
-                  'Halo Admin PP Bumi Mas / Beras Busur, saya ingin menanyakan harga terbaru untuk Beras Cap Putri Thailand (Kemasan 5kg, 10kg, 25kg, 50kg). Mohon info penawarannya.'
-                )}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group/price block hover:opacity-90 transition border-t border-white/20 pt-3"
-                title="Tanya harga Beras Cap Putri Thailand via WhatsApp"
-              >
-                <div className="flex items-baseline justify-between">
-                  <span className="text-xs text-white/80 tracking-tight-bella">Harga Terkini:</span>
-                  <span className="text-xl font-bold tracking-tight-bella text-white">Rp 14.800 <span className="text-xs font-normal text-white/80">/ kg</span></span>
-                </div>
-              </a>
-
+            <div className="pt-3 border-t border-white/20">
               <a
                 href={`https://wa.me/62818334998?text=${encodeURIComponent(
                   'Halo Admin PP Bumi Mas / Beras Busur, saya ingin menanyakan harga terbaru untuk Beras Cap Putri Thailand (Kemasan 5kg, 10kg, 25kg, 50kg). Mohon info penawarannya.'
@@ -404,23 +389,7 @@ export const PortalScreen: React.FC = () => {
                   )}
                 </div>
 
-                <div className="space-y-3 pt-2">
-                  <a
-                    href={`https://wa.me/62818334998?text=${encodeURIComponent(
-                      `Halo Admin PP Bumi Mas / Beras Busur, saya ingin menanyakan harga terbaru untuk Beras ${v.name} (${v.sizes}). Mohon info penawaran harga grosir dan stok hari ini.`
-                    )}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group/price block hover:opacity-85 transition"
-                    title={`Tanya harga Beras ${v.name} via WhatsApp`}
-                  >
-                    <span className="text-[11px] font-semibold text-[#142217]/60 block">Harga Terkini:</span>
-                    <div className="text-base sm:text-lg font-bold tracking-tight-bella text-[#1b4332] flex items-center gap-1.5">
-                      <span>{v.price}</span>
-                      <span className="text-xs font-normal text-[#142217]/60">{v.unit}</span>
-                    </div>
-                  </a>
-
+                <div className="pt-2">
                   <a
                     href={`https://wa.me/62818334998?text=${encodeURIComponent(
                       `Halo Admin PP Bumi Mas / Beras Busur, saya ingin menanyakan harga terbaru untuk Beras ${v.name} (${v.sizes}). Mohon info penawaran harga grosir dan stok hari ini.`
