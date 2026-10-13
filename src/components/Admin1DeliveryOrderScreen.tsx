@@ -400,7 +400,7 @@ export const Admin1DeliveryOrderScreen: React.FC = () => {
                 >
                   {customers.map(c => (
                     <option key={c.id} value={c.id}>
-                      {c.name} — {c.phone}
+                      {c.name} - {c.phone}
                     </option>
                   ))}
                 </select>

@@ -38,7 +38,12 @@ export const PortalScreen: React.FC = () => {
       const saved = localStorage.getItem('beras_busur_variants_settings');
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed.map((item: RiceVariant) => ({
+            ...item,
+            categoryBadge: (!item.categoryBadge || item.categoryBadge === 'Bestseller') ? 'Beras Pilihan' : item.categoryBadge,
+          }));
+        }
       }
     } catch (err) {
       console.error('Failed to load variants from localStorage', err);
@@ -172,7 +177,7 @@ export const PortalScreen: React.FC = () => {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <span className="bella-badge-white text-[11px] text-[#1b4332]">
-                  Bestseller • Cap Putri
+                  Varian Pilihan • Cap Putri
                 </span>
                 <span className="text-xs font-bold tracking-tight-bella text-[#e8f1eb] uppercase">
                   Sosoh 95%
@@ -203,19 +208,31 @@ export const PortalScreen: React.FC = () => {
             </div>
 
             <div className="space-y-3 pt-2">
-              <div className="flex items-baseline justify-between border-t border-white/20 pt-3">
-                <span className="text-xs text-white/80 tracking-tight-bella">Harga Mulai Dari:</span>
-                <span className="text-xl font-bold tracking-tight-bella text-white">Rp 14.800 <span className="text-xs font-normal text-white/80">/ kg</span></span>
-              </div>
-
               <a
-                href="https://www.instagram.com/berasbusur.id?rpxt=MW10dWI3aTFvMjZ2cA=="
+                href={`https://wa.me/62818334998?text=${encodeURIComponent(
+                  'Halo Admin PP Bumi Mas / Beras Busur, saya ingin menanyakan harga terbaru untuk Beras Cap Putri Thailand (Kemasan 5kg, 10kg, 25kg, 50kg). Mohon info penawarannya.'
+                )}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full bg-white hover:bg-[#f4f0e6] text-[#1b4332] border border-[#1b4332] rounded-full py-3 px-4 text-center font-bold text-xs sm:text-sm tracking-tight-bella transition flex items-center justify-center space-x-2"
+                className="group/price block hover:opacity-90 transition border-t border-white/20 pt-3"
+                title="Tanya harga Beras Cap Putri Thailand via WhatsApp"
               >
-                <Instagram className="w-4 h-4 text-[#1b4332]" />
-                <span>Pesan via DM / WhatsApp</span>
+                <div className="flex items-baseline justify-between">
+                  <span className="text-xs text-white/80 tracking-tight-bella">Harga Terkini:</span>
+                  <span className="text-xl font-bold tracking-tight-bella text-white">Rp 14.800 <span className="text-xs font-normal text-white/80">/ kg</span></span>
+                </div>
+              </a>
+
+              <a
+                href={`https://wa.me/62818334998?text=${encodeURIComponent(
+                  'Halo Admin PP Bumi Mas / Beras Busur, saya ingin menanyakan harga terbaru untuk Beras Cap Putri Thailand (Kemasan 5kg, 10kg, 25kg, 50kg). Mohon info penawarannya.'
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full bg-[#25D366] hover:bg-[#20ba59] text-white rounded-full py-3 px-4 text-center font-bold text-xs sm:text-sm tracking-tight-bella transition flex items-center justify-center space-x-2 shadow-sm"
+              >
+                <MessageCircle className="w-4 h-4 text-white" />
+                <span>Tanya Harga via WhatsApp</span>
               </a>
             </div>
           </div>
@@ -343,7 +360,7 @@ export const PortalScreen: React.FC = () => {
               >
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="bella-badge-green text-[10px]">{v.categoryBadge || 'Unggulan'}</span>
+                    <span className="bella-badge-sage text-[10px]">{v.categoryBadge || 'Beras Pilihan'}</span>
                     <span className="text-[11px] font-bold tracking-tight-bella text-[#1b4332]/80">{v.subBadge}</span>
                   </div>
 
@@ -388,17 +405,32 @@ export const PortalScreen: React.FC = () => {
                 </div>
 
                 <div className="space-y-3 pt-2">
-                  <div className="text-lg font-bold tracking-tight-bella text-[#1b4332]">
-                    {v.price} <span className="text-xs font-normal text-[#142217]/60">{v.unit}</span>
-                  </div>
-
                   <a
-                    href="https://www.instagram.com/berasbusur.id?rpxt=MW10dWI3aTFvMjZ2cA=="
+                    href={`https://wa.me/62818334998?text=${encodeURIComponent(
+                      `Halo Admin PP Bumi Mas / Beras Busur, saya ingin menanyakan harga terbaru untuk Beras ${v.name} (${v.sizes}). Mohon info penawaran harga grosir dan stok hari ini.`
+                    )}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-full bella-btn-pill py-2.5 text-xs text-center block hover:bg-[#e8f1eb]"
+                    className="group/price block hover:opacity-85 transition"
+                    title={`Tanya harga Beras ${v.name} via WhatsApp`}
                   >
-                    Pesan via Instagram
+                    <span className="text-[11px] font-semibold text-[#142217]/60 block">Harga Terkini:</span>
+                    <div className="text-base sm:text-lg font-bold tracking-tight-bella text-[#1b4332] flex items-center gap-1.5">
+                      <span>{v.price}</span>
+                      <span className="text-xs font-normal text-[#142217]/60">{v.unit}</span>
+                    </div>
+                  </a>
+
+                  <a
+                    href={`https://wa.me/62818334998?text=${encodeURIComponent(
+                      `Halo Admin PP Bumi Mas / Beras Busur, saya ingin menanyakan harga terbaru untuk Beras ${v.name} (${v.sizes}). Mohon info penawaran harga grosir dan stok hari ini.`
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full bg-[#25D366] hover:bg-[#20ba59] text-white py-2.5 px-3 rounded-full text-xs font-bold tracking-tight-bella flex items-center justify-center space-x-2 transition shadow-sm"
+                  >
+                    <MessageCircle className="w-4 h-4 text-white shrink-0" />
+                    <span>Tanya Harga via WhatsApp</span>
                   </a>
                 </div>
               </div>
