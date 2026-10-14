@@ -102,6 +102,7 @@ export const PortalScreen: React.FC = () => {
           return parsed.map((item: RiceVariant) => ({
             ...item,
             categoryBadge: (!item.categoryBadge || item.categoryBadge === 'Bestseller') ? 'Beras Pilihan' : item.categoryBadge,
+            sizes: item.sizes ? item.sizes.replace(/,?\s*50\s*kg/gi, '').trim() : item.sizes,
           }));
         }
       }
@@ -193,7 +194,7 @@ export const PortalScreen: React.FC = () => {
             {/* Top Brand Pill Badges */}
             <div className="relative z-10 flex flex-wrap items-center gap-2">
               <span className="bella-badge-white">
-                PP BUMI MAS x BERAS BUSUR
+                BERAS BUSUR
               </span>
               <span className="bella-badge-sage">
                 Banyuwangi • Jawa Timur
@@ -262,7 +263,7 @@ export const PortalScreen: React.FC = () => {
                 />
                 <div className="mt-3 flex items-center justify-between text-xs font-bold tracking-tight-bella">
                   <span>Pilihan Kemasan:</span>
-                  <span className="bg-white/20 px-2 py-0.5 rounded-full">5kg • 10kg • 25kg • 50kg</span>
+                  <span className="bg-white/20 px-2 py-0.5 rounded-full">5kg • 10kg • 25kg</span>
                 </div>
               </div>
             </div>
@@ -270,7 +271,7 @@ export const PortalScreen: React.FC = () => {
             <div className="pt-3 border-t border-white/20">
               <a
                 href={`https://wa.me/62818334998?text=${encodeURIComponent(
-                  'Halo Admin PP Bumi Mas / Beras Busur, saya ingin menanyakan harga terbaru untuk Beras Cap Putri Thailand (Kemasan 5kg, 10kg, 25kg, 50kg). Mohon info penawarannya.'
+                  'Halo Admin PP Bumi Mas / Beras Busur, saya ingin menanyakan harga terbaru untuk Beras Cap Putri Thailand (Kemasan 5kg, 10kg, 25kg). Mohon info penawarannya.'
                 )}`}
                 target="_blank"
                 rel="noopener noreferrer"

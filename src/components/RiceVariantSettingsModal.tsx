@@ -25,7 +25,7 @@ export const DEFAULT_RICE_VARIANTS: RiceVariant[] = [
     subBadge: 'Super Premium',
     image: 'https://images.unsplash.com/photo-1516684732162-798a0062be99?auto=format&fit=crop&w=600&q=80',
     description: 'Beras kristal putih bening, sosoh 95%, broken maks 5%. Nasi lembut pulen istimewa favorit keluarga.',
-    sizes: '5kg, 10kg, 25kg, 50kg',
+    sizes: '5kg, 10kg, 25kg',
     millingGrade: '95% Bening Kristal',
     price: 'Rp 14.800',
     unit: '/ kg',
@@ -55,7 +55,7 @@ export const DEFAULT_RICE_VARIANTS: RiceVariant[] = [
     subBadge: 'Premium Punel',
     image: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=600&q=80',
     description: 'Beras wangi alami dari kesuburan tanah Banyuwangi. Tekstur pulen, putih bersih, dan nikmat disajikan hangat.',
-    sizes: '5kg, 10kg, 25kg, 50kg',
+    sizes: '5kg, 10kg, 25kg',
     millingGrade: '95% Harum & Bersih',
     price: 'Rp 14.500',
     unit: '/ kg',
@@ -70,7 +70,7 @@ export const DEFAULT_RICE_VARIANTS: RiceVariant[] = [
     subBadge: 'Super Kepala',
     image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80',
     description: 'Beras kepala pilihan rumah makan dan katering. Tekstur butir utuh padat pulen dan tidak mudah basi.',
-    sizes: '10kg, 20kg, 25kg, 50kg',
+    sizes: '10kg, 20kg, 25kg',
     millingGrade: '90% Standar Kepala',
     price: 'Rp 13.900',
     unit: '/ kg',
@@ -249,7 +249,7 @@ export const RiceVariantSettingsModal: React.FC<RiceVariantSettingsModalProps> =
                 value={current.sizes}
                 onChange={(e) => updateCurrent('sizes', e.target.value)}
                 className="w-full px-3 py-2 rounded-lg border border-[#1b4332]/20 bg-white text-xs font-bold text-[#142217] focus:border-[#1b4332] outline-none"
-                placeholder="Contoh: 5kg, 10kg, 25kg, 50kg"
+                placeholder="Contoh: 5kg, 10kg, 25kg"
               />
             </div>
 

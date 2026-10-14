@@ -55,7 +55,7 @@ export const Admin1DeliveryOrderScreen: React.FC = () => {
   // Google Calendar Sync Modal State
   const [showGCalModal, setShowGCalModal] = useState<boolean>(false);
   const [gcalInputText, setGcalInputText] = useState<string>(
-    'ORDER DM - 08/09/2026\nCustomer: BUMI SUBUR SURABAYA\nExpedisi: EXP. CARAVAN (P. MATHIAS) GD DIPO KALIANAK\nItems: 20 Zak Putri Thailand 50kg, 150 Zak Putri Thailand 25kg, 75 Zak Pandan 20kg'
+    'ORDER DM - 08/09/2026\nCustomer: BUMI SUBUR SURABAYA\nExpedisi: EXP. CARAVAN (P. MATHIAS) GD DIPO KALIANAK\nItems: 170 Zak Putri Thailand 25kg, 75 Zak Pandan 20kg'
   );
 
   const handleSelectCustomer = (custId: string) => {
@@ -74,7 +74,7 @@ export const Admin1DeliveryOrderScreen: React.FC = () => {
   const handleAddItemRow = () => {
     setItems(prev => [
       ...prev,
-      { id: `it-${Date.now()}`, product_name: 'BERAS PREMIUM CAP PUTRI THAILAND @50 KG', unit: 'ZAK', qty: 50, weight_per_unit_kg: 50, total_kg: 2500 }
+      { id: `it-${Date.now()}`, product_name: 'BERAS PREMIUM CAP PUTRI THAILAND @25 KG', unit: 'ZAK', qty: 100, weight_per_unit_kg: 25, total_kg: 2500 }
     ]);
   };
 

@@ -17,7 +17,7 @@ export const Admin2TruckTierScreen: React.FC = () => {
 
   // Form Fields
   const [nopol, setNopol] = useState<string>('B 9912 KFX');
-  const [weightPerSak, setWeightPerSak] = useState<number>(50); // 50KG, 25KG, 20KG, 10KG
+  const [weightPerSak, setWeightPerSak] = useState<number>(25); // 25KG, 20KG, 10KG
   const [destination, setDestination] = useState<string>('GD. DIPO JAPFA SURABAYA');
   const [targetSakSJ, setTargetSakSJ] = useState<number>(400);
 
@@ -199,10 +199,9 @@ export const Admin2TruckTierScreen: React.FC = () => {
             <span className="text-slate-600 font-bold">Ukuran Karung/Sak:</span>
             <select
               value={weightPerSak}
-              onChange={(e) => setWeightPerSak(parseInt(e.target.value) || 50)}
+              onChange={(e) => setWeightPerSak(parseInt(e.target.value) || 25)}
               className="px-2 py-1 bg-white border border-slate-300 rounded font-bold text-xs text-[#0f3e2e]"
             >
-              <option value={50}>@50 KG / Sak</option>
               <option value={25}>@25 KG / Sak</option>
               <option value={20}>@20 KG / Sak</option>
               <option value={10}>@10 KG / Sak</option>
