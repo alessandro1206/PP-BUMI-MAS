@@ -37,7 +37,7 @@ export const Header: React.FC = () => {
     return (
       <>
         <div className="pt-2 sm:pt-4 px-2 sm:px-6 max-w-[1200px] mx-auto w-full sticky top-0 z-50">
-          <header className="bg-[#ffffff] rounded-[12px] border border-[#1b4332]/15 h-16 sm:h-20 px-2.5 sm:px-5 lg:px-6 flex items-center justify-between transition-all">
+          <header className="bg-[#ffffff]/95 backdrop-blur-md rounded-[12px] border border-[#18181b]/10 h-16 sm:h-20 px-2.5 sm:px-5 lg:px-6 flex items-center justify-between transition-all shadow-xs">
             {/* Brand Mark (Left) */}
             <div 
               className="flex items-center space-x-2 sm:space-x-3 cursor-pointer group shrink-0 min-w-0"
@@ -49,31 +49,31 @@ export const Header: React.FC = () => {
                 }
               }}
             >
-              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#1b4332] flex items-center justify-center text-[#f4f0e6] font-bold text-xs tracking-tight-bella shrink-0">
+              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#2d5a43] flex items-center justify-center text-[#faf8f5] font-bold text-xs tracking-tight-bella shrink-0 shadow-xs">
                 BM
               </div>
               <div className="min-w-0">
                 <div className="flex items-center space-x-1.5 sm:space-x-2">
-                  <span className="text-sm sm:text-base lg:text-lg font-bold tracking-tight-bella text-[#142217] whitespace-nowrap">
+                  <span className="text-sm sm:text-base lg:text-lg font-bold tracking-tight-bella text-[#18181b] whitespace-nowrap">
                     PP BUMI MAS
                   </span>
-                  <span className="hidden sm:inline-block text-[9px] sm:text-[10px] font-bold uppercase bg-[#e8f1eb] text-[#1b4332] px-1.5 sm:px-2 py-0.5 rounded-full border border-[#1b4332]/20 tracking-tight-bella whitespace-nowrap shrink-0">
+                  <span className="hidden sm:inline-block text-[9px] sm:text-[10px] font-bold uppercase bg-[#eaf2ec] text-[#2d5a43] px-1.5 sm:px-2 py-0.5 rounded-full border border-[#2d5a43]/20 tracking-wider whitespace-nowrap shrink-0">
                     BERAS BUSUR
                   </span>
                 </div>
-                <p className="hidden md:block text-[10px] sm:text-[11px] text-[#142217]/70 font-normal tracking-tight-bella whitespace-nowrap">
+                <p className="hidden md:block text-[10px] sm:text-[11px] text-[#52525b] font-normal tracking-tight-bella whitespace-nowrap">
                   Pabrik &amp; Reprocessing Beras Banyuwangi
                 </p>
               </div>
             </div>
 
             {/* Navigation Category Links (Desktop XL only to prevent collision) */}
-            <nav className="hidden xl:flex items-center space-x-6 text-sm font-normal text-[#142217] tracking-tight-bella whitespace-nowrap">
-              <a href="#koleksi-beras" className="hover:text-[#1b4332] transition">Koleksi Beras</a>
-              <a href="#tentang-busur" className="hover:text-[#1b4332] transition">Tentang Kami</a>
-              <a href="#kilang-proses" className="hover:text-[#1b4332] transition">Kilang &amp; Presisi</a>
-              <a href="#inspirasi-dapur" className="hover:text-[#1b4332] transition">Inspirasi Dapur</a>
-              <a href="#pesan-grosir" className="hover:text-[#1b4332] transition">Penawaran B2B</a>
+            <nav className="hidden xl:flex items-center space-x-6 text-sm font-normal text-[#18181b] tracking-tight-bella whitespace-nowrap">
+              <a href="#koleksi-beras" className="hover:text-[#2d5a43] transition">Koleksi Beras</a>
+              <a href="#tentang-busur" className="hover:text-[#2d5a43] transition">Tentang Kami</a>
+              <a href="#kilang-proses" className="hover:text-[#2d5a43] transition">Kilang &amp; Presisi</a>
+              <a href="#inspirasi-dapur" className="hover:text-[#2d5a43] transition">Inspirasi Dapur</a>
+              <a href="#pesan-grosir" className="hover:text-[#2d5a43] transition">Penawaran B2B</a>
             </nav>
 
             {/* Right Action Controls */}
@@ -82,10 +82,10 @@ export const Header: React.FC = () => {
                 href="https://www.instagram.com/berasbusur.id?rpxt=MW10dWI3aTFvMjZ2cA=="
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hidden xl:inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-full border border-[#1b4332]/20 hover:border-[#1b4332] text-xs font-bold tracking-tight-bella text-[#142217] transition bg-[#e8f1eb]/70 hover:bg-[#e8f1eb] whitespace-nowrap"
+                className="hidden xl:inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-full border border-[#2d5a43]/20 hover:border-[#2d5a43] text-xs font-bold tracking-tight-bella text-[#18181b] transition bg-[#eaf2ec]/70 hover:bg-[#eaf2ec] whitespace-nowrap"
                 title="Instagram Resmi @berasbusur.id"
               >
-                <Instagram className="w-3.5 h-3.5 text-[#2d6a4f]" />
+                <Instagram className="w-3.5 h-3.5 text-[#2d5a43]" />
                 <span>@berasbusur.id</span>
               </a>
 
@@ -93,7 +93,7 @@ export const Header: React.FC = () => {
                 <>
                   <button
                     onClick={() => setActiveScreen('SCREEN_WORKSTATIONS')}
-                    className="px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs font-bold tracking-tight-bella bg-[#1b4332] text-white hover:bg-[#245741] transition flex items-center space-x-1 sm:space-x-1.5 whitespace-nowrap shrink-0"
+                    className="px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs font-bold tracking-tight-bella bg-[#2d5a43] text-white hover:bg-[#234735] transition flex items-center space-x-1 sm:space-x-1.5 whitespace-nowrap shrink-0 shadow-xs"
                     title="Buka Stasiun Kerja ERP"
                   >
                     <Building2 className="w-3.5 h-3.5" />
@@ -108,7 +108,7 @@ export const Header: React.FC = () => {
                   </button>
                   <button
                     onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                    className="xl:hidden p-2 rounded-full border border-[#1b4332]/25 text-[#142217] hover:bg-[#e8f1eb] transition flex items-center justify-center shrink-0 w-8 h-8 sm:w-9 sm:h-9"
+                    className="xl:hidden p-2 rounded-full border border-[#18181b]/15 text-[#18181b] hover:bg-[#f3efea] transition flex items-center justify-center shrink-0 w-8 h-8 sm:w-9 sm:h-9"
                     aria-label="Buka Menu Navigasi"
                   >
                     {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
@@ -116,19 +116,19 @@ export const Header: React.FC = () => {
                 </>
               ) : (
                 <>
-                  {/* TOMBOL LOGIN STAF: Langsung tampil jelas di Mobile dan Desktop */}
+                  {/* TOMBOL LOGIN STAF */}
                   <button
                     onClick={() => setShowLoginModal(true)}
-                    className="px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full border border-[#1b4332]/40 bg-[#ffffff] hover:bg-[#e8f1eb] text-xs font-bold tracking-tight-bella text-[#142217] transition flex items-center space-x-1 sm:space-x-1.5 whitespace-nowrap shrink-0 shadow-xs"
+                    className="px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full border border-[#18181b]/20 bg-[#ffffff] hover:bg-[#f3efea] text-xs font-bold tracking-tight-bella text-[#18181b] transition flex items-center space-x-1 sm:space-x-1.5 whitespace-nowrap shrink-0 shadow-xs"
                     title="Login Akses Staf Pabrik"
                   >
-                    <Shield className="w-3.5 h-3.5 text-[#1b4332] shrink-0" />
+                    <Shield className="w-3.5 h-3.5 text-[#2d5a43] shrink-0" />
                     <span>Login Staf</span>
                   </button>
 
                   <a
                     href="#pesan-grosir"
-                    className="hidden sm:inline-flex bella-btn-green text-xs py-2 px-3 sm:px-5 font-bold tracking-tight-bella items-center space-x-1 whitespace-nowrap shrink-0"
+                    className="hidden sm:inline-flex bella-btn-green text-xs py-2 px-3 sm:px-5 font-bold tracking-tight-bella items-center space-x-1 whitespace-nowrap shrink-0 shadow-xs"
                   >
                     <span>Minta Penawaran</span>
                   </a>

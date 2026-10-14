@@ -168,18 +168,18 @@ export const PortalScreen: React.FC = () => {
   };
 
   return (
-    <div className="w-full bg-[#f4f0e6] text-[#142217] font-sans selection:bg-[#1b4332] selection:text-white pb-20">
+    <div className="w-full bg-[#faf8f5] text-[#18181b] font-sans selection:bg-[#2d5a43] selection:text-white pb-20">
       
       {/* Container 1200px Max-Width */}
       <div className="max-w-[1200px] mx-auto px-4 sm:px-6 space-y-16 sm:space-y-20 pt-6">
 
         {/* =========================================================================
-            1. HERO BANNER (Split Layout ~65% / ~35% with 12px radius, Green & Cream Connected)
+            1. HERO BANNER (Split Layout ~65% / ~35% with 12px radius, Artisanal Minimalist)
             ========================================================================= */}
         <section className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
           
           {/* Left ~65% (lg:col-span-8): Sunlit Harvest Sawah & Brand Intro */}
-          <div className="lg:col-span-8 relative rounded-[12px] overflow-hidden min-h-[460px] sm:min-h-[520px] flex flex-col justify-between p-6 sm:p-10 bg-[#dfd9cb]">
+          <div className="lg:col-span-8 relative rounded-[12px] overflow-hidden min-h-[460px] sm:min-h-[520px] flex flex-col justify-between p-6 sm:p-10 bg-[#f3efea] border border-[#18181b]/8 shadow-xs">
             {/* Background Photographic Image */}
             <div 
               className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-1000 scale-105"
@@ -188,15 +188,15 @@ export const PortalScreen: React.FC = () => {
               }}
             >
               {/* Sunlit warm overlay ensuring crisp black and white typography */}
-              <div className="absolute inset-0 bg-gradient-to-t from-[#0d1f14]/90 via-[#0d1f14]/45 to-transparent"></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-[#112318]/95 via-[#112318]/50 to-transparent"></div>
             </div>
 
             {/* Top Brand Pill Badges */}
             <div className="relative z-10 flex flex-wrap items-center gap-2">
-              <span className="bella-badge-white">
+              <span className="bella-badge-white text-[11px] font-bold shadow-xs">
                 BERAS BUSUR
               </span>
-              <span className="bella-badge-sage">
+              <span className="bella-badge-sage text-[11px] shadow-xs">
                 Banyuwangi • Jawa Timur
               </span>
             </div>
@@ -214,7 +214,7 @@ export const PortalScreen: React.FC = () => {
               <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                 <a
                   href="#koleksi-beras"
-                  className="bella-btn-pill inline-flex items-center justify-center space-x-2 text-xs sm:text-sm py-3 px-6 hover:bg-[#e8f1eb]"
+                  className="bella-btn-pill inline-flex items-center justify-center space-x-2 text-xs sm:text-sm py-3 px-6 shadow-xs"
                 >
                   <span>Jelajahi Koleksi Beras</span>
                   <ChevronRight className="w-4 h-4" />
@@ -224,7 +224,7 @@ export const PortalScreen: React.FC = () => {
                   href="https://www.instagram.com/berasbusur.id?rpxt=MW10dWI3aTFvMjZ2cA=="
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bella-btn-green inline-flex items-center justify-center space-x-2 text-xs sm:text-sm py-3 px-6"
+                  className="bella-btn-green inline-flex items-center justify-center space-x-2 text-xs sm:text-sm py-3 px-6 shadow-xs"
                 >
                   <Instagram className="w-4 h-4" />
                   <span>Instagram @berasbusur.id</span>
@@ -233,14 +233,14 @@ export const PortalScreen: React.FC = () => {
             </div>
           </div>
 
-          {/* Right ~35% (lg:col-span-4): Featured Product Card (Deep Forest Green #1b4332) */}
-          <div className="lg:col-span-4 bg-[#1b4332] text-white rounded-[12px] p-6 sm:p-8 flex flex-col justify-between space-y-6 border border-[#2d6a4f]/30">
+          {/* Right ~35% (lg:col-span-4): Featured Product Card (Deep Sumi Green #112318) */}
+          <div className="lg:col-span-4 bg-[#112318] text-white rounded-[12px] p-6 sm:p-8 flex flex-col justify-between space-y-6 border border-[#2d5a43]/30 shadow-xs">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="bella-badge-white text-[11px] text-[#1b4332]">
+                <span className="bg-white/90 text-[#18181b] text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
                   Varian Pilihan • Cap Putri
                 </span>
-                <span className="text-xs font-bold tracking-tight-bella text-[#e8f1eb] uppercase">
+                <span className="text-xs font-bold font-mono tracking-wider text-[#d4a359] uppercase">
                   Sosoh 95%
                 </span>
               </div>
@@ -249,13 +249,13 @@ export const PortalScreen: React.FC = () => {
                 <h2 className="text-2xl sm:text-3xl font-bold tracking-tight-bella text-white leading-tight">
                   Cap Putri Thailand
                 </h2>
-                <p className="text-xs sm:text-sm font-normal tracking-tight-bella text-[#e8f1eb]/90 mt-1 leading-snug">
-                  Beras kristal putih alami dengan aroma harum pandan dan tekstur pulen istimewa.
+                <p className="text-xs sm:text-sm font-normal tracking-tight-bella text-[#eaf2ec]/90 mt-1 leading-snug">
+                  Beras kristal putih bening dengan aroma harum alami dan tekstur pulen istimewa.
                 </p>
               </div>
 
               {/* Product Visual Presentation */}
-              <div className="relative rounded-[12px] overflow-hidden bg-white/10 p-4 border border-white/20">
+              <div className="relative rounded-[12px] overflow-hidden bg-white/5 p-4 border border-white/10">
                 <img 
                   src="https://images.unsplash.com/photo-1516684732162-798a0062be99?auto=format&fit=crop&w=800&q=80" 
                   alt="Nasi Pulen Cap Putri Thailand" 
@@ -263,19 +263,19 @@ export const PortalScreen: React.FC = () => {
                 />
                 <div className="mt-3 flex items-center justify-between text-xs font-bold tracking-tight-bella">
                   <span>Pilihan Kemasan:</span>
-                  <span className="bg-white/20 px-2 py-0.5 rounded-full">5kg • 10kg • 25kg</span>
+                  <span className="bg-white/15 px-2.5 py-1 rounded-full text-[11px]">5kg • 10kg • 25kg</span>
                 </div>
               </div>
             </div>
 
-            <div className="pt-3 border-t border-white/20">
+            <div className="pt-3 border-t border-white/15">
               <a
                 href={`https://wa.me/62818334998?text=${encodeURIComponent(
                   'Halo Admin PP Bumi Mas / Beras Busur, saya ingin menanyakan harga terbaru untuk Beras Cap Putri Thailand (Kemasan 5kg, 10kg, 25kg). Mohon info penawarannya.'
                 )}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full bg-[#25D366] hover:bg-[#20ba59] text-white rounded-full py-3 px-4 text-center font-bold text-xs sm:text-sm tracking-tight-bella transition flex items-center justify-center space-x-2 shadow-sm"
+                className="w-full bg-[#25D366] hover:bg-[#20ba59] text-white rounded-full py-3 px-4 text-center font-bold text-xs sm:text-sm tracking-tight-bella transition flex items-center justify-center space-x-2 shadow-xs"
               >
                 <MessageCircle className="w-4 h-4 text-white" />
                 <span>Tanya Harga via WhatsApp</span>
@@ -286,48 +286,48 @@ export const PortalScreen: React.FC = () => {
         </section>
 
         {/* =========================================================================
-            2. PURITY & TRUST ELEMENTS STRIP (Sand Beige & Sage Green Connected)
+            2. PURITY & TRUST ELEMENTS STRIP (Artisanal Metrics)
             ========================================================================= */}
-        <section className="bg-[#ffffff] rounded-[12px] p-6 sm:p-8 border border-[#1b4332]/10">
+        <section className="bg-[#ffffff] rounded-[12px] p-6 sm:p-8 border border-[#18181b]/8 shadow-xs">
           <div className="grid grid-cols-2 md:grid-cols-5 gap-6 text-center">
             
-            <div className="space-y-1 md:border-r md:border-[#1b4332]/10 md:pr-4">
-              <div className="text-xl sm:text-2xl font-bold tracking-tight-bella text-[#1b4332]">0%</div>
-              <div className="text-xs font-bold tracking-tight-bella text-[#142217]">Tanpa Pemutih</div>
-              <div className="text-[11px] font-normal tracking-tight-bella text-[#142217]/70">Warna kristal alami</div>
+            <div className="space-y-1 md:border-r md:border-[#18181b]/8 md:pr-4">
+              <div className="text-xl sm:text-2xl font-bold tracking-tight-bella text-[#2d5a43]">0%</div>
+              <div className="text-xs font-bold tracking-tight-bella text-[#18181b]">Tanpa Pemutih</div>
+              <div className="text-[11px] font-normal tracking-tight-bella text-[#52525b]">Warna kristal alami</div>
             </div>
 
-            <div className="space-y-1 md:border-r md:border-[#1b4332]/10 md:pr-4">
-              <div className="text-xl sm:text-2xl font-bold tracking-tight-bella text-[#1b4332]">100%</div>
-              <div className="text-xs font-bold tracking-tight-bella text-[#142217]">Padi Banyuwangi</div>
-              <div className="text-[11px] font-normal tracking-tight-bella text-[#142217]/70">Tanah vulkanik Ijen</div>
+            <div className="space-y-1 md:border-r md:border-[#18181b]/8 md:pr-4">
+              <div className="text-xl sm:text-2xl font-bold tracking-tight-bella text-[#2d5a43]">100%</div>
+              <div className="text-xs font-bold tracking-tight-bella text-[#18181b]">Padi Banyuwangi</div>
+              <div className="text-[11px] font-normal tracking-tight-bella text-[#52525b]">Tanah vulkanik Ijen</div>
             </div>
 
-            <div className="space-y-1 md:border-r md:border-[#1b4332]/10 md:pr-4">
-              <div className="text-xl sm:text-2xl font-bold tracking-tight-bella text-[#1b4332]">CCD Optik</div>
-              <div className="text-xs font-bold tracking-tight-bella text-[#142217]">Optical Color Sorter</div>
-              <div className="text-[11px] font-normal tracking-tight-bella text-[#142217]/70">Sortir bulir kuning &amp; rijek</div>
+            <div className="space-y-1 md:border-r md:border-[#18181b]/8 md:pr-4">
+              <div className="text-xl sm:text-2xl font-bold tracking-tight-bella text-[#2d5a43]">CCD Optik</div>
+              <div className="text-xs font-bold tracking-tight-bella text-[#18181b]">Optical Color Sorter</div>
+              <div className="text-[11px] font-normal tracking-tight-bella text-[#52525b]">Sortir bulir kuning &amp; rijek</div>
             </div>
 
-            <div className="space-y-1 md:border-r md:border-[#1b4332]/10 md:pr-4">
-              <div className="text-xl sm:text-2xl font-bold tracking-tight-bella text-[#1b4332]">Maks 14%</div>
-              <div className="text-xs font-bold tracking-tight-bella text-[#142217]">Permentan 22/2025</div>
-              <div className="text-[11px] font-normal tracking-tight-bella text-[#142217]/70">Standar mutu SNI resmi</div>
+            <div className="space-y-1 md:border-r md:border-[#18181b]/8 md:pr-4">
+              <div className="text-xl sm:text-2xl font-bold tracking-tight-bella text-[#2d5a43]">Maks 14%</div>
+              <div className="text-xs font-bold tracking-tight-bella text-[#18181b]">Permentan 22/2025</div>
+              <div className="text-[11px] font-normal tracking-tight-bella text-[#52525b]">Standar mutu SNI resmi</div>
             </div>
 
             <div className="col-span-2 md:col-span-1 space-y-1">
-              <div className="text-xl sm:text-2xl font-bold tracking-tight-bella text-[#1b4332]">Legal Tera</div>
-              <div className="text-xs font-bold tracking-tight-bella text-[#142217]">Metrologi Presisi</div>
-              <div className="text-[11px] font-normal tracking-tight-bella text-[#142217]/70">Bobot timbangan akurat</div>
+              <div className="text-xl sm:text-2xl font-bold tracking-tight-bella text-[#2d5a43]">Legal Tera</div>
+              <div className="text-xs font-bold tracking-tight-bella text-[#18181b]">Metrologi Presisi</div>
+              <div className="text-[11px] font-normal tracking-tight-bella text-[#52525b]">Bobot timbangan akurat</div>
             </div>
 
           </div>
         </section>
 
         {/* =========================================================================
-            3. LIFESTYLE SCENE SECTION (Warm Kitchen / Dining Counter Overlay)
+            3. LIFESTYLE SCENE SECTION (Terroir & Dining Heritage)
             ========================================================================= */}
-        <section id="tentang-busur" className="relative rounded-[12px] overflow-hidden min-h-[440px] sm:min-h-[500px] flex items-center justify-center p-6 bg-[#dfd9cb]">
+        <section id="tentang-busur" className="relative rounded-[12px] overflow-hidden min-h-[440px] sm:min-h-[500px] flex items-center justify-center p-6 bg-[#f3efea] border border-[#18181b]/8 shadow-xs">
           {/* Photographic Background */}
           <div 
             className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -335,34 +335,34 @@ export const PortalScreen: React.FC = () => {
               backgroundImage: `url('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1600&q=80')`,
             }}
           >
-            <div className="absolute inset-0 bg-[#0d1f14]/35 backdrop-brightness-95"></div>
+            <div className="absolute inset-0 bg-[#112318]/40 backdrop-brightness-95"></div>
           </div>
 
-          {/* Overlaid White Card (12px radius, 24px padding, 0 shadow, max-w-xl) */}
-          <div className="relative z-10 max-w-xl w-full bg-[#ffffff] rounded-[12px] p-6 sm:p-8 text-center space-y-4 border border-[#1b4332]/10">
+          {/* Overlaid White Card */}
+          <div className="relative z-10 max-w-xl w-full bg-[#ffffff] rounded-[12px] p-6 sm:p-8 text-center space-y-4 border border-[#18181b]/8 shadow-sm">
             <span className="bella-badge-sage text-[11px]">
-              Dapur Hangat Keluarga
+              Dapur Hangat Nusantara
             </span>
             
-            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight-bella text-[#142217] leading-tight">
+            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight-bella text-[#18181b] leading-tight">
               Dari Sawah Vulkanik Banyuwangi ke Meja Makan Anda
             </h2>
             
-            <p className="text-xs sm:text-sm font-normal tracking-tight-bella text-[#142217]/80 leading-relaxed">
+            <p className="text-xs sm:text-sm font-normal tracking-tight-bella text-[#52525b] leading-relaxed">
               Keluarga kami di PP Bumi Mas telah bermitra dengan kelompok tani lokal Banyuwangi selama puluhan tahun. Kami merawat setiap butir beras mulai dari penjemuran gabah kering giling hingga pengemasan higienis, agar setiap suapan nasi di rumah Anda terasa pulen, harum, dan bergizi.
             </p>
 
             <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
               <a 
                 href="#koleksi-beras"
-                className="bella-btn-pill text-xs py-2.5 px-5 font-bold hover:bg-[#e8f1eb]"
+                className="bella-btn-pill text-xs py-2.5 px-5 font-bold shadow-xs"
               >
                 Pilih Beras Pilihan Anda
               </a>
               <button
                 type="button"
                 onClick={() => handleOpenQuote()}
-                className="bella-btn-green text-xs py-2.5 px-5 font-bold"
+                className="bella-btn-green text-xs py-2.5 px-5 font-bold shadow-xs"
               >
                 Konsultasi Pasokan Toko
               </button>
@@ -378,22 +378,22 @@ export const PortalScreen: React.FC = () => {
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div className="space-y-2 max-w-2xl">
               <span className="bella-badge-sage text-[11px]">
-                Katalog Produk Resmi
+                Katalog Resmi Beras Busur
               </span>
-              <h2 className="text-3xl sm:text-4xl font-bold tracking-tight-bella text-[#142217]">
+              <h2 className="text-3xl sm:text-4xl font-bold tracking-tight-bella text-[#18181b]">
                 Koleksi Beras Unggulan
               </h2>
-              <p className="text-xs sm:text-sm font-normal tracking-tight-bella text-[#142217]/80">
+              <p className="text-xs sm:text-sm font-normal tracking-tight-bella text-[#52525b]">
                 Diproduksi langsung di kilang modern PP Bumi Mas Banyuwangi dengan standar beras pulen alami, higienis, dan tanpa bahan pengawet.
               </p>
             </div>
 
             <button
               onClick={() => setShowVariantSettings(true)}
-              className="inline-flex items-center space-x-2 px-4 py-2 rounded-full border border-[#1b4332]/25 bg-[#ffffff] hover:bg-[#e8f1eb] text-xs font-bold text-[#142217] transition shadow-sm shrink-0 self-start md:self-auto"
+              className="inline-flex items-center space-x-2 px-4 py-2 rounded-full border border-[#18181b]/15 bg-[#ffffff] hover:bg-[#f3efea] text-xs font-bold text-[#18181b] transition shadow-xs shrink-0 self-start md:self-auto"
               title="Atur teks nama, gambar, ukuran kemasan, dan harga varian beras"
             >
-              <SlidersHorizontal className="w-3.5 h-3.5 text-[#1b4332]" />
+              <SlidersHorizontal className="w-3.5 h-3.5 text-[#2d5a43]" />
               <span>Pengaturan Varian Beras</span>
             </button>
           </div>
@@ -402,15 +402,15 @@ export const PortalScreen: React.FC = () => {
             {variants.map((v) => (
               <div 
                 key={v.id}
-                className="bella-card flex flex-col justify-between space-y-5 border border-[#1b4332]/10 hover:border-[#1b4332]/40 transition group"
+                className="bella-card flex flex-col justify-between space-y-5 border border-[#18181b]/8 hover:border-[#2d5a43]/40 transition-all duration-300 group shadow-xs hover:shadow-sm"
               >
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <span className="bella-badge-sage text-[10px]">{v.categoryBadge || 'Beras Pilihan'}</span>
-                    <span className="text-[11px] font-bold tracking-tight-bella text-[#1b4332]/80">{v.subBadge}</span>
+                    <span className="text-[11px] font-bold tracking-tight-bella text-[#2d5a43]">{v.subBadge}</span>
                   </div>
 
-                  <div className="h-48 rounded-[8px] overflow-hidden bg-[#f4f0e6] flex items-center justify-center p-1">
+                  <div className="h-48 rounded-[8px] overflow-hidden bg-[#f3efea] flex items-center justify-center p-1">
                     <img 
                       src={v.image} 
                       alt={v.name} 
@@ -424,28 +424,28 @@ export const PortalScreen: React.FC = () => {
                   </div>
 
                   <div>
-                    <h3 className="text-base font-bold tracking-tight-bella text-[#142217]">{v.name}</h3>
-                    <p className="text-xs font-normal tracking-tight-bella text-[#142217]/70 mt-1 line-clamp-3">
+                    <h3 className="text-base font-bold tracking-tight-bella text-[#18181b]">{v.name}</h3>
+                    <p className="text-xs font-normal tracking-tight-bella text-[#52525b] mt-1 line-clamp-3">
                       {v.description}
                     </p>
                   </div>
 
-                  <div className="space-y-1 text-xs font-normal tracking-tight-bella border-t border-[#1b4332]/10 pt-2 text-[#142217]/80">
+                  <div className="space-y-1 text-xs font-normal tracking-tight-bella border-t border-[#18181b]/8 pt-2 text-[#52525b]">
                     <div className="flex justify-between">
                       <span>Kemasan:</span>
-                      <strong className="text-[#142217]">{v.sizes}</strong>
+                      <strong className="text-[#18181b]">{v.sizes}</strong>
                     </div>
                     <div className="flex justify-between">
                       <span>Karakteristik:</span>
-                      <strong className="text-[#142217]">{v.millingGrade}</strong>
+                      <strong className="text-[#18181b]">{v.millingGrade}</strong>
                     </div>
                   </div>
 
                   {/* Tersedia di Shopee dan Tokopedia */}
                   {v.availableOnMarketplace && (
-                    <div className="bg-[#e8f1eb] text-[#1b4332] border border-[#1b4332]/15 px-3 py-2 rounded-[8px] flex items-center space-x-2 text-xs font-bold tracking-tight-bella">
-                      <ShoppingBag className="w-4 h-4 text-[#2d6a4f] shrink-0" />
-                      <span>Tersedia di Shopee dan Tokopedia</span>
+                    <div className="bg-[#eaf2ec] text-[#2d5a43] border border-[#2d5a43]/15 px-3 py-2 rounded-[8px] flex items-center space-x-2 text-xs font-bold tracking-tight-bella">
+                      <ShoppingBag className="w-4 h-4 text-[#2d5a43] shrink-0" />
+                      <span>Tersedia di Shopee &amp; Tokopedia</span>
                     </div>
                   )}
                 </div>
@@ -457,7 +457,7 @@ export const PortalScreen: React.FC = () => {
                     )}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-full bg-[#25D366] hover:bg-[#20ba59] text-white py-2.5 px-3 rounded-full text-xs font-bold tracking-tight-bella flex items-center justify-center space-x-2 transition shadow-sm"
+                    className="w-full bg-[#25D366] hover:bg-[#20ba59] text-white py-2.5 px-3 rounded-full text-xs font-bold tracking-tight-bella flex items-center justify-center space-x-2 transition shadow-xs"
                   >
                     <MessageCircle className="w-4 h-4 text-white shrink-0" />
                     <span>Tanya Harga via WhatsApp</span>
@@ -472,19 +472,19 @@ export const PortalScreen: React.FC = () => {
         {/* =========================================================================
             5. INSPIRATION FEATURE CARD (Instagram @berasbusur.id & Dapur Nusantara)
             ========================================================================= */}
-        <section id="inspirasi-dapur" className="bg-[#dfd9cb] rounded-[12px] p-6 sm:p-10 border border-[#1b4332]/10">
+        <section id="inspirasi-dapur" className="bg-[#f3efea] rounded-[12px] p-6 sm:p-10 border border-[#18181b]/8 shadow-xs">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             
             <div className="lg:col-span-5 space-y-4">
-              <span className="bella-badge-white text-[11px] text-[#1b4332]">
+              <span className="bella-badge-white text-[11px] text-[#2d5a43] shadow-xs">
                 Instagram @berasbusur.id
               </span>
               
-              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight-bella text-[#142217] leading-tight">
+              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight-bella text-[#18181b] leading-tight">
                 Inspirasi Menu Harian &amp; Cerita Dapur Nusantara
               </h2>
               
-              <p className="text-xs sm:text-sm font-normal tracking-tight-bella text-[#142217]/80 leading-relaxed">
+              <p className="text-xs sm:text-sm font-normal tracking-tight-bella text-[#52525b] leading-relaxed">
                 Nasi pulen adalah kunci kenikmatan setiap hidangan Indonesia. Ikuti akun resmi <strong>@berasbusur.id</strong> untuk mendapatkan update stok harian, tips menanak nasi harum, dan resep kreasi dapur keluarga dari seluruh pelosok negeri.
               </p>
 
@@ -493,53 +493,53 @@ export const PortalScreen: React.FC = () => {
                   href="https://www.instagram.com/berasbusur.id?rpxt=MW10dWI3aTFvMjZ2cA=="
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bella-btn-green inline-flex items-center space-x-2 text-xs sm:text-sm"
+                  className="bella-btn-green inline-flex items-center space-x-2 text-xs sm:text-sm shadow-xs"
                 >
-                  <Instagram className="w-4 h-4 text-[#e8f1eb]" />
+                  <Instagram className="w-4 h-4 text-[#eaf2ec]" />
                   <span>Kunjungi Instagram @berasbusur.id</span>
                 </a>
               </div>
             </div>
 
             <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="bg-[#ffffff] rounded-[12px] p-3 border border-[#1b4332]/10 space-y-2">
+              <div className="bg-[#ffffff] rounded-[12px] p-3 border border-[#18181b]/8 space-y-2 shadow-xs">
                 <img 
                   src="https://images.unsplash.com/photo-1516684732162-798a0062be99?auto=format&fit=crop&w=400&q=80" 
                   alt="Nasi Liwet Gurih" 
                   className="w-full h-28 object-cover rounded-[8px]"
                 />
-                <div className="text-xs font-bold tracking-tight-bella text-[#142217]">Nasi Liwet Gurih</div>
-                <div className="text-[11px] text-[#142217]/70">Pulen alami dengan santan &amp; serai</div>
+                <div className="text-xs font-bold tracking-tight-bella text-[#18181b]">Nasi Liwet Gurih</div>
+                <div className="text-[11px] text-[#52525b]">Pulen alami dengan santan &amp; serai</div>
               </div>
 
-              <div className="bg-[#ffffff] rounded-[12px] p-3 border border-[#1b4332]/10 space-y-2">
+              <div className="bg-[#ffffff] rounded-[12px] p-3 border border-[#18181b]/8 space-y-2 shadow-xs">
                 <img 
                   src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=400&q=80" 
                   alt="Nasi Kuning Tumpeng" 
                   className="w-full h-28 object-cover rounded-[8px]"
                 />
-                <div className="text-xs font-bold tracking-tight-bella text-[#142217]">Nasi Kuning Tumpeng</div>
-                <div className="text-[11px] text-[#142217]/70">Warna kuning kunyit meresap sempurna</div>
+                <div className="text-xs font-bold tracking-tight-bella text-[#18181b]">Nasi Kuning Tumpeng</div>
+                <div className="text-[11px] text-[#52525b]">Warna kuning kunyit meresap sempurna</div>
               </div>
 
-              <div className="bg-[#ffffff] rounded-[12px] p-3 border border-[#1b4332]/10 space-y-2">
+              <div className="bg-[#ffffff] rounded-[12px] p-3 border border-[#18181b]/8 space-y-2 shadow-xs">
                 <img 
                   src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=400&q=80" 
                   alt="Nasi Uduk Betawi" 
                   className="w-full h-28 object-cover rounded-[8px]"
                 />
-                <div className="text-xs font-bold tracking-tight-bella text-[#142217]">Nasi Uduk Daun Pandan</div>
-                <div className="text-[11px] text-[#142217]/70">Aroma pandan alami menggugah nafsu makan</div>
+                <div className="text-xs font-bold tracking-tight-bella text-[#18181b]">Nasi Uduk Daun Pandan</div>
+                <div className="text-[11px] text-[#52525b]">Aroma pandan alami menggugah nafsu makan</div>
               </div>
 
-              <div className="bg-[#ffffff] rounded-[12px] p-3 border border-[#1b4332]/10 space-y-2">
+              <div className="bg-[#ffffff] rounded-[12px] p-3 border border-[#18181b]/8 space-y-2 shadow-xs">
                 <img 
                   src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=400&q=80" 
                   alt="Nasi Goreng Spesial" 
                   className="w-full h-28 object-cover rounded-[8px]"
                 />
-                <div className="text-xs font-bold tracking-tight-bella text-[#142217]">Nasi Goreng Spesial</div>
-                <div className="text-[11px] text-[#142217]/70">Butir tidak menggumpal, pas untuk resto</div>
+                <div className="text-xs font-bold tracking-tight-bella text-[#18181b]">Nasi Goreng Spesial</div>
+                <div className="text-[11px] text-[#52525b]">Butir tidak menggumpal, pas untuk resto</div>
               </div>
             </div>
 
@@ -555,52 +555,52 @@ export const PortalScreen: React.FC = () => {
             <span className="bella-badge-sage text-[11px]">
               Kilang Padi Modern PP Bumi Mas
             </span>
-            <h2 className="text-3xl sm:text-4xl font-bold tracking-tight-bella text-[#142217]">
+            <h2 className="text-3xl sm:text-4xl font-bold tracking-tight-bella text-[#18181b]">
               Tahapan Pengolahan Beras Presisi
             </h2>
-            <p className="text-xs sm:text-sm font-normal tracking-tight-bella text-[#142217]/80">
+            <p className="text-xs sm:text-sm font-normal tracking-tight-bella text-[#52525b]">
               Penggilingan padi terintegrasi berkapasitas puluhan ton per hari dengan standar higienis dan mesin sortir optik terkini.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
             
-            <div className="bella-card p-5 space-y-2 border border-[#1b4332]/10">
-              <span className="text-[11px] font-bold tracking-tight-bella text-[#2d6a4f]">TAHAP 01</span>
-              <h4 className="font-bold text-[#142217] text-sm tracking-tight-bella">Uji Mutu Gabah</h4>
-              <p className="text-xs text-[#142217]/70 leading-relaxed font-normal">
+            <div className="bella-card p-5 space-y-2 border border-[#18181b]/8 shadow-xs">
+              <span className="text-[11px] font-bold font-mono tracking-wider text-[#2d5a43]">TAHAP 01</span>
+              <h4 className="font-bold text-[#18181b] text-sm tracking-tight-bella">Uji Mutu Gabah</h4>
+              <p className="text-xs text-[#52525b] leading-relaxed font-normal">
                 Uji kadar air gabah kering giling (GKG) presisi dan penimbangan legal di jembatan timbang pabrik.
               </p>
             </div>
 
-            <div className="bella-card p-5 space-y-2 border border-[#1b4332]/10">
-              <span className="text-[11px] font-bold tracking-tight-bella text-[#2d6a4f]">TAHAP 02</span>
-              <h4 className="font-bold text-[#142217] text-sm tracking-tight-bella">De-Stoner &amp; Husker</h4>
-              <p className="text-xs text-[#142217]/70 leading-relaxed font-normal">
+            <div className="bella-card p-5 space-y-2 border border-[#18181b]/8 shadow-xs">
+              <span className="text-[11px] font-bold font-mono tracking-wider text-[#2d5a43]">TAHAP 02</span>
+              <h4 className="font-bold text-[#18181b] text-sm tracking-tight-bella">De-Stoner &amp; Husker</h4>
+              <p className="text-xs text-[#52525b] leading-relaxed font-normal">
                 Pemisahan batu, kerikil, dan sekam secara bertahap tanpa mematahkan bulir beras utama.
               </p>
             </div>
 
-            <div className="bella-card p-5 space-y-2 border border-[#1b4332]/10">
-              <span className="text-[11px] font-bold tracking-tight-bella text-[#2d6a4f]">TAHAP 03</span>
-              <h4 className="font-bold text-[#142217] text-sm tracking-tight-bella">Optical Color Sorter</h4>
-              <p className="text-xs text-[#142217]/70 leading-relaxed font-normal">
+            <div className="bella-card p-5 space-y-2 border border-[#18181b]/8 shadow-xs">
+              <span className="text-[11px] font-bold font-mono tracking-wider text-[#2d5a43]">TAHAP 03</span>
+              <h4 className="font-bold text-[#18181b] text-sm tracking-tight-bella">Optical Color Sorter</h4>
+              <p className="text-xs text-[#52525b] leading-relaxed font-normal">
                 Kamera optik kecepatan tinggi mendeteksi dan meniup bulir kuning, bintik hitam, dan kapur.
               </p>
             </div>
 
-            <div className="bella-card p-5 space-y-2 border border-[#1b4332]/10">
-              <span className="text-[11px] font-bold tracking-tight-bella text-[#2d6a4f]">TAHAP 04</span>
-              <h4 className="font-bold text-[#142217] text-sm tracking-tight-bella">Mist Polishing</h4>
-              <p className="text-xs text-[#142217]/70 leading-relaxed font-normal">
+            <div className="bella-card p-5 space-y-2 border border-[#18181b]/8 shadow-xs">
+              <span className="text-[11px] font-bold font-mono tracking-wider text-[#2d5a43]">TAHAP 04</span>
+              <h4 className="font-bold text-[#18181b] text-sm tracking-tight-bella">Mist Polishing</h4>
+              <p className="text-xs text-[#52525b] leading-relaxed font-normal">
                 Pengilapan kabut alami menghasilkan permukaan beras kristal bening tanpa zat pemutih sintetis.
               </p>
             </div>
 
-            <div className="bella-card p-5 space-y-2 border border-[#1b4332]/10">
-              <span className="text-[11px] font-bold tracking-tight-bella text-[#2d6a4f]">TAHAP 05</span>
-              <h4 className="font-bold text-[#142217] text-sm tracking-tight-bella">Sealed Bagging</h4>
-              <p className="text-xs text-[#142217]/70 leading-relaxed font-normal">
+            <div className="bella-card p-5 space-y-2 border border-[#18181b]/8 shadow-xs">
+              <span className="text-[11px] font-bold font-mono tracking-wider text-[#2d5a43]">TAHAP 05</span>
+              <h4 className="font-bold text-[#18181b] text-sm tracking-tight-bella">Sealed Bagging</h4>
+              <p className="text-xs text-[#52525b] leading-relaxed font-normal">
                 Pengemasan karung jahit higienis dan pemuatan armada truk ekspedisi ke Surabaya, Bali, dan kota Anda.
               </p>
             </div>
@@ -612,17 +612,17 @@ export const PortalScreen: React.FC = () => {
         {/* =========================================================================
             7. DIRECT COMMERCIAL B2B QUOTE SECTION (#pesan-grosir)
             ========================================================================= */}
-        <section id="pesan-grosir" className="bg-[#ffffff] rounded-[12px] p-6 sm:p-10 border border-[#1b4332]/10">
+        <section id="pesan-grosir" className="bg-[#ffffff] rounded-[12px] p-6 sm:p-10 border border-[#18181b]/8 shadow-xs">
           <div className="max-w-3xl mx-auto space-y-6">
             
             <div className="text-center space-y-2">
               <span className="bella-badge-sage text-[11px]">
                 Layanan B2B &amp; Grosir Resmi
               </span>
-              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight-bella text-[#142217]">
+              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight-bella text-[#18181b]">
                 Minta Penawaran Harga Beras Grosir
               </h2>
-              <p className="text-xs sm:text-sm font-normal tracking-tight-bella text-[#142217]/80">
+              <p className="text-xs sm:text-sm font-normal tracking-tight-bella text-[#52525b]">
                 Hubungi kantor pemasaran PP Bumi Mas langsung untuk kebutuhan restoran, jaringan katering, toko sembako, dan distributor dengan harga tangan pertama.
               </p>
             </div>
@@ -631,47 +631,47 @@ export const PortalScreen: React.FC = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 
                 <div className="space-y-1">
-                  <label className="text-xs font-bold tracking-tight-bella text-[#142217]">Nama Anda / Nama Usaha:</label>
+                  <label className="text-xs font-bold tracking-tight-bella text-[#18181b]">Nama Anda / Nama Usaha:</label>
                   <input
                     type="text"
                     required
                     value={clientName}
                     onChange={(e) => setClientName(e.target.value)}
                     placeholder="Contoh: Bu Hendra / RM Sederhana"
-                    className="w-full px-4 py-2.5 rounded-full border border-[#1b4332]/20 bg-[#f4f0e6] text-xs font-normal text-[#142217] placeholder-[#142217]/40 outline-none focus:border-[#1b4332]"
+                    className="w-full px-4 py-2.5 rounded-full border border-[#18181b]/15 bg-[#faf8f5] text-xs font-normal text-[#18181b] placeholder-[#71717a] outline-none focus:border-[#2d5a43]"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-bold tracking-tight-bella text-[#142217]">Nomor WhatsApp:</label>
+                  <label className="text-xs font-bold tracking-tight-bella text-[#18181b]">Nomor WhatsApp:</label>
                   <input
                     type="tel"
                     required
                     value={clientPhone}
                     onChange={(e) => setClientPhone(e.target.value)}
                     placeholder="Contoh: 0812-3456-7890"
-                    className="w-full px-4 py-2.5 rounded-full border border-[#1b4332]/20 bg-[#f4f0e6] text-xs font-normal text-[#142217] placeholder-[#142217]/40 outline-none focus:border-[#1b4332]"
+                    className="w-full px-4 py-2.5 rounded-full border border-[#18181b]/15 bg-[#faf8f5] text-xs font-normal text-[#18181b] placeholder-[#71717a] outline-none focus:border-[#2d5a43]"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-bold tracking-tight-bella text-[#142217]">Kota Tujuan Kirim:</label>
+                  <label className="text-xs font-bold tracking-tight-bella text-[#18181b]">Kota Tujuan Kirim:</label>
                   <input
                     type="text"
                     required
                     value={clientCity}
                     onChange={(e) => setClientCity(e.target.value)}
                     placeholder="Contoh: Surabaya / Denpasar / Banyuwangi"
-                    className="w-full px-4 py-2.5 rounded-full border border-[#1b4332]/20 bg-[#f4f0e6] text-xs font-normal text-[#142217] placeholder-[#142217]/40 outline-none focus:border-[#1b4332]"
+                    className="w-full px-4 py-2.5 rounded-full border border-[#18181b]/15 bg-[#faf8f5] text-xs font-normal text-[#18181b] placeholder-[#71717a] outline-none focus:border-[#2d5a43]"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-bold tracking-tight-bella text-[#142217]">Pilihan Jenis Beras:</label>
+                  <label className="text-xs font-bold tracking-tight-bella text-[#18181b]">Pilihan Jenis Beras:</label>
                   <select
                     value={selectedGrainPreset}
                     onChange={(e) => setSelectedGrainPreset(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-full border border-[#1b4332]/20 bg-[#f4f0e6] text-xs font-normal text-[#142217] outline-none focus:border-[#1b4332]"
+                    className="w-full px-4 py-2.5 rounded-full border border-[#18181b]/15 bg-[#faf8f5] text-xs font-normal text-[#18181b] outline-none focus:border-[#2d5a43]"
                   >
                     <option value="Cap Putri Thailand (Premium 5kg/10kg/25kg)">Cap Putri Thailand (Premium 5kg/10kg/25kg)</option>
                     <option value="Pulau Pandan (Beras Punel Mutu Pilihan)">Pulau Pandan (Beras Punel Mutu Pilihan)</option>
@@ -683,7 +683,7 @@ export const PortalScreen: React.FC = () => {
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-bold tracking-tight-bella text-[#142217]">Estimasi Volume Kebutuhan:</label>
+                <label className="text-xs font-bold tracking-tight-bella text-[#18181b]">Estimasi Volume Kebutuhan:</label>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                   {['1 Ton (Pickup)', '5 Ton (Engkel)', '12 Ton (CDD Long)', '25 Ton (Tronton)'].map((vol) => (
                     <button
@@ -692,8 +692,8 @@ export const PortalScreen: React.FC = () => {
                       onClick={() => setClientVolume(vol)}
                       className={`py-2 px-3 rounded-full text-xs font-bold tracking-tight-bella border transition ${
                         clientVolume === vol 
-                          ? 'bg-[#1b4332] text-white border-[#1b4332]' 
-                          : 'bg-[#f4f0e6] text-[#142217] border-[#1b4332]/20 hover:border-[#1b4332]'
+                          ? 'bg-[#2d5a43] text-white border-[#2d5a43] shadow-xs' 
+                          : 'bg-[#faf8f5] text-[#18181b] border-[#18181b]/15 hover:border-[#2d5a43]'
                       }`}
                     >
                       {vol}
@@ -706,7 +706,7 @@ export const PortalScreen: React.FC = () => {
                 <button
                   type="submit"
                   disabled={quoteSubmitted}
-                  className="bella-btn-green py-3 px-8 text-xs sm:text-sm font-bold inline-flex items-center space-x-2"
+                  className="bella-btn-green py-3 px-8 text-xs sm:text-sm font-bold inline-flex items-center space-x-2 shadow-xs"
                 >
                   <MessageCircle className="w-4 h-4" />
                   <span>{quoteSubmitted ? 'Menghubungkan ke WhatsApp...' : 'Kirim Permintaan ke WhatsApp Sales'}</span>
@@ -720,15 +720,15 @@ export const PortalScreen: React.FC = () => {
         {/* =========================================================================
             8. FOOTER (Minimal Sand Beige & White Surface)
             ========================================================================= */}
-        <footer className="bg-[#ffffff] rounded-[12px] p-6 sm:p-10 border border-[#1b4332]/10 space-y-8">
+        <footer className="bg-[#ffffff] rounded-[12px] p-6 sm:p-10 border border-[#18181b]/8 space-y-8 shadow-xs">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
             
             <div className="md:col-span-5 space-y-3">
               <div className="flex items-center space-x-2">
-                <span className="text-xl font-bold tracking-tight-bella text-[#142217]">PP BUMI MAS</span>
+                <span className="text-xl font-bold tracking-tight-bella text-[#18181b]">PP BUMI MAS</span>
                 <span className="bella-badge-sage text-[10px]">BERAS BUSUR</span>
               </div>
-              <p className="text-xs font-normal tracking-tight-bella text-[#142217]/70 max-w-sm leading-relaxed">
+              <p className="text-xs font-normal tracking-tight-bella text-[#52525b] max-w-sm leading-relaxed">
                 Pabrik penggilingan dan pemrosesan beras modern di Banyuwangi, Jawa Timur. Menghasilkan beras pulen bermutu tinggi tanpa zat kimia untuk keluarga dan mitra bisnis Anda.
               </p>
               <div className="pt-1">
@@ -736,28 +736,28 @@ export const PortalScreen: React.FC = () => {
                   href="https://www.instagram.com/berasbusur.id?rpxt=MW10dWI3aTFvMjZ2cA=="
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center space-x-2 text-xs font-bold tracking-tight-bella text-[#2d6a4f] hover:text-[#1b4332] hover:underline"
+                  className="inline-flex items-center space-x-2 text-xs font-bold tracking-tight-bella text-[#2d5a43] hover:underline"
                 >
                   <Instagram className="w-4 h-4" />
                   <span>Ikuti Akun Resmi @berasbusur.id</span>
                 </a>
               </div>
               <div className="pt-2 space-y-2">
-                <div className="text-[10px] font-bold uppercase tracking-wider text-[#142217]/60">
+                <div className="text-[10px] font-bold uppercase tracking-wider text-[#71717a]">
                   Sertifikasi &amp; Legalitas Resmi
                 </div>
                 <div className="flex flex-wrap gap-2 items-center">
-                  <div className="inline-flex items-center space-x-1.5 bg-[#e8f1eb] text-[#1b4332] px-2.5 py-1 rounded-full border border-[#1b4332]/25 text-[11px] font-bold shadow-xs">
+                  <div className="inline-flex items-center space-x-1.5 bg-[#eaf2ec] text-[#2d5a43] px-2.5 py-1 rounded-full border border-[#2d5a43]/20 text-[11px] font-bold shadow-xs">
                     <KementanLogo className="w-4 h-4 shrink-0" />
                     <span>Izin Edar Kementan RI</span>
                   </div>
-                  <span className="text-[11px] font-bold bg-[#e8f1eb] text-[#1b4332] px-2.5 py-1 rounded-full border border-[#1b4332]/25 shadow-xs">
+                  <span className="text-[11px] font-bold bg-[#eaf2ec] text-[#2d5a43] px-2.5 py-1 rounded-full border border-[#2d5a43]/20 shadow-xs">
                     Permentan No. 22/2025
                   </span>
-                  <span className="text-[11px] font-bold bg-[#e8f1eb] text-[#1b4332] px-2.5 py-1 rounded-full border border-[#1b4332]/25 shadow-xs">
+                  <span className="text-[11px] font-bold bg-[#eaf2ec] text-[#2d5a43] px-2.5 py-1 rounded-full border border-[#2d5a43]/20 shadow-xs">
                     Sertifikat Halal
                   </span>
-                  <span className="text-[11px] font-bold bg-[#e8f1eb] text-[#1b4332] px-2.5 py-1 rounded-full border border-[#1b4332]/25 shadow-xs">
+                  <span className="text-[11px] font-bold bg-[#eaf2ec] text-[#2d5a43] px-2.5 py-1 rounded-full border border-[#2d5a43]/20 shadow-xs">
                     Merek Terdaftar
                   </span>
                 </div>
@@ -765,14 +765,14 @@ export const PortalScreen: React.FC = () => {
             </div>
 
             <div className="md:col-span-3 space-y-2 text-xs tracking-tight-bella">
-              <div className="font-bold text-[#142217] uppercase text-[11px]">Navigasi Utama</div>
-              <ul className="space-y-1.5 font-normal text-[#142217]/80">
-                <li><a href="#koleksi-beras" className="hover:text-[#1b4332]">Koleksi Beras</a></li>
-                <li><a href="#tentang-busur" className="hover:text-[#1b4332]">Tentang Kami</a></li>
-                <li><a href="#kilang-proses" className="hover:text-[#1b4332]">Kilang &amp; Proses</a></li>
-                <li><a href="#inspirasi-dapur" className="hover:text-[#1b4332]">Inspirasi Dapur</a></li>
-                <li><a href="#pesan-grosir" className="hover:text-[#1b4332]">Penawaran Grosir</a></li>
-                <li className="pt-2 border-t border-[#1b4332]/10">
+              <div className="font-bold text-[#18181b] uppercase text-[11px]">Navigasi Utama</div>
+              <ul className="space-y-1.5 font-normal text-[#52525b]">
+                <li><a href="#koleksi-beras" className="hover:text-[#2d5a43]">Koleksi Beras</a></li>
+                <li><a href="#tentang-busur" className="hover:text-[#2d5a43]">Tentang Kami</a></li>
+                <li><a href="#kilang-proses" className="hover:text-[#2d5a43]">Kilang &amp; Proses</a></li>
+                <li><a href="#inspirasi-dapur" className="hover:text-[#2d5a43]">Inspirasi Dapur</a></li>
+                <li><a href="#pesan-grosir" className="hover:text-[#2d5a43]">Penawaran Grosir</a></li>
+                <li className="pt-2 border-t border-[#18181b]/8">
                   <button
                     type="button"
                     onClick={() => {
@@ -782,10 +782,10 @@ export const PortalScreen: React.FC = () => {
                         setShowLoginModal(true);
                       }
                     }}
-                    className="text-[#1b4332] font-bold hover:underline flex items-center space-x-1.5 py-1 text-xs"
+                    className="text-[#2d5a43] font-bold hover:underline flex items-center space-x-1.5 py-1 text-xs"
                     title="Akses Konsol Staf Pabrik & ERP"
                   >
-                    <Shield className="w-3.5 h-3.5 text-[#1b4332]" />
+                    <Shield className="w-3.5 h-3.5 text-[#2d5a43]" />
                     <span>{currentUser ? 'Buka Stasiun Kerja ERP' : 'Login Staf Pabrik'}</span>
                   </button>
                 </li>
@@ -793,25 +793,25 @@ export const PortalScreen: React.FC = () => {
             </div>
 
             <div className="md:col-span-4 space-y-2 text-xs tracking-tight-bella">
-              <div className="font-bold text-[#142217] uppercase text-[11px]">Lokasi Pabrik &amp; Kontak</div>
-              <p className="font-normal text-[#142217]/80 leading-relaxed">
+              <div className="font-bold text-[#18181b] uppercase text-[11px]">Lokasi Pabrik &amp; Kontak</div>
+              <p className="font-normal text-[#52525b] leading-relaxed">
                 Wonosobo, Kec. Srono, Kabupaten Banyuwangi, Jawa Timur 68471
               </p>
-              <p className="font-normal text-[#142217]/80">
+              <p className="font-normal text-[#52525b]">
                 WhatsApp: +62 818-334-998
               </p>
-              <p className="font-normal text-[#142217]/80">
+              <p className="font-normal text-[#52525b]">
                 Instagram: @berasbusur.id
               </p>
             </div>
 
           </div>
 
-          <div className="pt-6 border-t border-[#1b4332]/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] font-normal tracking-tight-bella text-[#142217]/60 text-center sm:text-left">
+          <div className="pt-6 border-t border-[#18181b]/8 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] font-normal tracking-tight-bella text-[#71717a] text-center sm:text-left">
             <div>
               &copy; {new Date().getFullYear()} PP BUMI MAS • Beras Busur. Hak Cipta Dilindungi Undang-Undang.
             </div>
-            <div className="flex items-center space-x-2 text-[#142217]/60">
+            <div className="flex items-center space-x-2 text-[#71717a]">
               <span>Wonosobo, Srono, Banyuwangi</span>
               <span>•</span>
               <span>Jawa Timur, Indonesia</span>
@@ -825,19 +825,19 @@ export const PortalScreen: React.FC = () => {
           QUOTE MODAL (Accessible if triggered directly via buttons)
           ========================================================================= */}
       {quoteModalOpen && (
-        <div className="fixed inset-0 z-50 bg-[#0d1f14]/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-[#ffffff] rounded-[12px] max-w-lg w-full p-6 sm:p-8 space-y-6 border border-[#1b4332]/20">
-            <div className="flex items-center justify-between border-b border-[#1b4332]/10 pb-3">
+        <div className="fixed inset-0 z-50 bg-[#112318]/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-[#ffffff] rounded-[12px] max-w-lg w-full p-6 sm:p-8 space-y-6 border border-[#18181b]/15 shadow-xl">
+            <div className="flex items-center justify-between border-b border-[#18181b]/8 pb-3">
               <div>
                 <span className="bella-badge-sage text-[10px]">Beras Busur</span>
-                <h3 className="text-xl font-bold tracking-tight-bella text-[#142217] mt-1">
+                <h3 className="text-xl font-bold tracking-tight-bella text-[#18181b] mt-1">
                   Minta Penawaran Resmi
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setQuoteModalOpen(false)}
-                className="w-8 h-8 rounded-full border border-[#1b4332]/20 flex items-center justify-center text-sm font-bold hover:bg-[#e8f1eb]"
+                className="w-8 h-8 rounded-full border border-[#18181b]/15 flex items-center justify-center text-sm font-bold hover:bg-[#f3efea]"
               >
                 &times;
               </button>
@@ -845,48 +845,48 @@ export const PortalScreen: React.FC = () => {
 
             <form onSubmit={handleQuoteSubmit} className="space-y-4">
               <div className="space-y-1">
-                <label className="text-xs font-bold tracking-tight-bella text-[#142217]">Nama Lengkap / Perusahaan:</label>
+                <label className="text-xs font-bold tracking-tight-bella text-[#18181b]">Nama Lengkap / Perusahaan:</label>
                 <input
                   type="text"
                   required
                   value={clientName}
                   onChange={(e) => setClientName(e.target.value)}
                   placeholder="Contoh: Pak Anton (UD Pangan Makmur)"
-                  className="w-full px-4 py-2.5 rounded-full border border-[#1b4332]/20 bg-[#f4f0e6] text-xs font-normal text-[#142217] outline-none focus:border-[#1b4332]"
+                  className="w-full px-4 py-2.5 rounded-full border border-[#18181b]/15 bg-[#faf8f5] text-xs font-normal text-[#18181b] outline-none focus:border-[#2d5a43]"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-bold tracking-tight-bella text-[#142217]">Nomor WhatsApp Aktif:</label>
+                <label className="text-xs font-bold tracking-tight-bella text-[#18181b]">Nomor WhatsApp Aktif:</label>
                 <input
                   type="tel"
                   required
                   value={clientPhone}
                   onChange={(e) => setClientPhone(e.target.value)}
                   placeholder="Contoh: 0812-3456-7890"
-                  className="w-full px-4 py-2.5 rounded-full border border-[#1b4332]/20 bg-[#f4f0e6] text-xs font-normal text-[#142217] outline-none focus:border-[#1b4332]"
+                  className="w-full px-4 py-2.5 rounded-full border border-[#18181b]/15 bg-[#faf8f5] text-xs font-normal text-[#18181b] outline-none focus:border-[#2d5a43]"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-bold tracking-tight-bella text-[#142217]">Kota Tujuan Kirim:</label>
+                <label className="text-xs font-bold tracking-tight-bella text-[#18181b]">Kota Tujuan Kirim:</label>
                 <input
                   type="text"
                   required
                   value={clientCity}
                   onChange={(e) => setClientCity(e.target.value)}
                   placeholder="Contoh: Surabaya / Denpasar / Malang"
-                  className="w-full px-4 py-2.5 rounded-full border border-[#1b4332]/20 bg-[#f4f0e6] text-xs font-normal text-[#142217] outline-none focus:border-[#1b4332]"
+                  className="w-full px-4 py-2.5 rounded-full border border-[#18181b]/15 bg-[#faf8f5] text-xs font-normal text-[#18181b] outline-none focus:border-[#2d5a43]"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-bold tracking-tight-bella text-[#142217]">Produk Pilihan:</label>
+                <label className="text-xs font-bold tracking-tight-bella text-[#18181b]">Produk Pilihan:</label>
                 <input
                   type="text"
                   readOnly
                   value={selectedGrainPreset}
-                  className="w-full px-4 py-2.5 rounded-full border border-[#1b4332]/20 bg-[#dfd9cb] text-xs font-bold text-[#142217]"
+                  className="w-full px-4 py-2.5 rounded-full border border-[#18181b]/15 bg-[#f3efea] text-xs font-bold text-[#18181b]"
                 />
               </div>
 
@@ -894,14 +894,14 @@ export const PortalScreen: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setQuoteModalOpen(false)}
-                  className="bella-btn-pill py-2 px-4 text-xs font-bold hover:bg-[#e8f1eb]"
+                  className="bella-btn-pill py-2 px-4 text-xs font-bold shadow-xs hover:bg-[#f3efea]"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
                   disabled={quoteSubmitted}
-                  className="bella-btn-green py-2 px-6 text-xs font-bold"
+                  className="bella-btn-green py-2 px-6 text-xs font-bold shadow-xs"
                 >
                   {quoteSubmitted ? 'Menghubungkan...' : 'Lanjutkan ke WhatsApp'}
                 </button>
