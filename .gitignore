@@ -28,3 +28,5 @@ release
 *.sw?
 __pycache__
 *.pyc
+debug_plates/*.jpg
+debug_plates/*.jpeg
