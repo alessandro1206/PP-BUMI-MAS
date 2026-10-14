@@ -36,11 +36,11 @@ export const Header: React.FC = () => {
   if (activeScreen === 'SCREEN_5') {
     return (
       <>
-        <div className="pt-3 sm:pt-5 px-3 sm:px-6 max-w-[1240px] mx-auto w-full sticky top-0 z-50">
-          <header className="bg-[#ffffff]/95 backdrop-blur-md rounded-2xl border border-[#18181b]/10 h-16 sm:h-20 px-3.5 sm:px-6 flex items-center justify-between transition-all shadow-xs">
+        <div className="pt-2 sm:pt-4 px-2 sm:px-6 max-w-[1200px] mx-auto w-full sticky top-0 z-50">
+          <header className="bg-[#ffffff] rounded-[12px] border border-[#1b4332]/15 h-16 sm:h-20 px-2.5 sm:px-5 lg:px-6 flex items-center justify-between transition-all">
             {/* Brand Mark (Left) */}
             <div 
-              className="flex items-center space-x-2.5 sm:space-x-3 cursor-pointer group shrink-0 min-w-0"
+              className="flex items-center space-x-2 sm:space-x-3 cursor-pointer group shrink-0 min-w-0"
               onClick={() => {
                 if (currentUser) {
                   setActiveScreen('SCREEN_WORKSTATIONS');
@@ -49,43 +49,43 @@ export const Header: React.FC = () => {
                 }
               }}
             >
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#2d5a43] flex items-center justify-center text-[#faf8f5] font-serif-editorial font-bold text-sm tracking-wide shrink-0 shadow-xs group-hover:bg-[#234735] transition">
-                B
+              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#1b4332] flex items-center justify-center text-[#f4f0e6] font-bold text-xs tracking-tight-bella shrink-0">
+                BM
               </div>
               <div className="min-w-0">
                 <div className="flex items-center space-x-1.5 sm:space-x-2">
-                  <span className="font-serif-editorial text-base sm:text-lg font-bold tracking-tight text-[#18181b] whitespace-nowrap">
+                  <span className="text-sm sm:text-base lg:text-lg font-bold tracking-tight-bella text-[#142217] whitespace-nowrap">
+                    PP BUMI MAS
+                  </span>
+                  <span className="hidden sm:inline-block text-[9px] sm:text-[10px] font-bold uppercase bg-[#e8f1eb] text-[#1b4332] px-1.5 sm:px-2 py-0.5 rounded-full border border-[#1b4332]/20 tracking-tight-bella whitespace-nowrap shrink-0">
                     BERAS BUSUR
                   </span>
-                  <span className="hidden sm:inline-block text-[9px] font-mono uppercase bg-[#eaf2ec] text-[#2d5a43] px-2 py-0.5 rounded-full border border-[#2d5a43]/20 tracking-wider whitespace-nowrap shrink-0">
-                    BANYUWANGI
-                  </span>
                 </div>
-                <p className="hidden md:block text-[10px] text-[#52525b] font-mono tracking-wider uppercase whitespace-nowrap">
-                  PP BUMI MAS • Kilang Presisi Kaki Gunung Ijen
+                <p className="hidden md:block text-[10px] sm:text-[11px] text-[#142217]/70 font-normal tracking-tight-bella whitespace-nowrap">
+                  Pabrik &amp; Reprocessing Beras Banyuwangi
                 </p>
               </div>
             </div>
 
-            {/* Navigation Category Links (Desktop XL) */}
-            <nav className="hidden xl:flex items-center space-x-7 text-xs font-semibold uppercase tracking-wider text-[#18181b] whitespace-nowrap">
-              <a href="#koleksi-beras" className="hover:text-[#2d5a43] transition">Koleksi Bulir</a>
-              <a href="#standar-mutu" className="hover:text-[#2d5a43] transition">Standar Mutu</a>
-              <a href="#terroir-proses" className="hover:text-[#2d5a43] transition">Terroir &amp; Kilang</a>
-              <a href="#inspirasi-dapur" className="hover:text-[#2d5a43] transition">Cerita Dapur</a>
-              <a href="#kalkulator-b2b" className="hover:text-[#2d5a43] transition">Kalkulator Grosir</a>
+            {/* Navigation Category Links (Desktop XL only to prevent collision) */}
+            <nav className="hidden xl:flex items-center space-x-6 text-sm font-normal text-[#142217] tracking-tight-bella whitespace-nowrap">
+              <a href="#koleksi-beras" className="hover:text-[#1b4332] transition">Koleksi Beras</a>
+              <a href="#tentang-busur" className="hover:text-[#1b4332] transition">Tentang Kami</a>
+              <a href="#kilang-proses" className="hover:text-[#1b4332] transition">Kilang &amp; Presisi</a>
+              <a href="#inspirasi-dapur" className="hover:text-[#1b4332] transition">Inspirasi Dapur</a>
+              <a href="#pesan-grosir" className="hover:text-[#1b4332] transition">Penawaran B2B</a>
             </nav>
 
             {/* Right Action Controls */}
-            <div className="flex items-center space-x-2 sm:space-x-3 shrink-0">
+            <div className="flex items-center space-x-1.5 sm:space-x-3 shrink-0">
               <a
                 href="https://www.instagram.com/berasbusur.id?rpxt=MW10dWI3aTFvMjZ2cA=="
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hidden xl:inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full border border-[#2d5a43]/20 hover:border-[#2d5a43] text-xs font-semibold text-[#18181b] transition bg-[#eaf2ec]/70 hover:bg-[#eaf2ec] whitespace-nowrap"
+                className="hidden xl:inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-full border border-[#1b4332]/20 hover:border-[#1b4332] text-xs font-bold tracking-tight-bella text-[#142217] transition bg-[#e8f1eb]/70 hover:bg-[#e8f1eb] whitespace-nowrap"
                 title="Instagram Resmi @berasbusur.id"
               >
-                <Instagram className="w-3.5 h-3.5 text-[#2d5a43]" />
+                <Instagram className="w-3.5 h-3.5 text-[#2d6a4f]" />
                 <span>@berasbusur.id</span>
               </a>
 
@@ -93,7 +93,7 @@ export const Header: React.FC = () => {
                 <>
                   <button
                     onClick={() => setActiveScreen('SCREEN_WORKSTATIONS')}
-                    className="rice-pill-btn text-xs py-2 px-4 shadow-xs"
+                    className="px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs font-bold tracking-tight-bella bg-[#1b4332] text-white hover:bg-[#245741] transition flex items-center space-x-1 sm:space-x-1.5 whitespace-nowrap shrink-0"
                     title="Buka Stasiun Kerja ERP"
                   >
                     <Building2 className="w-3.5 h-3.5" />
@@ -108,7 +108,7 @@ export const Header: React.FC = () => {
                   </button>
                   <button
                     onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                    className="xl:hidden p-2 rounded-full border border-[#18181b]/15 text-[#18181b] hover:bg-[#f3efea] transition flex items-center justify-center shrink-0 w-8 h-8 sm:w-9 sm:h-9"
+                    className="xl:hidden p-2 rounded-full border border-[#1b4332]/25 text-[#142217] hover:bg-[#e8f1eb] transition flex items-center justify-center shrink-0 w-8 h-8 sm:w-9 sm:h-9"
                     aria-label="Buka Menu Navigasi"
                   >
                     {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
@@ -116,18 +116,19 @@ export const Header: React.FC = () => {
                 </>
               ) : (
                 <>
+                  {/* TOMBOL LOGIN STAF: Langsung tampil jelas di Mobile dan Desktop */}
                   <button
                     onClick={() => setShowLoginModal(true)}
-                    className="rice-pill-outline text-xs py-2 px-3 sm:px-4 shadow-xs"
+                    className="px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full border border-[#1b4332]/40 bg-[#ffffff] hover:bg-[#e8f1eb] text-xs font-bold tracking-tight-bella text-[#142217] transition flex items-center space-x-1 sm:space-x-1.5 whitespace-nowrap shrink-0 shadow-xs"
                     title="Login Akses Staf Pabrik"
                   >
-                    <Shield className="w-3.5 h-3.5 text-[#2d5a43] shrink-0" />
+                    <Shield className="w-3.5 h-3.5 text-[#1b4332] shrink-0" />
                     <span>Login Staf</span>
                   </button>
 
                   <a
-                    href="#kalkulator-b2b"
-                    className="hidden sm:inline-flex rice-pill-btn text-xs py-2 px-4 font-semibold shadow-xs"
+                    href="#pesan-grosir"
+                    className="hidden sm:inline-flex bella-btn-green text-xs py-2 px-3 sm:px-5 font-bold tracking-tight-bella items-center space-x-1 whitespace-nowrap shrink-0"
                   >
                     <span>Minta Penawaran</span>
                   </a>
@@ -135,7 +136,7 @@ export const Header: React.FC = () => {
                   {/* Hamburger Menu Toggle (Below XL) */}
                   <button
                     onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                    className="xl:hidden p-2 rounded-full border border-[#18181b]/20 text-[#18181b] hover:bg-[#f3efea] transition flex items-center justify-center shrink-0 w-8 h-8 sm:w-9 sm:h-9"
+                    className="xl:hidden p-2 rounded-full border border-[#1b4332]/25 text-[#142217] hover:bg-[#e8f1eb] transition flex items-center justify-center shrink-0 w-8 h-8 sm:w-9 sm:h-9"
                     aria-label="Buka Menu Navigasi"
                   >
                     {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
@@ -147,9 +148,9 @@ export const Header: React.FC = () => {
 
           {/* Collapsible Mobile / Tablet Navigation Card */}
           {mobileMenuOpen && (
-            <div className="xl:hidden mt-2 bg-[#ffffff] rounded-2xl border border-[#18181b]/10 p-4 space-y-3 shadow-xl">
+            <div className="xl:hidden mt-2 bg-[#ffffff] rounded-[12px] border border-[#1b4332]/15 p-4 space-y-3 shadow-xl">
               {/* Quick Action: Login Staf & Penawaran in Mobile Menu */}
-              <div className="pb-3 border-b border-[#18181b]/8 flex flex-col gap-2">
+              <div className="pb-3 border-b border-[#1b4332]/10 flex flex-col gap-2">
                 {!currentUser ? (
                   <>
                     <button
@@ -157,26 +158,26 @@ export const Header: React.FC = () => {
                         setMobileMenuOpen(false);
                         setShowLoginModal(true);
                       }}
-                      className="w-full px-3 py-2.5 rounded-full bg-[#2d5a43] text-white text-xs font-semibold flex items-center justify-center space-x-2 hover:bg-[#234735] transition shadow-xs"
+                      className="w-full px-3 py-2.5 rounded-lg bg-[#1b4332] text-white text-xs font-bold tracking-tight-bella flex items-center justify-center space-x-2 hover:bg-[#245741] transition shadow-sm"
                     >
                       <Shield className="w-4 h-4 text-white" />
                       <span>Masuk ke Konsol Staf Pabrik (Login)</span>
                     </button>
                     <a
-                      href="#kalkulator-b2b"
+                      href="#pesan-grosir"
                       onClick={() => setMobileMenuOpen(false)}
-                      className="w-full px-3 py-2 rounded-full border border-[#18181b]/20 text-xs font-semibold text-[#18181b] text-center hover:bg-[#f3efea] transition"
+                      className="w-full px-3 py-2 rounded-lg border border-[#1b4332]/30 text-xs font-bold text-[#142217] text-center hover:bg-[#e8f1eb] transition"
                     >
-                      Minta Penawaran Grosir (B2B)
+                      Minta Penawaran B2B (Grosir)
                     </a>
                   </>
                 ) : (
-                  <div className="flex items-center justify-between p-2 rounded-xl bg-[#eaf2ec]">
+                  <div className="flex items-center justify-between p-2 rounded-lg bg-[#e8f1eb]">
                     <div className="flex items-center space-x-2">
-                      <Building2 className="w-4 h-4 text-[#2d5a43]" />
+                      <Building2 className="w-4 h-4 text-[#1b4332]" />
                       <div className="text-xs">
-                        <div className="font-bold text-[#18181b]">{currentUser.name}</div>
-                        <div className="text-[#52525b] text-[10px] font-mono">{currentUser.role}</div>
+                        <div className="font-bold text-[#142217]">{currentUser.name}</div>
+                        <div className="text-[#142217]/70 text-[10px] font-mono">{currentUser.role}</div>
                       </div>
                     </div>
                     <button
@@ -184,7 +185,7 @@ export const Header: React.FC = () => {
                         setMobileMenuOpen(false);
                         setActiveScreen('SCREEN_WORKSTATIONS');
                       }}
-                      className="px-3 py-1 bg-[#2d5a43] text-white rounded-full text-xs font-semibold shadow-xs"
+                      className="px-3 py-1 bg-[#1b4332] text-white rounded-full text-xs font-bold"
                     >
                       Buka Hub
                     </button>
@@ -192,52 +193,52 @@ export const Header: React.FC = () => {
                 )}
               </div>
 
-              <nav className="flex flex-col space-y-1 text-sm font-semibold text-[#18181b]">
+              <nav className="flex flex-col space-y-1 text-sm font-bold text-[#142217] tracking-tight-bella">
                 <a 
                   href="#koleksi-beras" 
                   onClick={() => setMobileMenuOpen(false)}
-                  className="px-3 py-2 rounded-lg hover:bg-[#f3efea] transition"
+                  className="px-3 py-2 rounded-lg hover:bg-[#e8f1eb] transition"
                 >
-                  Koleksi Bulir
+                  Koleksi Beras
                 </a>
                 <a 
-                  href="#standar-mutu" 
+                  href="#tentang-busur" 
                   onClick={() => setMobileMenuOpen(false)}
-                  className="px-3 py-2 rounded-lg hover:bg-[#f3efea] transition"
+                  className="px-3 py-2 rounded-lg hover:bg-[#e8f1eb] transition"
                 >
-                  Standar Mutu
+                  Tentang Kami
                 </a>
                 <a 
-                  href="#terroir-proses" 
+                  href="#kilang-proses" 
                   onClick={() => setMobileMenuOpen(false)}
-                  className="px-3 py-2 rounded-lg hover:bg-[#f3efea] transition"
+                  className="px-3 py-2 rounded-lg hover:bg-[#e8f1eb] transition"
                 >
-                  Terroir &amp; Kilang Presisi
+                  Kilang &amp; Presisi
                 </a>
                 <a 
                   href="#inspirasi-dapur" 
                   onClick={() => setMobileMenuOpen(false)}
-                  className="px-3 py-2 rounded-lg hover:bg-[#f3efea] transition"
+                  className="px-3 py-2 rounded-lg hover:bg-[#e8f1eb] transition"
                 >
-                  Cerita Dapur Nusantara
+                  Inspirasi Dapur
                 </a>
                 <a 
-                  href="#kalkulator-b2b" 
+                  href="#pesan-grosir" 
                   onClick={() => setMobileMenuOpen(false)}
-                  className="px-3 py-2 rounded-lg hover:bg-[#f3efea] transition"
+                  className="px-3 py-2 rounded-lg hover:bg-[#e8f1eb] transition"
                 >
-                  Kalkulator Grosir (B2B)
+                  Penawaran B2B
                 </a>
               </nav>
 
-              <div className="pt-2 border-t border-[#18181b]/8 flex flex-col space-y-2">
+              <div className="pt-2 border-t border-[#1b4332]/10 flex flex-col space-y-2">
                 <a
                   href="https://www.instagram.com/berasbusur.id?rpxt=MW10dWI3aTFvMjZ2cA=="
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-3 py-2 rounded-lg border border-[#2d5a43]/20 text-xs font-semibold text-[#18181b] flex items-center space-x-2 bg-[#eaf2ec]/70"
+                  className="px-3 py-2 rounded-lg border border-[#1b4332]/20 text-xs font-bold text-[#142217] flex items-center space-x-2 bg-[#e8f1eb]/60"
                 >
-                  <Instagram className="w-4 h-4 text-[#2d5a43]" />
+                  <Instagram className="w-4 h-4 text-[#2d6a4f]" />
                   <span>Instagram @berasbusur.id</span>
                 </a>
               </div>

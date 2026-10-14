@@ -4,15 +4,15 @@
 
 @layer base {
   :root {
-    /* Artisanal Minimalist Rice Mill Palette (The Rice Factory Style) */
-    --color-warm-canvas: #faf8f5;
+    /* Connected Shades of Green and Cream Palette */
+    --color-warm-canvas: #f4f0e6;
     --color-pristine-surface: #ffffff;
-    --color-sand-beige: #f3efea;
-    --color-ink-black: #18181b;
-    --color-forest-green: #2d5a43;
-    --color-leaf-green: #245741;
-    --color-sage-cream: #eaf2ec;
-    --color-coral-pulse: #2d5a43;
+    --color-sand-beige: #dfd9cb;
+    --color-ink-black: #142217;
+    --color-forest-green: #1b4332;
+    --color-leaf-green: #2d6a4f;
+    --color-sage-cream: #e8f1eb;
+    --color-coral-pulse: #1b4332;
 
     /* Mercury Tokens - Alpine banking at blue hour */
     --color-onyx-canvas: #171721;
@@ -116,13 +116,12 @@
   background-color: #ffffff;
   border-radius: 12px;
   padding: 24px;
-  border: 1px solid rgba(24, 24, 27, 0.08);
 }
 
 .bella-btn-pill {
   background-color: #ffffff;
-  color: #18181b;
-  border: 1px solid rgba(24, 24, 27, 0.2);
+  color: #000000;
+  border: 1px solid #000000;
   border-radius: 999px;
   padding: 12px 24px;
   font-weight: 700;
@@ -130,14 +129,13 @@
   transition: all 0.2s ease;
 }
 .bella-btn-pill:hover {
-  background-color: #f3efea;
-  border-color: rgba(24, 24, 27, 0.4);
+  background-color: #f5f4ec;
 }
 
 .bella-btn-coral, .bella-btn-green {
-  background-color: #2d5a43;
+  background-color: #1b4332;
   color: #ffffff;
-  border: 1px solid #2d5a43;
+  border: 1px solid #1b4332;
   border-radius: 999px;
   padding: 12px 24px;
   font-weight: 700;
@@ -145,12 +143,12 @@
   transition: all 0.2s ease;
 }
 .bella-btn-coral:hover, .bella-btn-green:hover {
-  background-color: #234735;
-  border-color: #234735;
+  background-color: #245741;
+  border-color: #245741;
 }
 
 .bella-badge-coral, .bella-badge-green {
-  background-color: #2d5a43;
+  background-color: #1b4332;
   color: #ffffff;
   border-radius: 999px;
   padding: 6px 14px;
@@ -163,9 +161,9 @@
 }
 
 .bella-badge-sage {
-  background-color: #eaf2ec;
-  color: #2d5a43;
-  border: 1px solid rgba(45, 90, 67, 0.2);
+  background-color: #e8f1eb;
+  color: #1b4332;
+  border: 1px solid rgba(27, 67, 50, 0.2);
   border-radius: 999px;
   padding: 6px 14px;
   font-size: 12px;
@@ -178,8 +176,8 @@
 
 .bella-badge-white {
   background-color: #ffffff;
-  color: #18181b;
-  border: 1px solid rgba(24, 24, 27, 0.12);
+  color: #142217;
+  border: 1px solid rgba(20, 34, 23, 0.12);
   border-radius: 999px;
   padding: 6px 14px;
   font-size: 12px;
@@ -188,81 +186,6 @@
   text-transform: uppercase;
   display: inline-flex;
   align-items: center;
-}
-
-.font-serif-editorial {
-  font-family: 'Playfair Display', 'Cormorant Garamond', Georgia, serif;
-}
-
-.font-sans-editorial {
-  font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-}
-
-/* Artisanal Minimalist Studio Styles (The Rice Factory / Refero Style) */
-.rice-card {
-  background-color: #ffffff;
-  border: 1px solid rgba(24, 24, 27, 0.08);
-  border-radius: 16px;
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.rice-card:hover {
-  border-color: rgba(45, 90, 67, 0.25);
-  box-shadow: 0 12px 32px -12px rgba(24, 24, 27, 0.06);
-}
-
-.rice-pill-btn {
-  background-color: #2d5a43;
-  color: #ffffff;
-  border-radius: 9999px;
-  padding: 10px 22px;
-  font-weight: 600;
-  font-size: 13px;
-  letter-spacing: -0.01em;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  transition: all 0.2s ease;
-}
-.rice-pill-btn:hover {
-  background-color: #234735;
-  transform: translateY(-1px);
-}
-
-.rice-pill-outline {
-  background-color: #ffffff;
-  color: #18181b;
-  border: 1px solid rgba(24, 24, 27, 0.16);
-  border-radius: 9999px;
-  padding: 10px 22px;
-  font-weight: 600;
-  font-size: 13px;
-  letter-spacing: -0.01em;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  transition: all 0.2s ease;
-}
-.rice-pill-outline:hover {
-  background-color: #f3efea;
-  border-color: rgba(24, 24, 27, 0.32);
-  transform: translateY(-1px);
-}
-
-.rice-badge-sage {
-  background-color: #eaf2ec;
-  color: #2d5a43;
-  border: 1px solid rgba(45, 90, 67, 0.2);
-  border-radius: 9999px;
-  padding: 4px 12px;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
 }
 
 .font-arcadia-display {
