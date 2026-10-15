@@ -918,7 +918,7 @@ export const Admin1DeliveryOrderScreen: React.FC = () => {
                   <span>Sync Google Calendar Order Konsumen</span>
                 </h3>
                 <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold font-mono px-2 py-0.5 rounded">
-                  Akun: juwitasriwulandari@gmail.com
+                  Akun: sriwulandarijuwita@gmail.com
                 </span>
               </div>
               <div className="flex items-center space-x-2">
@@ -969,7 +969,6 @@ export const Admin1DeliveryOrderScreen: React.FC = () => {
 
                   <div className="text-[11px] text-slate-600 bg-white p-2 rounded-xl border border-emerald-200">
                     <div><strong>Customer:</strong> BUMI SUBUR SURABAYA</div>
-                    <div><strong>Expedisi:</strong> EXP. CARAVAN (P. MATHIAS) GD DIPO KALIANAK</div>
                     <div><strong>Rincian Real Juwita (25 Ton):</strong> Betet @10 (5t), Betet @20 (100sak), Betet @25 (400sak), P.Thai @5 (3t), P.Thai @10 (5t)</div>
                   </div>
 
@@ -981,7 +980,7 @@ export const Admin1DeliveryOrderScreen: React.FC = () => {
                       brand_aka: 'BCAMP',
                       phone: '081 833 4998',
                       date: '2026-09-21',
-                      expedition_info: 'EXP. CARAVAN (P. MATHIAS)\nGD. DIPO CARAVAN\nJL. KALIANAK 55 BLOK QQ NO. 9 SURABAYA',
+                      expedition_info: '',
                       notes: 'Kalender Juwita: 9am bcamp 25 BM (21 Sep 2026)',
                       items: [
                         { id: 'it-1', product_name: 'Beras Cap Betet @10 KG', unit: 'ZAK', qty: 500, weight_per_unit_kg: 10, total_kg: 5000 },
@@ -1027,7 +1026,7 @@ export const Admin1DeliveryOrderScreen: React.FC = () => {
                       brand_aka: 'RBN',
                       phone: '081399887766',
                       date: '2026-09-22',
-                      expedition_info: 'EXP. DIPO OSOWILANGUN SURABAYA',
+                      expedition_info: '',
                       notes: 'Sync dari Kalender Juwita: 9am RBN 25 BM (22 Sep 2026)',
                       items: [
                         { id: 'it-1', product_name: 'BERAS PREMIUM CAP PANDAN @(5X10) KG', unit: 'ZAK', qty: 500, weight_per_unit_kg: 50, total_kg: 25000 }
@@ -1069,7 +1068,7 @@ export const Admin1DeliveryOrderScreen: React.FC = () => {
                       brand_aka: 'FNB',
                       phone: '085211223344',
                       date: '2026-09-24',
-                      expedition_info: 'EXP. KALIANAK BLOK BB NO. 12 SURABAYA',
+                      expedition_info: '',
                       notes: 'Sync dari Kalender Juwita: 9am FNB 25 BM (24 Sep 2026)',
                       items: [
                         { id: 'it-1', product_name: 'BERAS PREMIUM CAP PUTRI THAILAND @50 KG', unit: 'ZAK', qty: 500, weight_per_unit_kg: 50, total_kg: 25000 }
@@ -1111,7 +1110,7 @@ export const Admin1DeliveryOrderScreen: React.FC = () => {
                       brand_aka: 'WIN 15',
                       phone: '081233445566',
                       date: '2026-09-16',
-                      expedition_info: 'EXP. DIPO OSOWILANGUN BLOK B3 SURABAYA',
+                      expedition_info: '',
                       notes: 'Sync dari Kalender Juwita: 9am win 15 BM (16 Sep 2026)',
                       items: [
                         { id: 'it-1', product_name: 'BERAS PREMIUM CAP PUTRI THAILAND @50 KG', unit: 'ZAK', qty: 300, weight_per_unit_kg: 50, total_kg: 15000 }

@@ -32,7 +32,7 @@ import {
 import { CalendarEvent, CalendarEventType, CalendarEventStatus } from '../types';
 import { parseIcalFeed, fetchIcalWithProxies } from '../utils/icalParser';
 
-// Pre-seeded events from Juwita's Google Calendar (juwitasriwulandari@gmail.com)
+// Pre-seeded events from Juwita's Google Calendar (sriwulandarijuwita@gmail.com)
 const DEFAULT_CALENDAR_EVENTS: CalendarEvent[] = [
   {
     id: 'gcal-win15-sep16',
@@ -45,9 +45,9 @@ const DEFAULT_CALENDAR_EVENTS: CalendarEvent[] = [
     brand_aka: 'WIN 15',
     total_kg: 15000,
     nopol: 'P 8122 UY',
-    expedition_info: 'EXP. DIPO OSOWILANGUN BLOK B3 SURABAYA',
+    expedition_info: '',
     notes: 'Cap Putri Thailand 50KG (300 Sak = 15.000 KG)',
-    account_email: 'juwitasriwulandari@gmail.com',
+    account_email: 'sriwulandarijuwita@gmail.com',
     google_calendar_sync: true
   },
   {
@@ -61,9 +61,9 @@ const DEFAULT_CALENDAR_EVENTS: CalendarEvent[] = [
     brand_aka: 'BCAMP',
     total_kg: 25000,
     nopol: 'P 9081 AB',
-    expedition_info: 'EXP. CARAVAN JL. KALIANAK 55 BLOK QQ NO. 9 SURABAYA',
+    expedition_info: '',
     notes: 'Betet @10 (5t), Betet @20 (100sak), Betet @25 (400sak), P.Thai @5 (3t), P.Thai @10 (5t)',
-    account_email: 'juwitasriwulandari@gmail.com',
+    account_email: 'sriwulandarijuwita@gmail.com',
     google_calendar_sync: true
   },
   {
@@ -77,9 +77,9 @@ const DEFAULT_CALENDAR_EVENTS: CalendarEvent[] = [
     brand_aka: 'RBN',
     total_kg: 25000,
     nopol: 'W 8762 UZ',
-    expedition_info: 'EXP. DIPO OSOWILANGUN SURABAYA',
+    expedition_info: '',
     notes: 'Cap Pandan @(5x10) KG (500 Sak = 25.000 KG)',
-    account_email: 'juwitasriwulandari@gmail.com',
+    account_email: 'sriwulandarijuwita@gmail.com',
     google_calendar_sync: true
   },
   {
@@ -93,9 +93,9 @@ const DEFAULT_CALENDAR_EVENTS: CalendarEvent[] = [
     brand_aka: 'FNB',
     total_kg: 25000,
     nopol: 'L 9912 QA',
-    expedition_info: 'EXP. KALIANAK BLOK BB NO. 12 SURABAYA',
+    expedition_info: '',
     notes: 'Cap Putri Thailand 50KG (500 Sak = 25.000 KG)',
-    account_email: 'juwitasriwulandari@gmail.com',
+    account_email: 'sriwulandarijuwita@gmail.com',
     google_calendar_sync: true
   },
   {
@@ -109,8 +109,9 @@ const DEFAULT_CALENDAR_EVENTS: CalendarEvent[] = [
     brand_aka: 'GABAH BASAH',
     total_kg: 18450,
     nopol: 'P 8443 XA',
+    expedition_info: '',
     notes: 'Kadar air 21%, hampa 7%. Langsung timbang dan masuk dryer.',
-    account_email: 'juwitasriwulandari@gmail.com',
+    account_email: 'sriwulandarijuwita@gmail.com',
     google_calendar_sync: true
   },
   {
@@ -124,9 +125,9 @@ const DEFAULT_CALENDAR_EVENTS: CalendarEvent[] = [
     brand_aka: 'CAP BETET',
     total_kg: 20000,
     nopol: 'W 8021 PB',
-    expedition_info: 'EXP. WIRA LOGISTIK SURABAYA',
+    expedition_info: '',
     notes: 'Cap Betet Super Kepala 25KG (800 Sak)',
-    account_email: 'juwitasriwulandari@gmail.com',
+    account_email: 'sriwulandarijuwita@gmail.com',
     google_calendar_sync: true
   },
   {
@@ -140,9 +141,9 @@ const DEFAULT_CALENDAR_EVENTS: CalendarEvent[] = [
     brand_aka: 'BCAMP',
     total_kg: 25000,
     nopol: 'P 9102 BC',
-    expedition_info: 'EXP. CARAVAN JL. KALIANAK 55',
+    expedition_info: '',
     notes: 'P.Thai @10 (10t), Betet @25 (15t)',
-    account_email: 'juwitasriwulandari@gmail.com',
+    account_email: 'sriwulandarijuwita@gmail.com',
     google_calendar_sync: true
   },
   {
@@ -155,8 +156,9 @@ const DEFAULT_CALENDAR_EVENTS: CalendarEvent[] = [
     customer_name: 'REKAP HUTANG SUPLIER GABAH',
     brand_aka: 'BCA OWNER',
     total_kg: 0,
+    expedition_info: '',
     notes: 'Jadwal transfer H-1 asalan via internet banking BCA Owner.',
-    account_email: 'juwitasriwulandari@gmail.com',
+    account_email: 'sriwulandarijuwita@gmail.com',
     google_calendar_sync: true
   },
   {
@@ -168,8 +170,9 @@ const DEFAULT_CALENDAR_EVENTS: CalendarEvent[] = [
     status: 'IN_PROGRESS',
     customer_name: 'INTERNAL PP BUMI MAS',
     brand_aka: 'ALL BRAND',
+    expedition_info: '',
     notes: 'Meeting koordinasi jadwal kirim beras 4 varian bersama Juwita & Admin 1.',
-    account_email: 'juwitasriwulandari@gmail.com',
+    account_email: 'sriwulandarijuwita@gmail.com',
     google_calendar_sync: true
   },
   {
@@ -183,9 +186,9 @@ const DEFAULT_CALENDAR_EVENTS: CalendarEvent[] = [
     brand_aka: 'PUTRI THAI',
     total_kg: 25000,
     nopol: 'DK 8899 AB',
-    expedition_info: 'EXP. BALI INDAH KETAPANG',
+    expedition_info: '',
     notes: 'Cap Putri Thailand 50KG (500 Sak). Beras poles kristal baru.',
-    account_email: 'juwitasriwulandari@gmail.com',
+    account_email: 'sriwulandarijuwita@gmail.com',
     google_calendar_sync: true
   },
   {
@@ -198,8 +201,9 @@ const DEFAULT_CALENDAR_EVENTS: CalendarEvent[] = [
     customer_name: 'H. JOKO (SUPLIER ROGOJAMPI)',
     brand_aka: 'GABAH BASAH',
     total_kg: 22000,
+    expedition_info: '',
     notes: 'Kedatangan 1 Fuso dari area persawahan Rogojampi.',
-    account_email: 'juwitasriwulandari@gmail.com',
+    account_email: 'sriwulandarijuwita@gmail.com',
     google_calendar_sync: true
   },
   {
@@ -212,9 +216,9 @@ const DEFAULT_CALENDAR_EVENTS: CalendarEvent[] = [
     customer_name: 'UD TERUS JAYA SURABAYA',
     brand_aka: 'WIN 15',
     total_kg: 15000,
-    expedition_info: 'EXP. DIPO OSOWILANGUN SURABAYA',
+    expedition_info: '',
     notes: 'Pesanan lanjutan 15 Ton Cap Putri Thailand 50KG.',
-    account_email: 'juwitasriwulandari@gmail.com',
+    account_email: 'sriwulandarijuwita@gmail.com',
     google_calendar_sync: true
   }
 ];
@@ -475,7 +479,7 @@ export const CalendarScreen: React.FC = () => {
     setFormTotalKg(25000);
     setFormNopol('');
     setFormExpedition('');
-    setFormNotes('Sync dengan Google Calendar Juwita (juwitasriwulandari@gmail.com)');
+    setFormNotes('Sync dengan Google Calendar Juwita (sriwulandarijuwita@gmail.com)');
     setIsEditModalOpen(true);
   };
 
@@ -519,7 +523,7 @@ export const CalendarScreen: React.FC = () => {
         nopol: formNopol.trim().toUpperCase(),
         expedition_info: formExpedition.trim(),
         notes: formNotes.trim(),
-        account_email: 'juwitasriwulandari@gmail.com',
+        account_email: 'sriwulandarijuwita@gmail.com',
         google_calendar_sync: true,
         created_at: new Date().toISOString()
       };
@@ -540,7 +544,7 @@ export const CalendarScreen: React.FC = () => {
             nopol: formNopol.trim().toUpperCase(),
             expedition_info: formExpedition.trim(),
             notes: formNotes.trim(),
-            updated_at: new Date().toISOString()
+            account_email: 'sriwulandarijuwita@gmail.com'
           };
         }
         return evt;
@@ -751,7 +755,7 @@ export const CalendarScreen: React.FC = () => {
               <span>Kalender Jadwal Kirim &amp; Logistik</span>
             </h1>
             <p className="text-xs sm:text-sm text-[#c3c3cc]">
-              Sinkronisasi kalender operasional dengan Google Calendar Juwita (<strong>juwitasriwulandari@gmail.com</strong>). Anda dapat melihat, menambah, mengubah, dan menghapus jadwal kapan saja.
+              Sinkronisasi kalender operasional dengan Google Calendar Juwita (<strong>sriwulandarijuwita@gmail.com</strong>). Anda dapat melihat, menambah, mengubah, dan menghapus jadwal kapan saja.
             </p>
           </div>
 
@@ -1163,10 +1167,10 @@ export const CalendarScreen: React.FC = () => {
             <div>
               <h3 className="text-lg font-bold text-white flex items-center space-x-2">
                 <ExternalLink className="w-5 h-5 text-amber-400" />
-                <span>Integrasi Google Calendar (juwitasriwulandari@gmail.com)</span>
+                <span>Integrasi Google Calendar (sriwulandarijuwita@gmail.com)</span>
               </h3>
               <p className="text-xs text-[#c3c3cc] mt-1">
-                Akses web langsung ke kalender Juwita untuk sinkronisasi dua arah dengan smartphone dan perangkat lapangan.
+                Akses live langsung ke Google Calendar akun Juwita. Ekspedisi dan alamat dikosongkan.
               </p>
             </div>
 
@@ -1181,43 +1185,29 @@ export const CalendarScreen: React.FC = () => {
             </a>
           </div>
 
-          <div className="bg-[#272735] border border-amber-500/30 rounded-xl p-5 space-y-3">
-            <h4 className="font-bold text-amber-300 text-sm flex items-center space-x-2">
-              <AlertCircle className="w-4 h-4 text-amber-400" />
-              <span>Petunjuk Sinkronisasi Otomatis Google Calendar Juwita</span>
-            </h4>
-            <ul className="text-xs text-[#ededf3] space-y-2 list-disc pl-5">
-              <li>
-                <strong>Format Event Kalender Juwita:</strong> <code>[Jam] [Merek/AKA] [Tonnage] BM</code> (Contoh: <code>9am bcamp 25 BM</code> atau <code>9am win 15 BM</code>).
-              </li>
-              <li>
-                <strong>Sinkronisasi ke HP Juwita:</strong> Tekan tombol <strong>"Ekspor .ICS"</strong> di atas untuk mengunduh berkas kalender lalu buka langsung di Google Calendar Android / iPhone.
-              </li>
-              <li>
-                <strong>Pencatatan Surat Jalan (DO):</strong> Setiap event kalender yang disimpan dapat langsung dikonversi menjadi Surat Jalan resmi multi-item di modul Admin 1 (Surat Jalan DO).
-              </li>
-            </ul>
-          </div>
-
-          <div className="border border-[#70707d]/30 rounded-xl overflow-hidden bg-white h-[600px] flex flex-col items-center justify-center p-6 text-center text-slate-800 space-y-4">
-            <CalendarIcon className="w-16 h-16 text-emerald-600" />
-            <div className="max-w-md space-y-2">
-              <h4 className="text-lg font-bold text-slate-900">
-                Akses Google Calendar Resmi
-              </h4>
-              <p className="text-xs text-slate-600">
-                Google Calendar memerlukan login akun <strong>juwitasriwulandari@gmail.com</strong> di peramban Anda. Klik tombol di bawah untuk membuka antarmuka kalender langsung:
-              </p>
+          <div className="border border-[#70707d]/30 rounded-xl overflow-hidden bg-white shadow-sm flex flex-col">
+            <div className="bg-slate-100 p-3 border-b border-slate-200 flex items-center justify-between">
+              <span className="text-xs font-bold text-slate-700 flex items-center space-x-2">
+                <CalendarIcon className="w-4 h-4 text-emerald-600" />
+                <span>Google Calendar Aktif: <strong>sriwulandarijuwita@gmail.com</strong></span>
+              </span>
+              <a
+                href="https://calendar.google.com/calendar/u/0/r"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-emerald-700 font-bold hover:underline flex items-center space-x-1"
+              >
+                <span>Buka di Layar Penuh</span>
+                <ExternalLink className="w-3.5 h-3.5" />
+              </a>
             </div>
-            <a
-              href="https://calendar.google.com/calendar/u/0/r"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-full shadow-lg transition flex items-center space-x-2"
-            >
-              <ExternalLink className="w-4 h-4" />
-              <span>Buka kalender Juwita sekarang</span>
-            </a>
+            <iframe
+              src="https://calendar.google.com/calendar/embed?src=sriwulandarijuwita%40gmail.com&ctz=Asia%2FJakarta"
+              style={{ border: 0, width: '100%', height: '700px' }}
+              frameBorder="0"
+              scrolling="no"
+              title="Google Calendar sriwulandarijuwita@gmail.com"
+            />
           </div>
         </div>
       )}
@@ -1236,7 +1226,7 @@ export const CalendarScreen: React.FC = () => {
                   <span>{isNewEvent ? 'Tambah Jadwal Baru' : 'Ubah & Edit Jadwal'}</span>
                 </h3>
                 <span className="text-[10px] font-mono text-emerald-400">
-                  Akun: juwitasriwulandari@gmail.com
+                  Akun: sriwulandarijuwita@gmail.com (Ekspedisi & Alamat Dikosongkan)
                 </span>
               </div>
               <button
@@ -1536,7 +1526,7 @@ export const CalendarScreen: React.FC = () => {
                   <span>Pengaturan Secret iCal Google Calendar</span>
                 </h3>
                 <span className="text-[10px] font-mono text-emerald-400">
-                  Akun: juwitasriwulandari@gmail.com
+                  Akun: sriwulandarijuwita@gmail.com
                 </span>
               </div>
               <button
@@ -1555,7 +1545,7 @@ export const CalendarScreen: React.FC = () => {
               </h4>
               <ol className="text-xs text-[#ededf3] space-y-2 list-decimal pl-5">
                 <li>
-                  Buka <strong>calendar.google.com</strong> di komputer/laptop (pastikan login dengan akun <code>juwitasriwulandari@gmail.com</code>).
+                  Buka <strong>calendar.google.com</strong> di komputer/laptop (pastikan login dengan akun <code>sriwulandarijuwita@gmail.com</code>).
                 </li>
                 <li>
                   Di sisi kiri pada bagian <strong>"Kalender saya" (My calendars)</strong>, arahkan mouse ke kalender Juwita dan klik tanda <strong>tiga titik (⋮)</strong>.

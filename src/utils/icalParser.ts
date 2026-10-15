@@ -219,7 +219,7 @@ export function parseIcalFeed(rawIcs: string): CalendarEvent[] {
       total_kg: totalKg,
       expedition_info: location || (description.match(/Expedisi:\s*([^\n\r]+)/i)?.[1]?.trim() || ''),
       notes: description || summary,
-      account_email: 'juwitasriwulandari@gmail.com',
+      account_email: 'sriwulandarijuwita@gmail.com',
       google_calendar_sync: true,
       created_at: new Date().toISOString()
     });
