@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { Shield, Scale, Smartphone, Building2, UserCheck, LogOut, FileText, BarChart3, Users, Package, Wallet, Receipt, Layers, Key, BookOpen, Instagram, Menu, X, Calendar } from 'lucide-react';
+import { Shield, Scale, Smartphone, Building2, UserCheck, LogOut, FileText, BarChart3, Users, Package, Wallet, Receipt, Layers, Key, BookOpen, Instagram, Menu, X, Calendar, Warehouse } from 'lucide-react';
 import { LoginModal } from './LoginModal';
 import { AuditLogModal } from './AuditLogModal';
 import { InitialBalanceSetupModal } from './InitialBalanceSetupModal';
@@ -627,6 +627,17 @@ export const Header: React.FC = () => {
               >
                 <FileText className="w-3.5 h-3.5 text-emerald-400" />
                 <span>3. DO &amp; Surat Jalan</span>
+              </button>
+
+              <button
+                onClick={() => { setRole('ADMIN1'); setActiveScreen('SCREEN_FINISHED_GOODS_BUFFER'); }}
+                className={`px-3 py-1.5 rounded-lg transition flex items-center space-x-1.5 shrink-0 ${
+                  activeScreen === 'SCREEN_FINISHED_GOODS_BUFFER' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold shadow-sm' : 'text-amber-400/80 hover:text-amber-300 hover:bg-slate-800/50'
+                }`}
+                title="Gudang Barang Jadi & Rencana Cor Minimal"
+              >
+                <Warehouse className="w-3.5 h-3.5 text-amber-400" />
+                <span>⭐ Gudang Barang Jadi (Cor Min)</span>
               </button>
 
               <button

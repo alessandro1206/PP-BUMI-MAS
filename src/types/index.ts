@@ -218,6 +218,36 @@ export interface FinishedGoodOpnameItem {
   total_kg: number;
 }
 
+// ---- Modul Gudang Barang Jadi & Rencana Cor Minimal ----
+export interface FinishedGoodsCorPlanItem {
+  product_id: string;
+  product_code: string;
+  product_name: string;
+  quality_grade?: QualityGrade;
+  target_do_kg: number;          // Permintaan dari Rencana Kirim / DO (kg)
+  stock_fg_kg: number;           // Stok Beras Jadi Tersedia di Gudang (kg)
+  deficit_kg: number;            // Kekurangan Bersih = max(0, target_do - stock_fg) (kg)
+  est_yield_pct: number;         // Rendemen poles estimasi (default 67%)
+  min_asalan_cor_kg: number;     // Rencana Cor Minimal Asalan = ceil(deficit_kg / (yield/100))
+  actual_asalan_cor_kg: number;  // Realisasi Cor Mandor (BISA DINAIKKAN, MINIMAL = min_asalan_cor_kg)
+  selected_stapel_id?: string;   // Stapel Beras Asalan yang disedot / dicor
+  selected_stapel_name?: string;
+}
+
+export interface FinishedGoodsCorPlan {
+  id: string;
+  plan_date: string;
+  status: 'DRAFT' | 'APPROVED' | 'PROCESSED';
+  items: FinishedGoodsCorPlanItem[];
+  total_target_do_kg: number;
+  total_stock_fg_kg: number;
+  total_deficit_kg: number;
+  total_min_cor_kg: number;
+  total_actual_cor_kg: number;
+  notes?: string;
+  created_at: string;
+}
+
 export interface ByproductOpname {
   id: string;
   opname_date: string;

@@ -220,10 +220,18 @@ export const WorkstationHubScreen: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => handleEnterWorkstation('ADMIN1', 'SCREEN_CALENDAR')}
-                  className="col-span-2 px-2.5 py-2 backdrop-blur-md bg-emerald-400/30 hover:bg-emerald-400/45 text-emerald-50 rounded-xl text-left transition truncate border border-emerald-300/60 font-bold shadow-[0_0_14px_rgba(52,211,153,0.3)] focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:outline-none"
+                  className="px-2.5 py-2 backdrop-blur-md bg-emerald-400/30 hover:bg-emerald-400/45 text-emerald-50 rounded-xl text-left transition truncate border border-emerald-300/60 font-bold shadow-[0_0_14px_rgba(52,211,153,0.3)] focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:outline-none"
                   title="Kalender Juwita (Jadwal Pengiriman DO)"
                 >
-                  📅 Kalender Juwita (Jadwal DO)
+                  📅 Kalender DO
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleEnterWorkstation('ADMIN1', 'SCREEN_FINISHED_GOODS_BUFFER')}
+                  className="px-2.5 py-2 backdrop-blur-md bg-amber-400/30 hover:bg-amber-400/45 text-amber-100 rounded-xl text-left transition truncate border border-amber-300/60 font-bold shadow-[0_0_14px_rgba(251,191,36,0.3)] focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none"
+                  title="Gudang Barang Jadi & Rencana Cor Minimal"
+                >
+                  ⭐ Buffer &amp; Cor Min
                 </button>
               </div>
             </div>
@@ -313,10 +321,18 @@ export const WorkstationHubScreen: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => handleEnterWorkstation('ADMIN2', 'SCREEN_24')}
-                  className="col-span-2 px-2.5 py-2 backdrop-blur-md bg-white/[0.12] hover:bg-white/[0.22] text-white rounded-xl text-left transition truncate border border-white/20 font-medium hover:border-amber-300/60 shadow-xs focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none"
+                  className="px-2.5 py-2 backdrop-blur-md bg-white/[0.12] hover:bg-white/[0.22] text-white rounded-xl text-left transition truncate border border-white/20 font-medium hover:border-amber-300/60 shadow-xs focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none"
                   title="Tally Tier Muatan Truk"
                 >
-                  • Tally Tier Truk
+                  • Tally Truk
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleEnterWorkstation('ADMIN2', 'SCREEN_FINISHED_GOODS_BUFFER')}
+                  className="px-2.5 py-2 backdrop-blur-md bg-amber-400/30 hover:bg-amber-400/45 text-amber-100 rounded-xl text-left transition truncate border border-amber-300/60 font-bold shadow-[0_0_14px_rgba(251,191,36,0.3)] focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none"
+                  title="Gudang Barang Jadi & Rencana Cor Minimal"
+                >
+                  ⭐ Buffer &amp; Cor Min
                 </button>
               </div>
             </div>

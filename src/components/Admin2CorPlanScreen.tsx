@@ -12,9 +12,10 @@ function parsePackagingForSak(config: string): { innerWeightKg: number; outerWei
 }
 
 export const Admin2CorPlanScreen: React.FC = () => {
-  const { deliveryOrders, products, sakItems, stapelPiles, setActiveScreen } = useApp();
+  const { deliveryOrders, products, sakItems, stapelPiles, finishedGoodsPlans, setActiveScreen } = useApp();
   const today = new Date().toISOString().split('T')[0];
   const todayDOs = deliveryOrders.filter(d => d.delivery_date === today || !d.delivery_date);
+  const latestPlan = (finishedGoodsPlans || []).find(p => p.plan_date === today) || (finishedGoodsPlans || [])[0];
 
   // Cross-check input (optional)
   const [actualZak, setActualZak] = useState<string>('');
@@ -90,13 +91,53 @@ export const Admin2CorPlanScreen: React.FC = () => {
       </div>
 
       {/* Tab Bar */}
-      <div className="grid grid-cols-5 gap-1 p-1.5 bg-slate-200 rounded-xl font-bold text-[10px] text-center">
+      <div className="grid grid-cols-3 sm:grid-cols-6 gap-1 p-1.5 bg-slate-200 rounded-xl font-bold text-[10px] text-center">
         <button onClick={() => setActiveScreen('SCREEN_42')} className="py-2 bg-[#0f3e2e] text-white rounded-lg shadow">Cor Beras</button>
+        <button onClick={() => setActiveScreen('SCREEN_FINISHED_GOODS_BUFFER')} className="py-2 bg-amber-500 text-slate-950 font-extrabold rounded-lg shadow hover:bg-amber-400">⭐ Cor Min</button>
         <button onClick={() => setActiveScreen('SCREEN_8')} className="py-2 bg-white text-slate-700 rounded-lg">Minta Sak</button>
         <button onClick={() => setActiveScreen('SCREEN_SAK_STOCK')} className="py-2 bg-white text-slate-700 rounded-lg">Stok Sak</button>
         <button onClick={() => setActiveScreen('SCREEN_36')} className="py-2 bg-white text-slate-700 rounded-lg">Opname</button>
         <button onClick={() => setActiveScreen('SCREEN_24')} className="py-2 bg-white text-slate-700 rounded-lg">Tally</button>
       </div>
+
+      {/* Rencana Cor Minimal dari Gudang Barang Jadi Banner */}
+      {latestPlan ? (
+        <div className="bg-gradient-to-r from-amber-500/15 via-amber-500/10 to-emerald-500/10 border-2 border-amber-400/80 rounded-2xl p-4 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div className="space-y-1">
+            <div className="flex items-center space-x-2">
+              <span className="px-2 py-0.5 rounded-full bg-amber-500 text-slate-950 text-[10px] font-mono font-black">
+                GUDANG BARANG JADI
+              </span>
+              <span className="text-xs font-bold text-slate-800">
+                Instruksi Cor Minimal #{latestPlan.id}
+              </span>
+            </div>
+            <div className="text-xs text-slate-700 flex flex-wrap gap-x-4 gap-y-1 pt-0.5">
+              <span>Batas Min Cor: <strong className="text-amber-800 font-mono font-black">{latestPlan.total_min_asalan_kg.toLocaleString('id-ID')} KG</strong></span>
+              <span>Realisasi Rencana: <strong className="text-emerald-800 font-mono font-black">{latestPlan.total_actual_asalan_kg.toLocaleString('id-ID')} KG</strong></span>
+              <span>Surplus Buffer: <strong className="text-indigo-800 font-mono font-black">{latestPlan.total_surplus_fg_kg.toLocaleString('id-ID')} KG</strong></span>
+            </div>
+          </div>
+          <button
+            onClick={() => setActiveScreen('SCREEN_FINISHED_GOODS_BUFFER')}
+            className="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-extrabold rounded-xl shrink-0 shadow-sm transition"
+          >
+            Buka Form Cor Min &rarr;
+          </button>
+        </div>
+      ) : (
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 flex items-center justify-between text-xs">
+          <span className="text-amber-900 font-medium">
+            💡 <strong>Rekomendasi Cor:</strong> Hitung kebutuhan bersih DO vs stok barang jadi di gudang.
+          </span>
+          <button
+            onClick={() => setActiveScreen('SCREEN_FINISHED_GOODS_BUFFER')}
+            className="px-3 py-1 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-lg shrink-0 text-[11px]"
+          >
+            Kalkulator Cor Min &rarr;
+          </button>
+        </div>
+      )}
 
       {todayDOs.length === 0 ? (
         <div className="bg-blue-50 border-2 border-blue-200 rounded-2xl p-8 text-center space-y-2">

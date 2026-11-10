@@ -18,6 +18,7 @@ import { Admin2BerasStockScreen } from './components/Admin2BerasStockScreen';
 import { Admin2ByproductOpnameScreen } from './components/Admin2ByproductOpnameScreen';
 import { Admin2TruckTierScreen } from './components/Admin2TruckTierScreen';
 import { Admin2PaperCorPlanScreen } from './components/Admin2PaperCorPlanScreen';
+import { FinishedGoodsBufferScreen } from './components/FinishedGoodsBufferScreen';
 
 // Core Master Data & Laporan
 import { MasterSupplierScreen } from './components/MasterSupplierScreen';
@@ -64,6 +65,8 @@ const MainContent: React.FC = () => {
         return <Admin1ReceivablesScreen />;
       case 'SCREEN_BERAS_STOCK':
         return <Admin2BerasStockScreen />;
+      case 'SCREEN_FINISHED_GOODS_BUFFER':
+        return <FinishedGoodsBufferScreen />;
 
       // Admin 2 Screens (Produksi Pabrik & Logistik)
       case 'SCREEN_42':

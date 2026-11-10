@@ -20,7 +20,9 @@ import {
   SakTransaction,
   AccountCOA,
   JournalEntry,
-  InitialSetupData
+  InitialSetupData,
+  FinishedGoodsCorPlan,
+  FinishedGoodsCorPlanItem
 } from '../types';
 
 
@@ -64,6 +66,10 @@ interface AppContextType {
   deliveryOrders: SalesDeliveryOrder[];
   pettyCash: PettyCashTransaction[];
   stapelPiles: StapelPile[];
+  finishedGoodsPlans: FinishedGoodsCorPlan[];
+  saveFinishedGoodsPlan: (plan: Omit<FinishedGoodsCorPlan, 'id' | 'created_at'>) => FinishedGoodsCorPlan;
+  executeFinishedGoodsCorPlan: (planId: string) => void;
+  adjustFinishedGoodsStock: (productId: string, newStockKg: number, reason: string) => void;
 
   // Sak Management
   sakItems: SakItem[];
@@ -245,6 +251,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [stapelPiles, setStapelPiles] = useState<StapelPile[]>(() => loadStorage('bumimas_erp_stapel_piles', initialStapels));
   const [sakItems, setSakItems] = useState<SakItem[]>(() => loadStorage('bumimas_erp_sak_items', initialSakItems));
   const [sakTransactions, setSakTransactions] = useState<SakTransaction[]>(() => loadStorage('bumimas_erp_sak_transactions', []));
+  const [finishedGoodsPlans, setFinishedGoodsPlans] = useState<FinishedGoodsCorPlan[]>(() => loadStorage('bumimas_erp_finished_goods_plans', []));
 
   const [bankBalance, setBankBalance] = useState<number>(() => loadStorage('bumimas_erp_bank_balance', 1450000000));
 
@@ -342,6 +349,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   useEffect(() => {
     saveStorage('bumimas_erp_bank_balance', bankBalance);
   }, [bankBalance]);
+
+  useEffect(() => {
+    saveStorage('bumimas_erp_finished_goods_plans', finishedGoodsPlans);
+  }, [finishedGoodsPlans]);
 
 
   const cashBalance = pettyCash.reduce((acc, tx) => {
@@ -641,6 +652,62 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const updateProduct = (product: ProductItem) => {
     setProducts(prev => prev.map(p => p.id === product.id ? product : p));
     addAuditLog(`Update Master Barang`, `Ubah produk: ${product.name}`);
+  };
+
+  const adjustFinishedGoodsStock = (productId: string, newStockKg: number, reason: string) => {
+    setProducts(prev => prev.map(p => {
+      if (p.id === productId) {
+        addAuditLog(`Stock Opname Beras Jadi`, `${p.name}: Stok beras jadi disesuaikan dari ${p.finished_goods_stock_kg || 0} KG ke ${newStockKg} KG (Alasan: ${reason})`);
+        return { ...p, finished_goods_stock_kg: newStockKg };
+      }
+      return p;
+    }));
+  };
+
+  const saveFinishedGoodsPlan = (planData: Omit<FinishedGoodsCorPlan, 'id' | 'created_at'>): FinishedGoodsCorPlan => {
+    const newPlan: FinishedGoodsCorPlan = {
+      ...planData,
+      id: `fgplan-${Date.now()}`,
+      created_at: new Date().toISOString()
+    };
+    setFinishedGoodsPlans(prev => [newPlan, ...prev]);
+    addAuditLog(`Rencana Gudang Barang Jadi Dibuat`, `Tgl: ${newPlan.plan_date}, Target DO: ${newPlan.total_target_do_kg.toLocaleString('id-ID')} KG, Min Cor: ${newPlan.total_min_cor_kg.toLocaleString('id-ID')} KG, Realisasi Cor: ${newPlan.total_actual_cor_kg.toLocaleString('id-ID')} KG`);
+    return newPlan;
+  };
+
+  const executeFinishedGoodsCorPlan = (planId: string) => {
+    const targetPlan = finishedGoodsPlans.find(p => p.id === planId);
+    if (!targetPlan || targetPlan.status === 'PROCESSED') return;
+
+    // 1. Eksekusi pemotongan bahan asalan pada stapel terkait
+    targetPlan.items.forEach(item => {
+      if (item.actual_asalan_cor_kg > 0) {
+        if (item.selected_stapel_id) {
+          setStapelPiles(piles => piles.map(s => {
+            if (s.id === item.selected_stapel_id) {
+              const newStock = Math.max(0, s.stock_kg - item.actual_asalan_cor_kg);
+              return { ...s, stock_kg: newStock };
+            }
+            return s;
+          }));
+        }
+
+        // 2. Tambah stok Beras Jadi yang dihasilkan dari proses cor ke produk terkait
+        // Hasil beras jadi = actual_asalan_cor_kg * (est_yield_pct / 100)
+        const yieldBerasJadiKg = Math.round(item.actual_asalan_cor_kg * ((item.est_yield_pct || 67) / 100));
+        setProducts(prods => prods.map(p => {
+          if (p.id === item.product_id) {
+            const currentStock = p.finished_goods_stock_kg || 0;
+            return { ...p, finished_goods_stock_kg: currentStock + yieldBerasJadiKg };
+          }
+          return p;
+        }));
+      }
+    });
+
+    // 3. Update status plan ke PROCESSED
+    setFinishedGoodsPlans(prev => prev.map(p => p.id === planId ? { ...p, status: 'PROCESSED' } : p));
+    addAuditLog(`Eksekusi Cor Selesai & Tambah Stok Beras Jadi`, `Plan ID: ${planId}, Total Asalan Dicor: ${targetPlan.total_actual_cor_kg.toLocaleString('id-ID')} KG.`);
   };
 
   const adjustStapelStock = (stapelId: string, newStockKg: number, reason: string) => {
@@ -1078,6 +1145,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         deliveryOrders,
         pettyCash,
         stapelPiles,
+        finishedGoodsPlans,
+        saveFinishedGoodsPlan,
+        executeFinishedGoodsCorPlan,
+        adjustFinishedGoodsStock,
         sakItems,
         sakTransactions,
         addSakMasuk,
