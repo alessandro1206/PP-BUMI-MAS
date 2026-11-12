@@ -148,14 +148,27 @@ export const initialUserAccounts: UserAccount[] = [
   { id: 'u-admin2', username: 'admin2', name: 'Cak Mat (Checker Lapangan)', role: 'ADMIN2', password: 'admin234' }
 ];
 
-const initialSuppliers: Supplier[] = [];
-const initialCustomers: Customer[] = [];
-const initialProducts: ProductItem[] = [];
+const initialSuppliers: Supplier[] = [
+  { id: 'sup-1', name: 'Suplier H. Ahmad (Gabah Jombang)', bank_name: 'BCA', bank_account_number: '0129384751', phone: '081234567890', address: 'Jombang', status: 'AKTIF' },
+  { id: 'sup-2', name: 'Mitra Tani Jaya (Beras Asalan)', bank_name: 'BCA', bank_account_number: '8830192847', phone: '081987654321', address: 'Nganjuk', status: 'AKTIF' }
+];
+const initialCustomers: Customer[] = [
+  { id: 'cust-1', name: 'BUMI SUBUR SURABAYA', brand_aka: 'DM', contact_person: 'Ko Jimmy', phone: '0811324567', address: 'Surabaya', expedition_destination: 'Ekspedisi Niaga Trans', credit_limit: 500000000, payment_term: 'TEMPO_14_HARI', status: 'AKTIF' }
+];
+const initialProducts: ProductItem[] = [
+  { id: 'prod-1', code: 'BRS-PUTRI', name: 'Beras Premium Cap Putri Thailand @(5x10) KG', unit: 'SAK', weight_per_unit: 50, empty_bag_stock: 500, finished_goods_stock_kg: 10000, base_price_per_kg: 14800, packaging_config: '@(5x10)', inner_qty: 5, inner_weight_kg: 10 },
+  { id: 'prod-2', code: 'BRS-PANDAN', name: 'Beras Punel Pulau Pandan @25 KG', unit: 'SAK', weight_per_unit: 25, empty_bag_stock: 600, finished_goods_stock_kg: 8500, base_price_per_kg: 14900, packaging_config: '@(1x25)', inner_qty: 1, inner_weight_kg: 25 },
+  { id: 'prod-3', code: 'BRS-SRIARUM', name: 'Beras Premium Sri Arum @25 KG', unit: 'SAK', weight_per_unit: 25, empty_bag_stock: 700, finished_goods_stock_kg: 6000, base_price_per_kg: 14500, packaging_config: '@(1x25)', inner_qty: 1, inner_weight_kg: 25 },
+  { id: 'prod-4', code: 'BRS-BETET', name: 'Beras Super Kepala Cap Betet @25 KG', unit: 'SAK', weight_per_unit: 25, empty_bag_stock: 800, finished_goods_stock_kg: 9000, base_price_per_kg: 13900, packaging_config: '@(1x25)', inner_qty: 1, inner_weight_kg: 25 }
+];
 const initialSakItems: SakItem[] = [];
 const initialExpenses: ExpenseTransaction[] = [];
 const initialWeighbridge: WeighbridgeIn[] = [];
 const initialAuditLogs: AuditLog[] = [];
-const initialStapels: StapelPile[] = [];
+const initialStapels: StapelPile[] = [
+  { id: 'stapel-1', name: 'Stapel 1 - Gudang Utama (Asalan Banyuwangi)', quality_grade: 'Standar Pabrik', stock_kg: 85000, current_stock_kg: 85000, created_at: new Date().toISOString() },
+  { id: 'stapel-2', name: 'Stapel 2 - Area Reprocessing (Asalan Jember)', quality_grade: 'Super Fine', stock_kg: 45000, current_stock_kg: 45000, created_at: new Date().toISOString() }
+];
 const initialDeliveryOrders: SalesDeliveryOrder[] = [];
 const initialPettyCash: PettyCashTransaction[] = [];
 
@@ -230,7 +243,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const [suppliers, setSuppliers] = useState<Supplier[]>(() => loadStorage('bumimas_erp_suppliers', initialSuppliers));
   const [customers, setCustomers] = useState<Customer[]>(() => loadStorage('bumimas_erp_customers', initialCustomers));
-  const [products, setProducts] = useState<ProductItem[]>(() => loadStorage('bumimas_erp_products', initialProducts));
+  const [products, setProducts] = useState<ProductItem[]>(() => {
+    const loaded = loadStorage('bumimas_erp_products', initialProducts);
+    return (loaded && loaded.length > 0) ? loaded : initialProducts;
+  });
   const [expenses, setExpenses] = useState<ExpenseTransaction[]>(() => loadStorage('bumimas_erp_expenses', initialExpenses));
 
   const [weighbridgeInList, setWeighbridgeInList] = useState<WeighbridgeIn[]>(() => loadStorage('bumimas_erp_weighbridge', initialWeighbridge));
@@ -248,7 +264,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     'OPERASIONAL_KANTOR',
     'LAINNYA'
   ]);
-  const [stapelPiles, setStapelPiles] = useState<StapelPile[]>(() => loadStorage('bumimas_erp_stapel_piles', initialStapels));
+  const [stapelPiles, setStapelPiles] = useState<StapelPile[]>(() => {
+    const loaded = loadStorage('bumimas_erp_stapel_piles', initialStapels);
+    return (loaded && loaded.length > 0) ? loaded : initialStapels;
+  });
   const [sakItems, setSakItems] = useState<SakItem[]>(() => loadStorage('bumimas_erp_sak_items', initialSakItems));
   const [sakTransactions, setSakTransactions] = useState<SakTransaction[]>(() => loadStorage('bumimas_erp_sak_transactions', []));
   const [finishedGoodsPlans, setFinishedGoodsPlans] = useState<FinishedGoodsCorPlan[]>(() => loadStorage('bumimas_erp_finished_goods_plans', []));

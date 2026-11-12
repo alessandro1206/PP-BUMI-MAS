@@ -13,7 +13,8 @@ import {
   Plus, 
   RefreshCw,
   Clock,
-  History
+  History,
+  Sparkles
 } from 'lucide-react';
 import { FinishedGoodsCorPlanItem } from '../types';
 
@@ -64,20 +65,22 @@ export const FinishedGoodsBufferScreen: React.FC = () => {
   // Form State untuk setiap baris produk
   // Key = product_id
   const [rowInputs, setRowInputs] = useState<Record<string, {
-    estYieldPct: number;
-    actualAsalanKg: number;
-    selectedStapelId: string;
+    targetDoKg?: number;
+    stockFgKg?: number;
+    estYieldPct?: number;
+    actualAsalanKg?: number;
+    selectedStapelId?: string;
   }>>({});
 
   // Hitung data tabel kalkulator
   const planRows = useMemo(() => {
     return products.map(prod => {
       const doData = aggregatedDOItems[prod.id] || { totalKg: 0, doList: [] };
-      const targetDoKg = doData.totalKg;
-      const stockFgKg = prod.finished_goods_stock_kg || 0;
+      const customInput = rowInputs[prod.id];
+      const targetDoKg = customInput?.targetDoKg !== undefined ? customInput.targetDoKg : doData.totalKg;
+      const stockFgKg = customInput?.stockFgKg !== undefined ? customInput.stockFgKg : (prod.finished_goods_stock_kg || 0);
       const deficitKg = Math.max(0, targetDoKg - stockFgKg);
 
-      const customInput = rowInputs[prod.id];
       const estYieldPct = customInput?.estYieldPct || 67; // Default 67% rendemen poles
       const minAsalanCorKg = deficitKg > 0 ? Math.ceil(deficitKg / (estYieldPct / 100)) : 0;
       
@@ -141,7 +144,7 @@ export const FinishedGoodsBufferScreen: React.FC = () => {
     };
   }, [planRows]);
 
-  const handleUpdateRow = (prodId: string, field: 'estYieldPct' | 'actualAsalanKg' | 'selectedStapelId', value: any) => {
+  const handleUpdateRow = (prodId: string, field: 'targetDoKg' | 'stockFgKg' | 'estYieldPct' | 'actualAsalanKg' | 'selectedStapelId', value: any) => {
     setRowInputs(prev => {
       const current = prev[prodId] || {
         estYieldPct: 67,
@@ -156,6 +159,23 @@ export const FinishedGoodsBufferScreen: React.FC = () => {
         }
       };
     });
+  };
+
+  const handleApplyDemoScenario = () => {
+    const targetProd = products[0]?.id || 'prod-1';
+    setRowInputs({
+      [targetProd]: {
+        targetDoKg: 30000,
+        stockFgKg: 10000,
+        estYieldPct: 67,
+        actualAsalanKg: 75000,
+        selectedStapelId: stapelPiles[0]?.id || 'stapel-1'
+      }
+    });
+  };
+
+  const handleResetInputs = () => {
+    setRowInputs({});
   };
 
   const handleSaveAndDispatch = () => {
@@ -272,6 +292,73 @@ export const FinishedGoodsBufferScreen: React.FC = () => {
 
       {activeTab === 'KALKULATOR' ? (
         <>
+          {/* Guidance Card: Dimana Isinya & Siapa Yang Mengisi */}
+          <div className="bg-gradient-to-r from-[#1e1e2a] via-[#242436] to-[#1e1e2a] border border-amber-500/40 rounded-2xl p-4 sm:p-5 shadow-sm space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#70707d]/20 pb-3">
+              <div className="flex items-center space-x-2">
+                <span className="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/40 font-mono text-xs font-bold">
+                  PANDUAN ALUR
+                </span>
+                <h4 className="font-extrabold text-white text-sm">
+                  Dari Mana Angka Ini Berasal &amp; Siapa yang Mengisi?
+                </h4>
+              </div>
+              <div className="flex items-center space-x-2">
+                <button
+                  type="button"
+                  onClick={handleApplyDemoScenario}
+                  className="px-3.5 py-2 bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-extrabold text-xs rounded-xl shadow-md transition flex items-center space-x-1.5 cursor-pointer"
+                  title="Klik untuk mengisi simulasi contoh 30 Ton DO vs 75 Ton Cor"
+                >
+                  <Sparkles className="w-4 h-4 text-slate-950" />
+                  <span>⚡ Coba Contoh: DO 30 Ton &amp; Cor 75 Ton</span>
+                </button>
+                {Object.keys(rowInputs).length > 0 && (
+                  <button
+                    type="button"
+                    onClick={handleResetInputs}
+                    className="px-3 py-2 bg-[#272735] hover:bg-[#323244] text-slate-300 text-xs font-bold rounded-xl border border-[#70707d]/30 transition cursor-pointer"
+                    title="Reset isian ke data asli"
+                  >
+                    Reset
+                  </button>
+                )}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs text-slate-200">
+              <div className="bg-[#171721] p-3 rounded-xl border border-blue-500/30 space-y-1">
+                <div className="font-bold text-blue-300 flex items-center space-x-1.5">
+                  <span className="w-5 h-5 rounded-full bg-blue-500/20 flex items-center justify-center text-[11px] font-mono font-bold">1</span>
+                  <span>Admin Kantor (Admin 1)</span>
+                </div>
+                <p className="text-[11px] text-[#c3c3cc] leading-relaxed">
+                  Membuat <strong>Surat Jalan (DO)</strong> saat ada pesanan kirim. Angka Target DO otomatis terisi dari order hari ini, atau bisa Bapak ketik langsung di kolom Target DO di tabel bawah.
+                </p>
+              </div>
+
+              <div className="bg-[#171721] p-3 rounded-xl border border-emerald-500/30 space-y-1">
+                <div className="font-bold text-emerald-300 flex items-center space-x-1.5">
+                  <span className="w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center text-[11px] font-mono font-bold">2</span>
+                  <span>Gudang Barang Jadi (Buffer)</span>
+                </div>
+                <p className="text-[11px] text-[#c3c3cc] leading-relaxed">
+                  Mencatat stok beras siap kirim di lantai gudang. Sistem menghitung kekurangan dan <strong>menerbitkan batas minimal cor</strong> (dikunci agar muatan truk tidak kurang).
+                </p>
+              </div>
+
+              <div className="bg-[#171721] p-3 rounded-xl border border-purple-500/30 space-y-1">
+                <div className="font-bold text-purple-300 flex items-center space-x-1.5">
+                  <span className="w-5 h-5 rounded-full bg-purple-500/20 flex items-center justify-center text-[11px] font-mono font-bold">3</span>
+                  <span>Mandor Cor (Admin 2 di Pabrik)</span>
+                </div>
+                <p className="text-[11px] text-[#c3c3cc] leading-relaxed">
+                  Melihat batas minimal. Jika ada waktu luang mesin, <strong>bisa menaikkan cor</strong> (misal dari butuh 45 Ton menjadi 75 Ton). Sisa kelebihan beras otomatis masuk stok gudang berikutnya.
+                </p>
+              </div>
+            </div>
+          </div>
+
           {/* 4 Summary Stat Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* Card 1: Permintaan DO */}
@@ -395,14 +482,36 @@ export const FinishedGoodsBufferScreen: React.FC = () => {
                           </div>
                         </td>
 
-                        {/* Target DO */}
-                        <td className="p-3 text-right font-extrabold text-blue-400 text-sm">
-                          {row.targetDoKg.toLocaleString('id-ID')} <span className="text-[10px] font-normal text-slate-400">KG</span>
+                        {/* Target DO (Bisa Diedit Langsung) */}
+                        <td className="p-3 text-right">
+                          <div className="flex items-center justify-end space-x-1">
+                            <input
+                              type="number"
+                              min={0}
+                              step={500}
+                              value={row.targetDoKg}
+                              onChange={(e) => handleUpdateRow(row.product.id, 'targetDoKg', Number(e.target.value) || 0)}
+                              className="w-24 p-1.5 rounded-lg bg-[#272735] border border-blue-500/40 text-right font-extrabold text-blue-300 outline-none focus:border-blue-400 text-xs"
+                              title="Target kebutuhan kirim DO (KG)"
+                            />
+                            <span className="text-[10px] text-slate-400">KG</span>
+                          </div>
                         </td>
 
-                        {/* Stok Barang Jadi */}
-                        <td className="p-3 text-right font-extrabold text-emerald-400 text-sm">
-                          {row.stockFgKg.toLocaleString('id-ID')} <span className="text-[10px] font-normal text-slate-400">KG</span>
+                        {/* Stok Barang Jadi (Bisa Diedit Langsung) */}
+                        <td className="p-3 text-right">
+                          <div className="flex items-center justify-end space-x-1">
+                            <input
+                              type="number"
+                              min={0}
+                              step={500}
+                              value={row.stockFgKg}
+                              onChange={(e) => handleUpdateRow(row.product.id, 'stockFgKg', Number(e.target.value) || 0)}
+                              className="w-24 p-1.5 rounded-lg bg-[#272735] border border-emerald-500/40 text-right font-extrabold text-emerald-300 outline-none focus:border-emerald-400 text-xs"
+                              title="Stok beras siap kirim di gudang saat ini (KG)"
+                            />
+                            <span className="text-[10px] text-slate-400">KG</span>
+                          </div>
                         </td>
 
                         {/* Kekurangan Bersih */}
