@@ -154,8 +154,8 @@ export const LoginModal: React.FC<LoginModalProps> = ({ targetRole: initialRole,
                     <Scale className="w-5 h-5 text-[#ededf3]" />
                   </div>
                   <div>
-                    <h4 className="font-normal text-[#ededf3] text-sm">2. Admin 1 (Kantor &amp; Timbangan)</h4>
-                    <p className="text-[11px] text-[#c3c3cc]">Pos timbangan digital RS-232, kasir, DO, dan faktur</p>
+                    <h4 className="font-normal text-[#ededf3] text-sm">2. Admin 1 (Kantor, Timbangan &amp; Gudang)</h4>
+                    <p className="text-[11px] text-[#c3c3cc]">Pos timbangan RS-232, DO, Gudang Barang Jadi &amp; Rencana Cor Min</p>
                   </div>
                 </div>
                 <ArrowRight className="w-4 h-4 text-[#c3c3cc] group-hover:text-white transition" />
@@ -172,8 +172,8 @@ export const LoginModal: React.FC<LoginModalProps> = ({ targetRole: initialRole,
                     <Smartphone className="w-5 h-5 text-[#ededf3]" />
                   </div>
                   <div>
-                    <h4 className="font-normal text-[#ededf3] text-sm">3. Admin 2 (HP Field Checker)</h4>
-                    <p className="text-[11px] text-[#c3c3cc]">Perencanaan cor kiby, permohonan sak, opname gudang</p>
+                    <h4 className="font-normal text-[#ededf3] text-sm">3. Admin 2 (HP Field Checker &amp; Cor)</h4>
+                    <p className="text-[11px] text-[#c3c3cc]">Perencanaan cor kiby, kontrol cor minimal gudang, sak, tally truk</p>
                   </div>
                 </div>
                 <ArrowRight className="w-4 h-4 text-[#c3c3cc] group-hover:text-white transition" />
