@@ -121,6 +121,7 @@ export const FinishedGoodsBufferScreen: React.FC = () => {
     let totalDeficit = 0;
     let totalMinCor = 0;
     let totalActualCor = 0;
+    let totalSurplusFG = 0;
     let hasValidationViolation = false;
 
     planRows.forEach(r => {
@@ -129,6 +130,7 @@ export const FinishedGoodsBufferScreen: React.FC = () => {
       totalDeficit += r.deficitKg;
       totalMinCor += r.minAsalanCorKg;
       totalActualCor += r.actualAsalanKg;
+      totalSurplusFG += r.surplusFgAfterCor;
       if (r.isActualBelowMin) {
         hasValidationViolation = true;
       }
@@ -140,6 +142,7 @@ export const FinishedGoodsBufferScreen: React.FC = () => {
       totalDeficit,
       totalMinCor,
       totalActualCor,
+      totalSurplusFG,
       hasValidationViolation
     };
   }, [planRows]);
@@ -389,31 +392,31 @@ export const FinishedGoodsBufferScreen: React.FC = () => {
               </div>
             </div>
 
-            {/* Card 3: Rencana Cor Minimal (Floor Limit) */}
-            <div className="bg-[#1e1e2a] border-2 border-amber-500/40 rounded-2xl p-5 space-y-1 bg-amber-500/5">
+            {/* Card 3: Rencana Cor Asalan (Bisa Diedit & Dinaikkan) */}
+            <div className="bg-[#1e1e2a] border-2 border-amber-500/50 rounded-2xl p-5 space-y-1 bg-amber-500/10">
               <div className="flex items-center justify-between text-xs text-amber-300 font-extrabold">
-                <span>3. BATAS MINIMAL COR ASALAN</span>
-                <ShieldCheck className="w-4 h-4 text-amber-400" />
+                <span>3. RENCANA COR ASALAN</span>
+                <Flame className="w-4 h-4 text-amber-400" />
               </div>
               <div className="text-3xl font-extrabold text-amber-400">
-                {(summary.totalMinCor / 1000).toFixed(1)} <span className="text-sm font-normal text-slate-300">Ton</span>
+                {(summary.totalActualCor / 1000).toFixed(1)} <span className="text-sm font-normal text-slate-300">Ton</span>
               </div>
-              <div className="text-[11px] text-amber-300/80 font-bold">
-                🔒 TIDAK BISA DIKURANGI (Wajib Kejar DO)
+              <div className="text-[11px] text-amber-300/90 font-medium">
+                Batas Minimal: <strong>{(summary.totalMinCor / 1000).toFixed(1)} Ton</strong> (Bisa diedit dinaikkan)
               </div>
             </div>
 
-            {/* Card 4: Realisasi Cor Lapangan */}
-            <div className="bg-[#1e1e2a] border-2 border-purple-500/40 rounded-2xl p-5 space-y-1 bg-purple-500/5">
-              <div className="flex items-center justify-between text-xs text-purple-300 font-extrabold">
-                <span>4. REALISASI COR LAPANGAN</span>
-                <Flame className="w-4 h-4 text-purple-400" />
+            {/* Card 4: Surplus Buffer Beras Masuk Gudang */}
+            <div className="bg-[#1e1e2a] border-2 border-emerald-500/50 rounded-2xl p-5 space-y-1 bg-emerald-500/10">
+              <div className="flex items-center justify-between text-xs text-emerald-300 font-extrabold">
+                <span>4. SURPLUS CADANGAN GUDANG</span>
+                <Warehouse className="w-4 h-4 text-emerald-400" />
               </div>
-              <div className="text-3xl font-extrabold text-purple-300">
-                {(summary.totalActualCor / 1000).toFixed(1)} <span className="text-sm font-normal text-slate-300">Ton</span>
+              <div className="text-3xl font-extrabold text-emerald-400">
+                +{(summary.totalSurplusFG / 1000).toFixed(1)} <span className="text-sm font-normal text-slate-300">Ton</span>
               </div>
-              <div className="text-[11px] text-purple-300/80 font-bold">
-                ⚡ BEBAS DINAIKKAN (Sisa Jadi Stok)
+              <div className="text-[11px] text-emerald-300/90 font-medium">
+                +<strong>{summary.totalSurplusFG.toLocaleString('id-ID')} KG</strong> beras baru siap jadi stok gudang
               </div>
             </div>
           </div>
@@ -450,18 +453,19 @@ export const FinishedGoodsBufferScreen: React.FC = () => {
                 <thead>
                   <tr className="bg-[#272735] text-[#c3c3cc] font-mono text-[11px] border-b border-[#70707d]/30">
                     <th className="p-3">PRODUK &amp; KEMASAN</th>
-                    <th className="p-3 text-right">TARGET DO</th>
-                    <th className="p-3 text-right">STOK GUDANG JADI</th>
-                    <th className="p-3 text-right">KEKURANGAN BERAS</th>
+                    <th className="p-3 text-right">TARGET DO (KG)</th>
+                    <th className="p-3 text-right">STOK GUDANG JADI (KG)</th>
+                    <th className="p-3 text-right">KEKURANGAN (KG)</th>
                     <th className="p-3 text-center">RENDEMEN</th>
-                    <th className="p-3 text-right bg-amber-950/40 text-amber-300 font-bold border-x border-amber-800/40">
-                      MINIMAL COR ASALAN
+                    <th className="p-3 text-center bg-amber-950/40 text-amber-300 font-bold border-x border-amber-800/40 min-w-[220px]">
+                      RENCANA COR ASALAN (KG)<br/>
+                      <span className="text-[10px] text-amber-400 font-normal">Bisa Diedit / Dinaikkan untuk Stok</span>
                     </th>
-                    <th className="p-3 text-center bg-purple-950/40 text-purple-300 font-bold border-r border-purple-800/40">
-                      REALISASI COR MANDOR
+                    <th className="p-3">SUMBER STAPEL</th>
+                    <th className="p-3 text-right bg-emerald-950/30 text-emerald-300 font-bold">
+                      SURPLUS STOK GUDANG<br/>
+                      <span className="text-[10px] text-emerald-400 font-normal">Sisa beras setelah DO</span>
                     </th>
-                    <th className="p-3">SUMBER STAPEL ASALAN</th>
-                    <th className="p-3 text-right">SISA BUFFER SETELAH KIRIM</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#70707d]/20 font-medium">
@@ -543,33 +547,39 @@ export const FinishedGoodsBufferScreen: React.FC = () => {
                           </div>
                         </td>
 
-                        {/* Minimal Cor Asalan (Kunci Batas Bawah) */}
-                        <td className="p-3 text-right font-extrabold text-amber-300 text-sm bg-amber-950/20 border-x border-amber-800/30">
-                          {row.minAsalanCorKg.toLocaleString('id-ID')} <span className="text-[10px] font-normal text-amber-400/70">KG</span>
-                        </td>
-
-                        {/* Realisasi Cor Mandor (Bisa Dinaikkan) */}
-                        <td className={`p-3 text-center bg-purple-950/20 border-r border-purple-800/30 ${row.isActualBelowMin ? 'bg-rose-950/40 ring-2 ring-rose-500' : ''}`}>
+                        {/* Rencana Cor Asalan (Bisa Diedit & Dinaikkan) */}
+                        <td className={`p-3 text-center bg-amber-950/20 border-x border-amber-800/30 ${row.isActualBelowMin ? 'bg-rose-950/40 ring-2 ring-rose-500' : ''}`}>
                           <div className="space-y-1">
-                            <input 
-                              type="number"
-                              min={row.minAsalanCorKg}
-                              step={500}
-                              value={row.actualAsalanKg}
-                              onChange={(e) => handleUpdateRow(row.product.id, 'actualAsalanKg', Number(e.target.value) || 0)}
-                              className={`w-28 p-2 rounded-xl text-center font-extrabold text-sm outline-none transition ${
-                                row.isActualBelowMin 
-                                  ? 'bg-rose-900 text-white border-2 border-rose-400' 
-                                  : 'bg-[#272735] text-purple-200 border border-purple-500/50 focus:border-purple-400'
-                              }`}
-                            />
-                            <div className="text-[10px] font-bold">
+                            <div className="flex items-center justify-center space-x-1">
+                              <input 
+                                type="number"
+                                min={row.minAsalanCorKg}
+                                step={500}
+                                value={row.actualAsalanKg}
+                                onChange={(e) => handleUpdateRow(row.product.id, 'actualAsalanKg', Number(e.target.value) || 0)}
+                                className={`w-32 p-2 rounded-xl text-center font-black text-sm outline-none transition ${
+                                  row.isActualBelowMin 
+                                    ? 'bg-rose-900 text-white border-2 border-rose-400' 
+                                    : row.actualAsalanKg > row.minAsalanCorKg
+                                    ? 'bg-amber-500 text-slate-950 border-2 border-amber-300 font-black shadow-[0_0_12px_rgba(251,191,36,0.35)]'
+                                    : 'bg-[#272735] text-amber-200 border border-amber-500/50 focus:border-amber-400'
+                                }`}
+                              />
+                              <span className="text-slate-400 text-xs font-bold">KG</span>
+                            </div>
+                            <div className="text-[10px]">
                               {row.isActualBelowMin ? (
-                                <span className="text-rose-400 font-extrabold block">Kurang {row.minAsalanCorKg - row.actualAsalanKg} KG!</span>
+                                <span className="text-rose-400 font-extrabold block">
+                                  ⚠️ Kurang {(row.minAsalanCorKg - row.actualAsalanKg).toLocaleString('id-ID')} KG dari minimal DO!
+                                </span>
                               ) : row.actualAsalanKg > row.minAsalanCorKg ? (
-                                <span className="text-emerald-400 font-bold block">+{(row.actualAsalanKg - row.minAsalanCorKg).toLocaleString('id-ID')} KG Surplus Cor</span>
+                                <span className="text-amber-300 font-bold block">
+                                  ⚡ Naik +{(row.actualAsalanKg - row.minAsalanCorKg).toLocaleString('id-ID')} KG untuk stok
+                                </span>
                               ) : (
-                                <span className="text-slate-400 block">Pas Target Minimal</span>
+                                <span className="text-slate-400 font-medium block">
+                                  (Pas batas minimal DO: {row.minAsalanCorKg.toLocaleString('id-ID')} KG)
+                                </span>
                               )}
                             </div>
                           </div>
@@ -591,8 +601,15 @@ export const FinishedGoodsBufferScreen: React.FC = () => {
                         </td>
 
                         {/* Sisa Buffer Setelah Kirim */}
-                        <td className="p-3 text-right font-extrabold text-sm text-emerald-300">
-                          +{row.surplusFgAfterCor.toLocaleString('id-ID')} <span className="text-[10px] font-normal text-slate-400">KG</span>
+                        <td className="p-3 text-right font-extrabold text-sm text-emerald-300 bg-emerald-950/15">
+                          <div>+{row.surplusFgAfterCor.toLocaleString('id-ID')} <span className="text-[10px] font-normal text-slate-400">KG</span></div>
+                          <div className="text-[10px] text-slate-400 font-normal">
+                            {row.actualAsalanKg > 0 ? (
+                              <span>Hasil: {Math.round(row.actualAsalanKg * (row.estYieldPct / 100)).toLocaleString('id-ID')} KG Beras</span>
+                            ) : (
+                              <span>Tidak cor baru</span>
+                            )}
+                          </div>
                         </td>
                       </tr>
                     );

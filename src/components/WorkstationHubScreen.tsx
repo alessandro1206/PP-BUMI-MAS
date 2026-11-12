@@ -28,9 +28,11 @@ export const WorkstationHubScreen: React.FC = () => {
   };
 
   const isSuperAdmin = currentUser?.role === 'SUPER_ADMIN';
-  const isOwner = currentUser?.role === 'OWNER' || isSuperAdmin;
-  const isAdmin1 = currentUser?.role === 'ADMIN1' || isSuperAdmin;
-  const isAdmin2 = currentUser?.role === 'ADMIN2' || isSuperAdmin;
+  const showAdmin1 = isSuperAdmin || currentUser?.role === 'ADMIN1';
+  const showAdmin2 = isSuperAdmin || currentUser?.role === 'ADMIN2';
+  const showOwner = isSuperAdmin || currentUser?.role === 'OWNER';
+  const showSuperAdmin = isSuperAdmin;
+  const visibleCardsCount = [showAdmin1, showAdmin2, showOwner, showSuperAdmin].filter(Boolean).length;
 
   const currentDateFormatted = new Intl.DateTimeFormat('id-ID', {
     weekday: 'long',
@@ -143,18 +145,21 @@ export const WorkstationHubScreen: React.FC = () => {
       </section>
 
       {/* =========================================================================
-          GRID: 4 VIBRANT FROSTED GLASS WORKSTATION CONSOLES
+          GRID: VIBRANT FROSTED GLASS WORKSTATION CONSOLES (Role Filtered)
           ========================================================================= */}
-      <section className="relative z-10 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+      <section className={`relative z-10 grid gap-6 ${
+        visibleCardsCount === 1 
+          ? 'grid-cols-1 max-w-xl mx-auto w-full' 
+          : visibleCardsCount === 2 
+          ? 'grid-cols-1 md:grid-cols-2 max-w-4xl mx-auto w-full'
+          : 'grid-cols-1 md:grid-cols-2 xl:grid-cols-4'
+      }`}>
         
         {/* =========================================================================
             Workstation 1: Pos Timbangan & Kasir (Admin 1) - Vivid Emerald Glass
             ========================================================================= */}
-        <div className={`p-6 rounded-3xl backdrop-blur-2xl transition-all duration-300 flex flex-col justify-between space-y-6 ${
-          isAdmin1 
-            ? 'bg-gradient-to-b from-emerald-500/[0.22] via-white/[0.1] to-emerald-950/[0.35] border border-emerald-400/60 hover:border-emerald-300 shadow-[0_16px_40px_0_rgba(16,185,129,0.3),inset_0_1.5px_2px_0_rgba(255,255,255,0.45)] hover:scale-[1.01]' 
-            : 'bg-white/[0.05] border border-white/15 opacity-60'
-        }`}>
+        {showAdmin1 && (
+        <div className="p-6 rounded-3xl backdrop-blur-2xl transition-all duration-300 flex flex-col justify-between space-y-6 bg-gradient-to-b from-emerald-500/[0.22] via-white/[0.1] to-emerald-950/[0.35] border border-emerald-400/60 hover:border-emerald-300 shadow-[0_16px_40px_0_rgba(16,185,129,0.3),inset_0_1.5px_2px_0_rgba(255,255,255,0.45)] hover:scale-[1.01]">
           <div className="space-y-4">
             
             <div className="flex items-center justify-between">
@@ -247,15 +252,13 @@ export const WorkstationHubScreen: React.FC = () => {
             <ChevronRight className="w-4 h-4 text-white group-hover:translate-x-1 transition-transform" />
           </button>
         </div>
+        )}
 
         {/* =========================================================================
             Workstation 2: Gudang, Beras & Karung (Admin 2) - Vivid Amber / Gold Glass
             ========================================================================= */}
-        <div className={`p-6 rounded-3xl backdrop-blur-2xl transition-all duration-300 flex flex-col justify-between space-y-6 ${
-          isAdmin2 
-            ? 'bg-gradient-to-b from-amber-500/[0.22] via-white/[0.1] to-amber-950/[0.35] border border-amber-400/60 hover:border-amber-300 shadow-[0_16px_40px_0_rgba(245,158,11,0.3),inset_0_1.5px_2px_0_rgba(255,255,255,0.45)] hover:scale-[1.01]' 
-            : 'bg-white/[0.05] border border-white/15 opacity-60'
-        }`}>
+        {showAdmin2 && (
+        <div className="p-6 rounded-3xl backdrop-blur-2xl transition-all duration-300 flex flex-col justify-between space-y-6 bg-gradient-to-b from-amber-500/[0.22] via-white/[0.1] to-amber-950/[0.35] border border-amber-400/60 hover:border-amber-300 shadow-[0_16px_40px_0_rgba(245,158,11,0.3),inset_0_1.5px_2px_0_rgba(255,255,255,0.45)] hover:scale-[1.01]">
           <div className="space-y-4">
             
             <div className="flex items-center justify-between">
@@ -348,15 +351,13 @@ export const WorkstationHubScreen: React.FC = () => {
             <ChevronRight className="w-4 h-4 text-slate-950 group-hover:translate-x-1 transition-transform" />
           </button>
         </div>
+        )}
 
         {/* =========================================================================
             Workstation 3: Konsol Pemilik & Keuangan (Owner) - Vivid Royal Indigo Glass
             ========================================================================= */}
-        <div className={`p-6 rounded-3xl backdrop-blur-2xl transition-all duration-300 flex flex-col justify-between space-y-6 ${
-          isOwner 
-            ? 'bg-gradient-to-b from-indigo-500/[0.25] via-white/[0.1] to-purple-950/[0.35] border border-indigo-400/60 hover:border-indigo-300 shadow-[0_16px_40px_0_rgba(99,102,241,0.3),inset_0_1.5px_2px_0_rgba(255,255,255,0.45)] hover:scale-[1.01]' 
-            : 'bg-white/[0.05] border border-white/15 opacity-60'
-        }`}>
+        {showOwner && (
+        <div className="p-6 rounded-3xl backdrop-blur-2xl transition-all duration-300 flex flex-col justify-between space-y-6 bg-gradient-to-b from-indigo-500/[0.25] via-white/[0.1] to-purple-950/[0.35] border border-indigo-400/60 hover:border-indigo-300 shadow-[0_16px_40px_0_rgba(99,102,241,0.3),inset_0_1.5px_2px_0_rgba(255,255,255,0.45)] hover:scale-[1.01]">
           <div className="space-y-4">
             
             <div className="flex items-center justify-between">
@@ -448,15 +449,13 @@ export const WorkstationHubScreen: React.FC = () => {
             <ChevronRight className="w-4 h-4 text-white group-hover:translate-x-1 transition-transform" />
           </button>
         </div>
+        )}
 
         {/* =========================================================================
             Workstation 4: Akuntansi & Pajak SAK EMKM (Super Admin) - Vivid Cyan Glass
             ========================================================================= */}
-        <div className={`p-6 rounded-3xl backdrop-blur-2xl transition-all duration-300 flex flex-col justify-between space-y-6 ${
-          isSuperAdmin 
-            ? 'bg-gradient-to-b from-cyan-500/[0.25] via-white/[0.1] to-blue-950/[0.35] border border-cyan-400/60 hover:border-cyan-300 shadow-[0_16px_40px_0_rgba(6,182,212,0.3),inset_0_1.5px_2px_0_rgba(255,255,255,0.45)] hover:scale-[1.01]' 
-            : 'bg-white/[0.05] border border-white/15 opacity-60'
-        }`}>
+        {showSuperAdmin && (
+        <div className="p-6 rounded-3xl backdrop-blur-2xl transition-all duration-300 flex flex-col justify-between space-y-6 bg-gradient-to-b from-cyan-500/[0.25] via-white/[0.1] to-blue-950/[0.35] border border-cyan-400/60 hover:border-cyan-300 shadow-[0_16px_40px_0_rgba(6,182,212,0.3),inset_0_1.5px_2px_0_rgba(255,255,255,0.45)] hover:scale-[1.01]">
           <div className="space-y-4">
             
             <div className="flex items-center justify-between">
@@ -541,6 +540,7 @@ export const WorkstationHubScreen: React.FC = () => {
             <ChevronRight className="w-4 h-4 text-slate-950 group-hover:translate-x-1 transition-transform" />
           </button>
         </div>
+        )}
 
       </section>
 
