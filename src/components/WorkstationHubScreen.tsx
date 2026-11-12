@@ -116,9 +116,8 @@ export const WorkstationHubScreen: React.FC = () => {
                 <div className="w-7 h-7 rounded-full bg-emerald-400/30 border border-emerald-300/60 flex items-center justify-center shadow-[0_0_12px_rgba(52,211,153,0.4)]">
                   <UserCheck className="w-4 h-4 text-emerald-200" />
                 </div>
-                <span>{currentUser ? currentUser.name : 'Staf Internal'}</span>
-                <span className="text-[11px] font-mono px-2.5 py-0.5 rounded-full backdrop-blur-md bg-emerald-500/30 border border-emerald-300/50 text-emerald-100 font-extrabold shadow-xs">
-                  {getRoleLabel(currentUser?.role)}
+                <span className="text-sm font-bold text-white">
+                  {currentUser ? currentUser.name : 'Staf Internal Pabrik'}
                 </span>
               </div>
             </div>

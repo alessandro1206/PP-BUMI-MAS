@@ -142,10 +142,10 @@ export const defaultCOAList: AccountCOA[] = [
 ];
 
 export const initialUserAccounts: UserAccount[] = [
-  { id: 'u-super', username: 'superadmin', name: 'Super Admin (Akses Penuh + Pajak)', role: 'SUPER_ADMIN', password: 'super123' },
-  { id: 'u-owner', username: 'owner', name: 'Bpk. Hartanto (Owner)', role: 'OWNER', password: 'owner123' },
-  { id: 'u-admin1', username: 'admin1', name: 'Mbak Rina (Admin Kantor)', role: 'ADMIN1', password: 'admin123' },
-  { id: 'u-admin2', username: 'admin2', name: 'Cak Mat (Checker Lapangan)', role: 'ADMIN2', password: 'admin234' }
+  { id: 'u-super', username: 'superadmin', name: 'Super Admin', role: 'SUPER_ADMIN', password: 'super123' },
+  { id: 'u-owner', username: 'owner', name: 'Bpk. Hartanto', role: 'OWNER', password: 'owner123' },
+  { id: 'u-admin1', username: 'admin1', name: 'Staf Pos Timbangan & Kasir', role: 'ADMIN1', password: 'admin123' },
+  { id: 'u-admin2', username: 'admin2', name: 'Mandor Gudang & Produksi', role: 'ADMIN2', password: 'admin234' }
 ];
 
 const initialSuppliers: Supplier[] = [
@@ -203,7 +203,12 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // User Authentication & Screen Persistence
   const [currentUser, setCurrentUser] = useState<UserAccount | null>(() => {
-    return loadStorage<UserAccount | null>('bumimas_erp_current_user', null);
+    const raw = loadStorage<UserAccount | null>('bumimas_erp_current_user', null);
+    if (!raw) return null;
+    let name = raw.name;
+    if (name.includes('Rina')) name = 'Staf Pos Timbangan & Kasir';
+    if (name.includes('Cak Mat')) name = 'Mandor Gudang & Produksi';
+    return { ...raw, name };
   });
 
   const [role, setRole] = useState<RoleType>(() => {
@@ -232,7 +237,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [userAccounts, setUserAccounts] = useState<UserAccount[]>(() => {
     const saved = loadStorage<UserAccount[] | null>('bumimas_erp_user_accounts', null);
     if (saved && Array.isArray(saved) && saved.length > 0) {
-      return saved;
+      return saved.map(u => ({
+        ...u,
+        name: u.name.includes('Rina') ? 'Staf Pos Timbangan & Kasir' : u.name.includes('Cak Mat') ? 'Mandor Gudang & Produksi' : u.name
+      }));
     }
     return initialUserAccounts;
   });

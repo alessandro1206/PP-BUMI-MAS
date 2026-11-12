@@ -366,7 +366,7 @@ export const Header: React.FC = () => {
               <div className="hidden lg:flex items-center space-x-2 bg-[#1e1e2a] px-3.5 py-1.5 rounded-full border border-[#70707d]/30 text-xs">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#5266eb] animate-pulse"></span>
                 <span className="text-[#c3c3cc]">
-                  {currentUser ? `${currentUser.name} (${currentUser.role})` : 'Akses Publik'}
+                  {currentUser ? currentUser.name : 'Akses Publik'}
                 </span>
               </div>
             )}
