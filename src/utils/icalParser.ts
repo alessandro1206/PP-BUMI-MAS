@@ -242,6 +242,18 @@ export async function fetchIcalWithProxies(originalUrl: string): Promise<string>
 
   const errors: string[] = [];
 
+  // Attempt 0: Internal Vercel API Proxy (server-side, completely bypasses browser CORS)
+  try {
+    const proxyUrl = `/api/ical-proxy?url=${encodeURIComponent(cleanUrl)}`;
+    const res = await fetch(proxyUrl);
+    if (res.ok) {
+      const text = await res.text();
+      if (text.includes('BEGIN:VCALENDAR')) return text;
+    }
+  } catch (e: any) {
+    errors.push(`Internal Proxy: ${e?.message || 'Failed'}`);
+  }
+
   // Attempt 1: Direct fetch
   try {
     const res = await fetch(cleanUrl);
