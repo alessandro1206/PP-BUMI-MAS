@@ -34,6 +34,14 @@ export const WorkstationHubScreen: React.FC = () => {
   const showSuperAdmin = isSuperAdmin;
   const visibleCardsCount = [showAdmin1, showAdmin2, showOwner, showSuperAdmin].filter(Boolean).length;
 
+  const getRoleLabel = (r?: RoleType) => {
+    if (r === 'ADMIN1') return 'Pos Timbangan & Kasir Kecil';
+    if (r === 'ADMIN2') return 'Gudang & Produksi Milling';
+    if (r === 'OWNER') return 'Kas Utama & Keuangan';
+    if (r === 'SUPER_ADMIN') return 'Super Admin';
+    return 'Staf Operasional Pabrik';
+  };
+
   const currentDateFormatted = new Intl.DateTimeFormat('id-ID', {
     weekday: 'long',
     day: 'numeric',
@@ -110,7 +118,7 @@ export const WorkstationHubScreen: React.FC = () => {
                 </div>
                 <span>{currentUser ? currentUser.name : 'Staf Internal'}</span>
                 <span className="text-[11px] font-mono px-2.5 py-0.5 rounded-full backdrop-blur-md bg-emerald-500/30 border border-emerald-300/50 text-emerald-100 font-extrabold shadow-xs">
-                  {currentUser?.role || 'OPERATOR'}
+                  {getRoleLabel(currentUser?.role)}
                 </span>
               </div>
             </div>
@@ -166,22 +174,19 @@ export const WorkstationHubScreen: React.FC = () => {
               <div className="w-13 h-13 rounded-2xl backdrop-blur-xl bg-emerald-400/30 border border-emerald-300/60 flex items-center justify-center text-emerald-100 shadow-[0_0_24px_rgba(52,211,153,0.55)]">
                 <Scale className="w-7 h-7" />
               </div>
-              <span className="text-[11px] font-mono px-3 py-1 rounded-full backdrop-blur-md bg-emerald-400/30 text-emerald-100 border border-emerald-300/60 font-extrabold tracking-wider shadow-[0_0_14px_rgba(52,211,153,0.4)]">
-                ADMIN 1
-              </span>
             </div>
 
             <div>
               <h3 className="font-extrabold text-white text-xl tracking-tight drop-shadow-sm">
-                Pos Timbangan &amp; Kasir
+                Pos Timbangan &amp; Kasir Kecil
               </h3>
               <p className="text-xs font-mono text-emerald-200 mt-0.5 font-bold">
-                Operasional Penimbangan &amp; DO
+                Operasional Penimbangan &amp; DO Pabrik
               </p>
             </div>
 
             <p className="text-xs text-slate-100 leading-relaxed font-normal">
-              Pencatatan penimbangan truk gabah dan beras jadi (Bruto, Tara, Netto), penerbitan tiket timbang resmi (STT), surat jalan (DO), dan kasir pelunasan toko.
+              Pencatatan penimbangan truk gabah dan beras jadi (Bruto, Tara, Netto), penerbitan tiket timbang resmi (STT), surat jalan (DO), serta kasir kecil operasional harian pabrik.
             </p>
 
             {/* Frosted Glass Module Shortcuts */}
@@ -202,9 +207,9 @@ export const WorkstationHubScreen: React.FC = () => {
                   type="button"
                   onClick={() => handleEnterWorkstation('ADMIN1', 'SCREEN_31')}
                   className="px-2.5 py-2 backdrop-blur-md bg-white/[0.12] hover:bg-white/[0.22] text-white rounded-xl text-left transition truncate border border-white/20 font-medium hover:border-emerald-300/60 shadow-xs focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:outline-none"
-                  title="Kasir Tunai Toko"
+                  title="Kasir Kecil Operasional Pabrik"
                 >
-                  • Kasir Tunai Toko
+                  • Kasir Kecil Pabrik
                 </button>
                 <button
                   type="button"
@@ -218,9 +223,9 @@ export const WorkstationHubScreen: React.FC = () => {
                   type="button"
                   onClick={() => handleEnterWorkstation('ADMIN1', 'SCREEN_RECEIVABLES')}
                   className="px-2.5 py-2 backdrop-blur-md bg-white/[0.12] hover:bg-white/[0.22] text-white rounded-xl text-left transition truncate border border-white/20 font-medium hover:border-emerald-300/60 shadow-xs focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:outline-none"
-                  title="Piutang Toko"
+                  title="Piutang Customer Pabrik"
                 >
-                  • Piutang Toko
+                  • Piutang Customer
                 </button>
                 <button
                   type="button"
@@ -248,7 +253,7 @@ export const WorkstationHubScreen: React.FC = () => {
             onClick={() => handleEnterWorkstation('ADMIN1', 'SCREEN_16')}
             className="w-full py-3.5 px-4 backdrop-blur-xl bg-emerald-500 hover:bg-emerald-400 text-white text-xs font-extrabold rounded-2xl transition flex items-center justify-between border border-emerald-300/60 shadow-[0_6px_24px_rgba(16,185,129,0.55),inset_0_1px_0_rgba(255,255,255,0.45)] focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:outline-none group"
           >
-            <span>Buka Pos Timbangan &amp; DO</span>
+            <span>Buka Pos Timbangan &amp; Kantor</span>
             <ChevronRight className="w-4 h-4 text-white group-hover:translate-x-1 transition-transform" />
           </button>
         </div>
@@ -265,17 +270,14 @@ export const WorkstationHubScreen: React.FC = () => {
               <div className="w-13 h-13 rounded-2xl backdrop-blur-xl bg-amber-400/30 border border-amber-300/60 flex items-center justify-center text-amber-100 shadow-[0_0_24px_rgba(251,191,36,0.55)]">
                 <Package className="w-7 h-7" />
               </div>
-              <span className="text-[11px] font-mono px-3 py-1 rounded-full backdrop-blur-md bg-amber-400/30 text-amber-100 border border-amber-300/60 font-extrabold tracking-wider shadow-[0_0_14px_rgba(251,191,36,0.4)]">
-                ADMIN 2
-              </span>
             </div>
 
             <div>
               <h3 className="font-extrabold text-white text-xl tracking-tight drop-shadow-sm">
-                Gudang, Beras &amp; Karung
+                Gudang &amp; Produksi Milling
               </h3>
               <p className="text-xs font-mono text-amber-200 mt-0.5 font-bold">
-                Produksi Milling &amp; Logistik
+                Produksi Milling &amp; Logistik Pabrik
               </p>
             </div>
 
@@ -364,29 +366,24 @@ export const WorkstationHubScreen: React.FC = () => {
               <div className="w-13 h-13 rounded-2xl backdrop-blur-xl bg-indigo-400/30 border border-indigo-300/60 flex items-center justify-center text-indigo-100 shadow-[0_0_24px_rgba(129,140,248,0.55)]">
                 <Shield className="w-7 h-7" />
               </div>
-              <div className="flex items-center space-x-1.5">
-                {pendingTransferCount > 0 && (
-                  <span className="px-2.5 py-1 rounded-full backdrop-blur-md bg-rose-500/35 text-rose-100 border border-rose-300/60 text-[10px] font-mono font-extrabold shadow-[0_0_14px_rgba(244,63,94,0.4)]">
-                    {pendingTransferCount} antri
-                  </span>
-                )}
-                <span className="text-[11px] font-mono px-3 py-1 rounded-full backdrop-blur-md bg-indigo-400/30 text-indigo-100 border border-indigo-300/60 font-extrabold tracking-wider shadow-[0_0_14px_rgba(129,140,248,0.4)]">
-                  OWNER
+              {pendingTransferCount > 0 && (
+                <span className="px-2.5 py-1 rounded-full backdrop-blur-md bg-rose-500/35 text-rose-100 border border-rose-300/60 text-[10px] font-mono font-extrabold shadow-[0_0_14px_rgba(244,63,94,0.4)]">
+                  {pendingTransferCount} antri transfer
                 </span>
-              </div>
+              )}
             </div>
 
             <div>
               <h3 className="font-extrabold text-white text-xl tracking-tight drop-shadow-sm">
-                Konsol Pemilik &amp; Keuangan
+                Kas Utama &amp; Keuangan Pabrik
               </h3>
               <p className="text-xs font-mono text-indigo-200 mt-0.5 font-bold">
-                Penetapan Harga &amp; Transfer Bank
+                Kasir Kas Utama, Penetapan Harga &amp; Bank
               </p>
             </div>
 
             <p className="text-xs text-slate-100 leading-relaxed font-normal">
-              Penetapan harga harian gabah kering giling (GKG), approval transfer m-banking suplier, verifikasi hutang toko, serta kontrol saldo kas dan rekening pabrik.
+              Kasir kas utama pabrik, penetapan harga harian gabah kering giling (GKG), approval transfer m-banking suplier, verifikasi piutang customer, serta kontrol saldo kas brankas dan rekening bank.
             </p>
 
             {/* Frosted Glass Module Shortcuts */}
@@ -433,7 +430,7 @@ export const WorkstationHubScreen: React.FC = () => {
                   className="col-span-2 px-2.5 py-2 backdrop-blur-md bg-indigo-400/30 hover:bg-indigo-400/45 text-indigo-50 rounded-xl text-left transition truncate border border-indigo-300/60 font-bold shadow-[0_0_14px_rgba(129,140,248,0.3)] focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:outline-none"
                   title="Laporan Keuangan Eksekutif"
                 >
-                  • Laporan Keuangan Owner
+                  • Laporan Kas &amp; Keuangan
                 </button>
               </div>
             </div>
@@ -445,7 +442,7 @@ export const WorkstationHubScreen: React.FC = () => {
             onClick={() => handleEnterWorkstation('OWNER', 'SCREEN_13')}
             className="w-full py-3.5 px-4 backdrop-blur-xl bg-indigo-500 hover:bg-indigo-400 text-white text-xs font-extrabold rounded-2xl transition flex items-center justify-between border border-indigo-300/60 shadow-[0_6px_24px_rgba(99,102,241,0.55),inset_0_1px_0_rgba(255,255,255,0.45)] focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:outline-none group"
           >
-            <span>Buka Konsol Owner</span>
+            <span>Buka Kas Utama &amp; Keuangan</span>
             <ChevronRight className="w-4 h-4 text-white group-hover:translate-x-1 transition-transform" />
           </button>
         </div>
@@ -462,9 +459,6 @@ export const WorkstationHubScreen: React.FC = () => {
               <div className="w-13 h-13 rounded-2xl backdrop-blur-xl bg-cyan-400/30 border border-cyan-300/60 flex items-center justify-center text-cyan-100 shadow-[0_0_24px_rgba(34,211,238,0.55)]">
                 <FileSpreadsheet className="w-7 h-7" />
               </div>
-              <span className="text-[11px] font-mono px-3 py-1 rounded-full backdrop-blur-md bg-cyan-400/30 text-cyan-100 border border-cyan-300/60 font-extrabold tracking-wider shadow-[0_0_14px_rgba(34,211,238,0.4)]">
-                SUPER ADMIN
-              </span>
             </div>
 
             <div>
@@ -472,7 +466,7 @@ export const WorkstationHubScreen: React.FC = () => {
                 Akuntansi &amp; Pajak SAK EMKM
               </h3>
               <p className="text-xs font-mono text-cyan-200 mt-0.5 font-bold">
-                Double-Entry &amp; Audit Log
+                Laporan Keuangan &amp; Audit Transaksi
               </p>
             </div>
 

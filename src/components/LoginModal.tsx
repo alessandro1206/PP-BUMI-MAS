@@ -125,7 +125,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ targetRole: initialRole,
                 <ArrowRight className="w-4 h-4 text-[#c3c3cc] group-hover:text-white transition" />
               </button>
 
-              {/* Icon 1: OWNER */}
+              {/* Icon 1: OWNER / KAS UTAMA */}
               <button
                 type="button"
                 onClick={() => handleSelectRole('OWNER')}
@@ -136,14 +136,14 @@ export const LoginModal: React.FC<LoginModalProps> = ({ targetRole: initialRole,
                     <Shield className="w-5 h-5 text-[#ededf3]" />
                   </div>
                   <div>
-                    <h4 className="font-normal text-[#ededf3] text-sm">1. Konsol Owner (Pemilik)</h4>
-                    <p className="text-[11px] text-[#c3c3cc]">Penetapan harga beras, approval hutang, dan transfer</p>
+                    <h4 className="font-normal text-[#ededf3] text-sm">1. Kasir Utama &amp; Keuangan Pabrik</h4>
+                    <p className="text-[11px] text-[#c3c3cc]">Kasir kas utama, penetapan harga beras, dan approval transfer bank</p>
                   </div>
                 </div>
                 <ArrowRight className="w-4 h-4 text-[#c3c3cc] group-hover:text-white transition" />
               </button>
 
-              {/* Icon 2: ADMIN 1 */}
+              {/* Icon 2: TIMBANGAN & KASIR KECIL */}
               <button
                 type="button"
                 onClick={() => handleSelectRole('ADMIN1')}
@@ -154,14 +154,14 @@ export const LoginModal: React.FC<LoginModalProps> = ({ targetRole: initialRole,
                     <Scale className="w-5 h-5 text-[#ededf3]" />
                   </div>
                   <div>
-                    <h4 className="font-normal text-[#ededf3] text-sm">2. Admin 1 (Kantor, Timbangan &amp; Gudang)</h4>
-                    <p className="text-[11px] text-[#c3c3cc]">Pos timbangan RS-232, DO, Gudang Barang Jadi &amp; Rencana Cor Min</p>
+                    <h4 className="font-normal text-[#ededf3] text-sm">2. Pos Timbangan &amp; Kasir Kecil Pabrik</h4>
+                    <p className="text-[11px] text-[#c3c3cc]">Penimbangan RS-232, kasir kecil operasional, DO, &amp; buffer cor min</p>
                   </div>
                 </div>
                 <ArrowRight className="w-4 h-4 text-[#c3c3cc] group-hover:text-white transition" />
               </button>
 
-              {/* Icon 3: ADMIN 2 */}
+              {/* Icon 3: GUDANG & PRODUKSI MILLING */}
               <button
                 type="button"
                 onClick={() => handleSelectRole('ADMIN2')}
@@ -172,8 +172,8 @@ export const LoginModal: React.FC<LoginModalProps> = ({ targetRole: initialRole,
                     <Smartphone className="w-5 h-5 text-[#ededf3]" />
                   </div>
                   <div>
-                    <h4 className="font-normal text-[#ededf3] text-sm">3. Admin 2 (HP Field Checker &amp; Cor)</h4>
-                    <p className="text-[11px] text-[#c3c3cc]">Perencanaan cor kiby, kontrol cor minimal gudang, sak, tally truk</p>
+                    <h4 className="font-normal text-[#ededf3] text-sm">3. Gudang &amp; Produksi Milling (Mandor)</h4>
+                    <p className="text-[11px] text-[#c3c3cc]">Perencanaan cor kiby, kontrol cor minimal gudang, sak, &amp; tally truk</p>
                   </div>
                 </div>
                 <ArrowRight className="w-4 h-4 text-[#c3c3cc] group-hover:text-white transition" />

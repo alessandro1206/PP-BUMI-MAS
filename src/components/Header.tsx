@@ -443,7 +443,7 @@ export const Header: React.FC = () => {
                         }`}
                       >
                         <Shield className="w-3.5 h-3.5 text-emerald-400" />
-                        <span>Owner</span>
+                        <span>Kas Utama &amp; Keuangan</span>
                         {pendingCount > 0 && (
                           <span className="ml-1 px-1.5 py-0.2 bg-rose-500/90 text-white rounded-full text-[10px] font-mono">
                             {pendingCount}
@@ -462,7 +462,7 @@ export const Header: React.FC = () => {
                         }`}
                       >
                         <Scale className="w-3.5 h-3.5 text-emerald-400" />
-                        <span>Admin 1 (Timbangan)</span>
+                        <span>Timbangan &amp; Kasir Kecil</span>
                       </button>
                     )}
 
@@ -476,7 +476,7 @@ export const Header: React.FC = () => {
                         }`}
                       >
                         <Smartphone className="w-3.5 h-3.5 text-amber-400" />
-                        <span>Admin 2</span>
+                        <span>Gudang &amp; Produksi</span>
                       </button>
                     )}
                   </div>
@@ -596,7 +596,7 @@ export const Header: React.FC = () => {
             <div className="flex items-center space-x-1 font-medium overflow-x-auto py-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
               <span className="text-emerald-400 font-bold uppercase text-[11px] mr-2 flex items-center space-x-1 shrink-0 font-mono">
                 <Scale className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Tugas Admin 1:</span>
+                <span>Operasional Kantor:</span>
               </span>
 
               <button
@@ -647,7 +647,7 @@ export const Header: React.FC = () => {
                 }`}
               >
                 <Receipt className="w-3.5 h-3.5 text-emerald-400" />
-                <span>4. Kasir Piutang</span>
+                <span>4. Piutang Customer</span>
               </button>
 
               <button
