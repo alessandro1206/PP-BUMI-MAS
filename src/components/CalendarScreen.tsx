@@ -226,8 +226,8 @@ const DEFAULT_CALENDAR_EVENTS: CalendarEvent[] = [
 export const CalendarScreen: React.FC = () => {
   const { setActiveScreen, customers, deliveryOrders } = useApp();
 
-  // Current viewed month and year
-  const [currentDate, setCurrentDate] = useState<Date>(() => new Date(2026, 9, 13)); // Default Oct 2026
+  // Current viewed month and year (defaults dynamically to today's date)
+  const [currentDate, setCurrentDate] = useState<Date>(() => new Date());
   const [viewMode, setViewMode] = useState<'MONTH' | 'AGENDA' | 'GCAL_WEB'>('MONTH');
 
   // Calendar events persisted in localStorage
@@ -265,7 +265,10 @@ export const CalendarScreen: React.FC = () => {
 
   // Form state
   const [formTitle, setFormTitle] = useState('');
-  const [formDate, setFormDate] = useState('2026-10-13');
+  const [formDate, setFormDate] = useState(() => {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  });
   const [formTime, setFormTime] = useState('09:00');
   const [formType, setFormType] = useState<CalendarEventType>('DO_DELIVERY');
   const [formStatus, setFormStatus] = useState<CalendarEventStatus>('PLANNED');
@@ -317,15 +320,6 @@ export const CalendarScreen: React.FC = () => {
       const merged = [...parsedEvents, ...nonDuplicatedOld];
       saveEvents(merged);
 
-      if (parsedEvents[0]?.date) {
-        const parts = parsedEvents[0].date.split('-');
-        const evYear = parseInt(parts[0], 10);
-        const evMonth = parseInt(parts[1], 10);
-        if (!isNaN(evYear) && !isNaN(evMonth)) {
-          setCurrentDate(new Date(evYear, evMonth - 1, 13));
-        }
-      }
-
       setSyncSuccessMsg(`Berhasil memuat ${parsedEvents.length} jadwal langsung dari Google Calendar Juwita!`);
     } catch (err: any) {
       console.error('Failed to sync iCal feed', err);
@@ -355,15 +349,6 @@ export const CalendarScreen: React.FC = () => {
         const merged = [...parsedEvents, ...nonDuplicatedOld];
         saveEvents(merged);
 
-        if (parsedEvents[0]?.date) {
-          const parts = parsedEvents[0].date.split('-');
-          const evYear = parseInt(parts[0], 10);
-          const evMonth = parseInt(parts[1], 10);
-          if (!isNaN(evYear) && !isNaN(evMonth)) {
-            setCurrentDate(new Date(evYear, evMonth - 1, 13));
-          }
-        }
-
         alert(`Berhasil mengimpor ${parsedEvents.length} jadwal dari berkas ${file.name}!`);
         setShowIcalSettingsModal(false);
       } catch (err: any) {
@@ -387,15 +372,6 @@ export const CalendarScreen: React.FC = () => {
       const merged = [...parsedEvents, ...nonDuplicatedOld];
       saveEvents(merged);
 
-      if (parsedEvents[0]?.date) {
-        const parts = parsedEvents[0].date.split('-');
-        const evYear = parseInt(parts[0], 10);
-        const evMonth = parseInt(parts[1], 10);
-        if (!isNaN(evYear) && !isNaN(evMonth)) {
-          setCurrentDate(new Date(evYear, evMonth - 1, 13));
-        }
-      }
-
       alert(`Berhasil mengimpor ${parsedEvents.length} jadwal dari teks iCal!`);
       setPastedIcsContent('');
       setShowIcalSettingsModal(false);
@@ -413,6 +389,11 @@ export const CalendarScreen: React.FC = () => {
     'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
   ];
 
+  const monthNamesShort = [
+    'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun',
+    'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'
+  ];
+
   const handlePrevMonth = () => {
     setCurrentDate(new Date(year, month - 1, 1));
   };
@@ -422,7 +403,7 @@ export const CalendarScreen: React.FC = () => {
   };
 
   const handleToday = () => {
-    setCurrentDate(new Date(2026, 9, 13)); // Match current project date Oct 13, 2026
+    setCurrentDate(new Date());
   };
 
   // Generate calendar days for month grid
@@ -430,6 +411,11 @@ export const CalendarScreen: React.FC = () => {
     const firstDayOfMonth = new Date(year, month, 1).getDay(); // 0 is Sunday
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const daysInPrevMonth = new Date(year, month, 0).getDate();
+
+    const today = new Date();
+    const todayYear = today.getFullYear();
+    const todayMonth = today.getMonth();
+    const todayDay = today.getDate();
 
     const grid: { dateStr: string; dayNum: number; isCurrentMonth: boolean; isToday: boolean }[] = [];
 
@@ -448,7 +434,7 @@ export const CalendarScreen: React.FC = () => {
       const mStr = String(month + 1).padStart(2, '0');
       const dStr = String(d).padStart(2, '0');
       const dateStr = `${year}-${mStr}-${dStr}`;
-      const isToday = (year === 2026 && month === 9 && d === 13);
+      const isToday = (year === todayYear && month === todayMonth && d === todayDay);
       grid.push({ dateStr, dayNum: d, isCurrentMonth: true, isToday });
     }
 
@@ -470,7 +456,9 @@ export const CalendarScreen: React.FC = () => {
     setIsNewEvent(true);
     setSelectedEvent(null);
     setFormTitle('9am Order Baru BM');
-    setFormDate(dateStr || `${year}-${String(month + 1).padStart(2, '0')}-13`);
+    const now = new Date();
+    const defaultDateStr = dateStr || `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    setFormDate(defaultDateStr);
     setFormTime('09:00');
     setFormType('DO_DELIVERY');
     setFormStatus('PLANNED');
@@ -877,7 +865,7 @@ export const CalendarScreen: React.FC = () => {
             onClick={handleToday}
             className="px-3.5 py-1.5 rounded-lg bg-[#272735] hover:bg-[#323244] text-xs font-bold text-emerald-400 border border-[#70707d]/30 transition"
           >
-            Hari Ini (13 Okt)
+            Hari Ini ({new Date().getDate()} {monthNamesShort[new Date().getMonth()]})
           </button>
 
           <button

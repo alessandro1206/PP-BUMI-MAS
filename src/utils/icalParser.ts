@@ -173,13 +173,15 @@ export function parseIcalFeed(rawIcs: string): CalendarEvent[] {
       type = 'GENERAL_NOTE';
     }
 
-    // Determine status: compare with project date 2026-10-13
+    // Determine status: compare with today's real date dynamically
+    const now = new Date();
+    const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
     let status: CalendarEventStatus = 'PLANNED';
     if (statusRaw === 'CANCELLED') {
       status = 'CANCELLED';
-    } else if (date < '2026-10-13') {
+    } else if (date < todayStr) {
       status = 'COMPLETED';
-    } else if (date === '2026-10-13') {
+    } else if (date === todayStr) {
       status = 'IN_PROGRESS';
     } else {
       status = 'PLANNED';
